@@ -23,7 +23,7 @@ module "lb_listener_rule" {
   path_pattern = ["/teams*"]
   tags = local.tags
   vpc_id = data.terraform_remote_state.core.outputs.vpc_id
-  priority = 2
+  priority = 4
 }
 
 module "fargate_autoscaling" {
