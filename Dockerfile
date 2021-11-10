@@ -5,7 +5,7 @@ ENV NAME fw-teams
 ENV USER fw-teams
 
 RUN apk update && apk upgrade && \
-    apk add --no-cache --update bash git openssh python alpine-sdk
+    apk add --no-cache --update bash git openssh alpine-sdk
 
 RUN addgroup $USER && adduser -s /bin/bash -D -G $USER $USER
 

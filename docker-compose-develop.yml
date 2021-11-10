@@ -10,17 +10,17 @@ services:
       NODE_PATH: app/src
       CT_REGISTER_MODE: auto
       CT_URL: http://mymachine:9000
-      LOCAL_URL: http://mymachine:3035
+      LOCAL_URL: http://127.0.0.1:3035
       MONGO_PORT_27017_TCP_ADDR: mongo
       REDIS_PORT_6379_TCP_ADDR: redis
       CT_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im1pY3Jvc2VydmljZSIsImNyZWF0ZWRBdCI6IjIwMTYtMDktMTQifQ.IRCIRm1nfIQTfda_Wb6Pg-341zhV8soAgzw7dd5HxxQ
       JWT_SECRET: reallyunguessablesecretkey
       API_VERSION: v1
-      API_GATEWAY_URL: http://mymachine:9000
-      API_GATEWAY_EXTERNAL_URL: http://mymachine:9000
-      API_GATEWAY_QUEUE_URL: redis://mymachine:6379
+      API_GATEWAY_URL: http://127.0.0.1:9000
+      API_GATEWAY_EXTERNAL_URL: http://127.0.0.1:9000
+      API_GATEWAY_QUEUE_URL: redis://redis:6379
       API_GATEWAY_QUEUE_NAME: mail
-      APP_URL: http://mymachine:3035
+      APP_URL: http://127.0.0.1:3035
       FASTLY_ENABLED: "false"
     command: develop
     volumes:
