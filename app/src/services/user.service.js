@@ -1,16 +1,22 @@
 const logger = require('logger');
-const { RWAPIMicroservice } = require('rw-api-microservice-node');
+const axios = require('axios');
+const loggedInUserService = require('./LoggedInUserService');
 
 class UserService {
 
     static async getEmailById(userId) {
         logger.info('Get user by user id', userId);
         try {
-            const user = await RWAPIMicroservice.requestToMicroservice({
-                uri: `/user/${userId}`,
+            let baseURL = process.env.USER_API_URL;
+            const response = await axios.default({
+                baseURL,
+                url: `/user/${userId}`,
                 method: 'GET',
-                json: true
+                headers: {
+                    'authorization': loggedInUserService.token
+                }
             });
+            const user = response.data;
             if (!user || !user.data) return null;
             logger.info('Get user by user id', user);
             return user.data ? user.data.attributes.email : null;

@@ -5,9 +5,9 @@ const config = require('config');
 const loader = require('loader');
 const mongoose = require('mongoose');
 const koaSimpleHealthCheck = require('koa-simple-healthcheck');
+const loggedInUserService = require('./services/LoggedInUserService')
 
 mongoose.Promise = Promise;
-// const { RWAPIMicroservice } = require('rw-api-microservice-node');
 const ErrorSerializer = require('serializers/error.serializer');
 
 const mongoUri = process.env.MONGO_URI || `mongodb://${config.get('mongodb.host')}:${config.get('mongodb.port')}/${config.get('mongodb.database')}`;
@@ -63,18 +63,10 @@ app.use(async (ctx, next) => {
 app.use(koaLogger());
 app.use(koaSimpleHealthCheck());
 
-// app.use(RWAPIMicroservice.bootstrap({
-//     name: config.get('service.name'),
-//     info: require('../microservice/register.json'),
-//     swagger: require('../microservice/public-swagger.json'),
-//     logger,
-//     baseURL: process.env.CT_URL,
-//     url: process.env.LOCAL_URL,
-//     token: process.env.CT_TOKEN,
-//     fastlyEnabled: process.env.FASTLY_ENABLED,
-//     fastlyServiceId: process.env.FASTLY_SERVICEID,
-//     fastlyAPIKey: process.env.FASTLY_APIKEY
-// }));
+app.use(async function(ctx, next) {
+    await loggedInUserService.setLoggedInUser(ctx, logger);
+    await next();
+})
 
 loader.loadRoutes(app);
 

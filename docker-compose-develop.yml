@@ -1,4 +1,4 @@
-version: "3"
+version: "3.5"
 services:
   develop:
     build: .
@@ -8,12 +8,11 @@ services:
     environment:
       PORT: 3035
       NODE_PATH: app/src
-      CT_REGISTER_MODE: auto
-      CT_URL: http://mymachine:9000
+      CT_URL: https://api.resourcewatch.org
       LOCAL_URL: http://127.0.0.1:3035
+      USER_API_URL: https://api.resourcewatch.org
       MONGO_PORT_27017_TCP_ADDR: mongo
       REDIS_PORT_6379_TCP_ADDR: redis
-      CT_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im1pY3Jvc2VydmljZSIsImNyZWF0ZWRBdCI6IjIwMTYtMDktMTQifQ.IRCIRm1nfIQTfda_Wb6Pg-341zhV8soAgzw7dd5HxxQ
       JWT_SECRET: reallyunguessablesecretkey
       API_VERSION: v1
       API_GATEWAY_URL: http://127.0.0.1:9000
@@ -28,6 +27,9 @@ services:
     depends_on:
       - mongo
       - redis
+    networks:
+      - gfw-teams-network
+      - gfw-network
 
   mongo:
     image: mongo:3.4
@@ -37,6 +39,8 @@ services:
     volumes:
       - $HOME/docker/data/fw-teams/mongodb:/data/db
     restart: always
+    networks:
+      - gfw-network
 
   redis:
     image: bitnami/redis
@@ -44,4 +48,11 @@ services:
       - "6379:6379"
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - gfw-teams-network
+networks:
+  gfw-teams-network:
+    name: gfw-teams-network
+  gfw-network:
+    name: gfw-network
 
