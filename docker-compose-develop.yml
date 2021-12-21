@@ -6,20 +6,19 @@ services:
     ports:
         - "3035:3035"
     environment:
-      PORT: 3035
       NODE_PATH: app/src
-      CT_URL: https://api.resourcewatch.org
-      LOCAL_URL: http://127.0.0.1:3035
-      USER_API_URL: https://api.resourcewatch.org
-      MONGO_PORT_27017_TCP_ADDR: mongo
-      REDIS_PORT_6379_TCP_ADDR: redis
+      NODE_ENV: dev
+      SUPPRESS_NO_CONFIG_WARNING: "true"
+      LOGGER_LEVEL: debug
+      SERVICE_PORT: 3035
       JWT_SECRET: reallyunguessablesecretkey
-      API_VERSION: v1
-      API_GATEWAY_URL: http://127.0.0.1:9000
-      API_GATEWAY_EXTERNAL_URL: http://127.0.0.1:9000
-      API_GATEWAY_QUEUE_URL: redis://redis:6379
-      API_GATEWAY_QUEUE_NAME: mail
+      MONGODB_HOST: mongo
+      MONGODB_PORT: 27017
+      REDIS_URL: redis://redis:6379
+      REDIS_QUEUE_NAME: mail
       APP_URL: http://127.0.0.1:3035
+      USERS_API_URL: https://api.resourcewatch.org
+      CONTROL_TOWER_URL: https://api.resourcewatch.org
     command: develop
     volumes:
       - ./app:/opt/fw-teams/app

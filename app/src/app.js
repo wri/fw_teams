@@ -10,7 +10,7 @@ const loggedInUserService = require('./services/LoggedInUserService')
 mongoose.Promise = Promise;
 const ErrorSerializer = require('serializers/error.serializer');
 
-const mongoUri = process.env.MONGO_URI || `mongodb://${config.get('mongodb.host')}:${config.get('mongodb.port')}/${config.get('mongodb.database')}`;
+const mongoUri = `mongodb://${config.get('mongodb.host')}:${config.get('mongodb.port')}/${config.get('mongodb.database')}`;
 const validate = require('koa-validate');
 
 const koaBody = require('koa-body')({
@@ -70,10 +70,10 @@ app.use(async function(ctx, next) {
 
 loader.loadRoutes(app);
 
-const server = app.listen(process.env.PORT, () => {
+const server = app.listen(config.get("service.port"), () => {
 
 });
 
-logger.info('Server started in ', process.env.PORT);
+logger.info('Server started in ', config.get("service.port"));
 
 module.exports = server;
