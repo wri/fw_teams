@@ -1,8 +1,0 @@
-{
-  "logger": {
-    "name": "fw-teams",
-    "level": "debug",
-    "toFile": false,
-    "dirLogFile": null
-  }
-}

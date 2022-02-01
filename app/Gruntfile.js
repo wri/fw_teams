@@ -10,9 +10,6 @@ module.exports = (grunt) => {
             dev: {
                 options: {
                     script: 'app/index.js',
-                    node_env: 'dev',
-                    port: process.env.PORT,
-                    output: 'started'
                 }
             }
         },
