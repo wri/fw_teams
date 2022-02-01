@@ -3,12 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "NODE_PATH=app/src node ./node_modules/.bin/grunt --gruntfile app/Gruntfile.js e2eTest",
-    "develop": "NODE_PATH=app/src node ./node_modules/.bin/grunt --gruntfile app/Gruntfile.js",
-    "start": "NODE_PATH=app/src node app/index.js",
-    "coverage": "NODE_PATH=app/src node ./node_modules/.bin/grunt --gruntfile app/Gruntfile.js nyc"
-  },
   "author": "Vizzuality",
   "engines": {
     "node": "~12"

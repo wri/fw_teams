@@ -4,7 +4,7 @@ This repository is the node skeleton microservice to create node microservice fo
 
 ## Dependencies
 
-The FW teams microservice is built using [Node.js](https://nodejs.org/en/), and can be executed ~~either natively~~ or using Docker, ~~each of which has its own set of requirements~~.
+The FW teams microservice is built using [Node.js](https://nodejs.org/en/), and can be executed ~~either natively or~~ using Docker~~, each of which has its own set of requirements~~.
 
 Execution using Docker requires:
 - [Docker](https://www.docker.com/)
@@ -28,8 +28,8 @@ After that, follow one of the instructions below:
 1 - Execute the following command to run ~~Control tower~~ Docker:
 
 ```
-make build
-make develop
+docker-compose -f docker-compose-develop.yml build
+docker-compose -f docker-compose-develop.yml up
 ```
 
 The endpoints provided by this microservice should now be available.
@@ -40,8 +40,8 @@ The endpoints provided by this microservice should now be available.
 
 Follow the instruction above for setting up the runtime environment for Docker execution, then run:
 ```
-make build
-make test
+docker-compose -f docker-compose-test.yml build
+docker-compose -f docker-compose-test.yml up --abort-on-container-exit
 ```
 
 ## Quick Overview

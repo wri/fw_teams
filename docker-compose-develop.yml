@@ -19,7 +19,6 @@ services:
       APP_URL: http://127.0.0.1:3035
       USERS_API_URL: https://api.resourcewatch.org
       CONTROL_TOWER_URL: https://api.resourcewatch.org
-    command: develop
     volumes:
       - ./app:/opt/fw-teams/app
     depends_on:
@@ -28,6 +27,7 @@ services:
     networks:
       - gfw-teams-network
       - gfw-network
+    command: node node_modules/.bin/grunt --gruntfile app/Gruntfile.js
 
   mongo:
     image: mongo:3.4

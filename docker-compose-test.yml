@@ -19,10 +19,10 @@ services:
       APP_URL: http://127.0.0.1:3035
       USERS_API_URL: http://127.0.0.1:9000
       CONTROL_TOWER_URL: http://127.0.0.1:9000
-    command: test
     depends_on:
       - mongo
       - redis
+    command: node node_modules/.bin/grunt --gruntfile app/Gruntfile.js e2eTest
 
   mongo:
     image: mongo:3.4
