@@ -10,6 +10,7 @@
   "keywords": [],
   "license": "MIT",
   "scripts": {
+    "preinstall": "node -e \"throw new Error('You must use Docker for local development, please refer to the README')\"",
     "lint": "eslint app --fix"
   },
   "devDependencies": {

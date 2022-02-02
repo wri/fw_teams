@@ -25,19 +25,25 @@ After that, follow one of the instructions below:
 
 ### Using Docker
 
-1 - Execute the following command to run ~~Control tower~~ Docker:
+1 - Execute the following command to run Docker:
 
 ```shell
-docker-compose -f docker-compose-develop.yml build
-docker-compose -f docker-compose-develop.yml up
+make up-and-build   # First time building Docker or you've made changes to the Dockerfile
+make up             # When Docker has already been built and you're starting from where you left off
 ```
 
-The endpoints provided by this microservice should now be available.
+The endpoints provided by this microservice should now be available: [localhost:3035](http://localhost:3035)
 
 2 - Run the following command to lint the project:
 
 ```shell
-docker-compose -f docker-compose-develop.yml run develop yarn run lint
+make lint
+```
+
+3 - To close Docker:
+
+```shell
+make down
 ```
 
 ## Testing
@@ -46,8 +52,7 @@ docker-compose -f docker-compose-develop.yml run develop yarn run lint
 
 Follow the instruction above for setting up the runtime environment for Docker execution, then run:
 ```shell
-docker-compose -f docker-compose-test.yml build
-docker-compose -f docker-compose-test.yml up --abort-on-container-exit
+make test
 ```
 
 ## Quick Overview
