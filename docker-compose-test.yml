@@ -6,25 +6,23 @@ services:
       - "3035:3035"
     container_name: fw-teams-test
     environment:
-      PORT: 3035
       NODE_PATH: app/src
       NODE_ENV: test
-      CT_URL: http://127.0.0.1:9000
-      LOCAL_URL: http://127.0.0.1:3035
-      USER_API_URL: http://127.0.0.1:9000
-      MONGO_PORT_27017_TCP_ADDR: mongo
-      REDIS_PORT_6379_TCP_ADDR: redis
+      SUPPRESS_NO_CONFIG_WARNING: "true"
+      LOGGER_LEVEL: debug
+      SERVICE_PORT: 3035
       JWT_SECRET: reallyunguessablesecretkey
-      API_VERSION: v1
-      API_GATEWAY_URL: http://127.0.0.1:9000
-      API_GATEWAY_EXTERNAL_URL: http://127.0.0.1:9000
-      API_GATEWAY_QUEUE_URL: redis://redis:6379
-      API_GATEWAY_QUEUE_NAME: mail
+      MONGODB_HOST: mongo
+      MONGODB_PORT: 27017
+      REDIS_URL: redis://redis:6379
+      REDIS_QUEUE_NAME: mail
       APP_URL: http://127.0.0.1:3035
-    command: test
+      USERS_API_URL: http://127.0.0.1:9000
+      CONTROL_TOWER_URL: http://127.0.0.1:9000
     depends_on:
       - mongo
       - redis
+    command: node node_modules/.bin/grunt --gruntfile app/Gruntfile.js e2eTest
 
   mongo:
     image: mongo:3.4

@@ -1,21 +1,28 @@
 {
-  "mongodb": {
-    "host": "MONGO_PORT_27017_TCP_ADDR",
-    "port": "MONGO_PORT_27017_TCP_PORT"
+  "logger": {
+    "level": "LOGGER_LEVEL"
+  },
+  "application": {
+    "url": "APP_URL"
   },
   "service": {
-    "port": "PORT"
+    "port": "SERVICE_PORT"
+  },
+  "mongodb": {
+    "host": "MONGODB_HOST",
+    "port": "MONGODB_PORT"
   },
   "jwt": {
     "token": "JWT_SECRET"
   },
-  "apiGateway": {
-    "uri": "API_GATEWAY_URI",
-    "externalUrl": "API_GATEWAY_EXTERNAL_URL",
-    "queueUrl": "API_GATEWAY_QUEUE_URL",
-    "queueName": "API_GATEWAY_QUEUE_NAME"
+  "redis": {
+    "url": "REDIS_URL",
+    "queueName": "REDIS_QUEUE_NAME"
   },
-  "application": {
-    "url": "APP_URL"
+  "usersApi": {
+    "url": "USERS_API_URL"
+  },
+  "controlTower": {
+    "url": "CONTROL_TOWER_URL"
   }
 }

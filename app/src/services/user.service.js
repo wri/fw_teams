@@ -1,13 +1,14 @@
 const logger = require('logger');
 const axios = require('axios');
 const loggedInUserService = require('./LoggedInUserService');
+const config = require('config');
 
 class UserService {
 
     static async getEmailById(userId) {
         logger.info('Get user by user id', userId);
         try {
-            let baseURL = process.env.USER_API_URL;
+            let baseURL = config.get("usersApi.url");
             const response = await axios.default({
                 baseURL,
                 url: `/user/${userId}`,

@@ -2,6 +2,7 @@ const axios = require('axios');
 // eslint-disable-next-line camelcase
 const response_error = require('../responses/response.error');
 require('logger');
+const config = require('config');
 
 class LoggedInUserService {
 
@@ -29,7 +30,7 @@ class LoggedInUserService {
         }
         try {
             this.token = ctx.request.header.authorization;
-            const baseURL = process.env.CT_URL;
+            const baseURL = config.get("ct.url");
             const getUserDetailsRequestConfig = {
                 method: 'GET',
                 baseURL,

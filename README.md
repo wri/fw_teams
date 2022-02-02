@@ -4,7 +4,7 @@ This repository is the node skeleton microservice to create node microservice fo
 
 ## Dependencies
 
-The FW teams microservice is built using [Node.js](https://nodejs.org/en/), and can be executed either natively or using Docker, each of which has its own set of requirements.
+The FW teams microservice is built using [Node.js](https://nodejs.org/en/), and can be executed ~~either natively or~~ using Docker~~, each of which has its own set of requirements~~.
 
 Execution using Docker requires:
 - [Docker](https://www.docker.com/)
@@ -25,13 +25,11 @@ After that, follow one of the instructions below:
 
 ### Using Docker
 
-1 - Create and complete your `dev.env` file with your configuration. The meaning of the variables is available in this [section](#configuration-environment-variables). You can find an example `dev.env.sample` file in the project root.
-
-2 - Execute the following command to run Control tower:
+1 - Execute the following command to run ~~Control tower~~ Docker:
 
 ```
-make build
-make develop
+docker-compose -f docker-compose-develop.yml build
+docker-compose -f docker-compose-develop.yml up
 ```
 
 The endpoints provided by this microservice should now be available.
@@ -42,23 +40,9 @@ The endpoints provided by this microservice should now be available.
 
 Follow the instruction above for setting up the runtime environment for Docker execution, then run:
 ```
-make build
-make test
+docker-compose -f docker-compose-test.yml build
+docker-compose -f docker-compose-test.yml up --abort-on-container-exit
 ```
-
-## Configuration
-
-It is necessary to define these environment variables:
-
-* CT_URL => Control Tower URL
-* NODE_ENV => Environment (prod, staging, dev)
-* JWT_SECRET => The secret used to generate JWT tokens.
-* API_GATEWAY_URI => Gateway Service API URL
-* API_GATEWAY_EXTERNAL_URI
-* API_GATEWAY_QUEUE_URL => Url of async queue
-* API_GATEWAY_QUEUE_NAME => mail
-
-You can optionally set other variables, see [this file](config/custom-environment-variables.json) for an extended list.
 
 ## Quick Overview
 
