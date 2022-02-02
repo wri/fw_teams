@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@2
+      uses: actions/checkout@v2
 
     - name: Start containers
       run: docker-compose -f "docker-compose-develop.yml" up -d --build
