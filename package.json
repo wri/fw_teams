@@ -60,13 +60,5 @@
     "rw-api-microservice-node": "^3.4.1",
     "vizz.async-client": "^1.0.0"
   },
-  "prettier": "@3sidedcube/prettier-config",
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.js": "eslint --cache --fix"
-  }
+  "prettier": "@3sidedcube/prettier-config"
 }
