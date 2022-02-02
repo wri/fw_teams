@@ -1,4 +1,3 @@
-/* eslint-disable import/no-dynamic-require */
 const fs = require("fs");
 
 const routersPath = `${__dirname}/routes`;
