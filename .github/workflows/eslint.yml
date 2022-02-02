@@ -10,12 +10,18 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        ref: ${{ github.head_ref }}
 
     - name: Start containers
       run: docker-compose -f "docker-compose-develop.yml" up -d --build
 
     - name: Run eslint
       run : docker-compose -f "docker-compose-develop.yml" run develop yarn run prettier:check
+
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Apply prettier changes
 
     - name: Stop containers
       if: always()
