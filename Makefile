@@ -12,5 +12,5 @@ down:
 lint:
 	docker-compose -f docker-compose-develop.yml run develop yarn run lint
 
-test:
+test-and-build:
 	docker-compose -f docker-compose-test.yml up -d --build --abort-on-container-exit

@@ -52,7 +52,7 @@ make down
 
 Follow the instruction above for setting up the runtime environment for Docker execution, then run:
 ```shell
-make test
+make test-and-build
 ```
 
 ## Quick Overview
