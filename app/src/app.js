@@ -1,5 +1,5 @@
-const Koa = require("koa");
-const logger = require("logger");
+const Koa = require('koa');
+const logger = require('logger');
 const koaLogger = require("koa-logger");
 const config = require("config");
 const loader = require("loader");
