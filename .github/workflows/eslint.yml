@@ -15,4 +15,8 @@ jobs:
       run: docker-compose -f "docker-compose-develop.yml" up -d --build
 
     - name: Run eslint
-      run : docker-compose -f "docker-compose-develop.yml" run develop node --version
+      run : docker-compose -f "docker-compose-develop.yml" run develop yarn run prettier:check
+
+    - name: Stop containers
+      if: always()
+      run: docker-compose -f "docker-compose-develop.yml" down

@@ -10,7 +10,8 @@
   "keywords": [],
   "license": "MIT",
   "scripts": {
-    "prettier": "prettier app --write"
+    "prettier": "prettier app --write",
+    "prettier:check": "prettier app --check"
   },
   "devDependencies": {
     "@3sidedcube/prettier-config": "^1.0.0",
