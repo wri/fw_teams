@@ -60,7 +60,8 @@ data "template_file" "container_definition" {
   vars = {
     environment = var.environment
     aws_region = var.region
-    image = "${module.app_docker_image.repository_url}:${local.container_tag}"
+    //image = "${module.app_docker_image.repository_url}:${local.container_tag}"
+    image = "nginx:latest"
     container_name = var.project_prefix
     container_port = var.container_port
     log_group = aws_cloudwatch_log_group.default.name
