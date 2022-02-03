@@ -50,6 +50,9 @@ variable "REDIS_QUEUE_NAME" {
   type    = string
   default = "mail"
 }
+variable "JWT_SECRET" {
+  type    = string
+}
 variable "NODE_PATH" {
   type    = string
   default = "src/app"

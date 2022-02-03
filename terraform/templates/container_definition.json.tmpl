@@ -9,7 +9,7 @@
       "value": "${environment}"
     },
     {
-      "name": "LOG_LEVEL",
+      "name": "LOGGER_LEVEL",
       "value": "${log_level}"
     },
      {
@@ -17,8 +17,8 @@
       "value": "${data_bucket}"
     },
     {
-      "name": "REDIS_ENDPOINT",
-      "value": "${redis_endpoint}"
+      "name": "REDIS_URL",
+      "value": "redis://${redis_endpoint}:${redis_port}"
     },
     {
       "name": "REDIS_QUEUE_NAME",
@@ -55,7 +55,7 @@
     {
       "name": "CONTROL_TOWER_URL",
       "value": "${CONTROL_TOWER_URL}"
-    },
+    }
   ],
   "secrets": [
     {

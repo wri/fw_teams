@@ -68,6 +68,7 @@ data "template_file" "container_definition" {
     db_secret_arn              = data.terraform_remote_state.core.outputs.document_db_secrets_arn
     data_bucket                = data.terraform_remote_state.fw_core.outputs.data_bucket
     redis_endpoint             = data.terraform_remote_state.core.outputs.redis_replication_group_primary_endpoint_address
+    redis_port                 = data.terraform_remote_state.core.outputs.redis_replication_group_port
     gfw_data_api_key           = data.terraform_remote_state.fw_core.outputs.gfw_data_api_key_secret_arn
     document_db_endpoint       = data.terraform_remote_state.core.outputs.document_db_endpoint
     document_db_port           = data.terraform_remote_state.core.outputs.document_db_port
@@ -75,7 +76,7 @@ data "template_file" "container_definition" {
     NODE_ENV                   = var.environment
     SUPPRESS_NO_CONFIG_WARNING = "true"
     SERVICE_PORT               = var.container_port
-    JWT_SECRET                 = from_github_secret
+    JWT_SECRET                 = var.JWT_SECRET
     redis_queue_name           = var.REDIS_QUEUE_NAME
     APP_URL                    = var.APP_URL
     USERS_API_URL              = var.USERS_API_URL
