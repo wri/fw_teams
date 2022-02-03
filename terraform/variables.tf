@@ -46,6 +46,26 @@ variable "auto_scaling_max_cpu_util" {
   type    = number
   default = 75
 }
+variable "REDIS_QUEUE_NAME" {
+  type    = string
+  default = "mail"
+}
+variable "NODE_PATH" {
+  type    = string
+  default = "src/app"
+}
+variable "APP_URL" {
+  type    = string
+  default = "http://127.0.0.1:3035"
+}
+variable "USERS_API_URL" {
+  type    = string
+  default = "https://api.resourcewatch.org"
+}
+variable "CONTROL_TOWER_URL" {
+  type    = string
+  default = "https://api.resourcewatch.org"
+}
 variable "auto_scaling_min_capacity" {
   type = number
 }
