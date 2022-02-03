@@ -75,7 +75,7 @@ data "template_file" "container_definition" {
     NODE_ENV                   = var.environment
     SUPPRESS_NO_CONFIG_WARNING = "true"
     SERVICE_PORT               = var.container_port
-    JWT_SECRET                 = from_github_secret
+    JWT_SECRET                 = var.JWT_SECRET
     redis_queue_name           = var.REDIS_QUEUE_NAME
     APP_URL                    = var.APP_URL
     USERS_API_URL              = var.USERS_API_URL
