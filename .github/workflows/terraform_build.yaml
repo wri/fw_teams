@@ -19,7 +19,6 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.aws_key_production }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_production }}
         AWS_REGION: ${{ secrets.aws_region_production }}
-        JWT_SECRET: ${{ secrets.fw_teams_jwt_secret_prod }}
       run: |
         ./scripts/infra plan
         ./scripts/infra apply
@@ -30,7 +29,6 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.aws_key_staging }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_staging }}
         AWS_REGION: ${{ secrets.aws_region_staging }}
-        JWT_SECRET: ${{ secrets.fw_teams_jwt_secret_staging }}
       run: |
         ./scripts/infra plan
         ./scripts/infra apply
@@ -41,7 +39,6 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.aws_key_dev }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_dev }}
         AWS_REGION: ${{ secrets.aws_region_dev }}
-        JWT_SECRET: ${{ secrets.fw_teams_jwt_secret_dev }}
       run: |
         ./scripts/infra plan
         ./scripts/infra apply
