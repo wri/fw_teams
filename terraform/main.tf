@@ -68,6 +68,7 @@ data "template_file" "container_definition" {
     db_secret_arn              = data.terraform_remote_state.core.outputs.document_db_secrets_arn
     data_bucket                = data.terraform_remote_state.fw_core.outputs.data_bucket
     redis_endpoint             = data.terraform_remote_state.core.outputs.redis_replication_group_primary_endpoint_address
+    redis_port                 = data.terraform_remote_state.core.outputs.redis_replication_group_port
     gfw_data_api_key           = data.terraform_remote_state.fw_core.outputs.gfw_data_api_key_secret_arn
     document_db_endpoint       = data.terraform_remote_state.core.outputs.document_db_endpoint
     document_db_port           = data.terraform_remote_state.core.outputs.document_db_port
