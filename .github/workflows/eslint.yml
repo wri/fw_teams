@@ -14,10 +14,10 @@ jobs:
         ref: ${{ github.head_ref }}
 
     - name: Start containers
-      run: docker-compose -f "docker-compose-develop.yml" up -d --build
+      run: make up-and-build
 
     - name: Run eslint
-      run : docker-compose -f "docker-compose-develop.yml" run develop yarn run lint
+      run : make lint
 
     - name: Commit prettier changes
       uses: stefanzweifel/git-auto-commit-action@v4
@@ -26,4 +26,4 @@ jobs:
 
     - name: Stop containers
       if: always()
-      run: docker-compose -f "docker-compose-develop.yml" down
+      run: make down
