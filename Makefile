@@ -1,11 +1,16 @@
-default:
+.PHONY:
 
-build:
-	docker-compose -f docker-compose-develop.yml build
-	docker-compose -f docker-compose-test.yml build
+up-and-build:
+	docker-compose -f docker-compose-develop.yml up -d --build
 
-develop:
+up:
 	docker-compose -f docker-compose-develop.yml up
 
-test:
-	docker-compose -f docker-compose-test.yml up --abort-on-container-exit
+down:
+	docker-compose -f docker-compose-develop.yml down
+
+lint:
+	docker-compose -f docker-compose-develop.yml run develop yarn run lint
+
+test-and-build:
+	docker-compose -f docker-compose-test.yml up --build --abort-on-container-exit

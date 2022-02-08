@@ -1,18 +1,21 @@
 {
   "logger": {
-    "name": "fw-teams-DEV",
-    "level": "debug",
+    "name": "fw-teams",
+    "level": "LOGGER_LEVEL",
     "toFile": false,
     "dirLogFile": null
   },
+  "application": {
+    "url": "APP_URL"
+  },
   "service": {
     "name": "fw-teams-1.0.0",
-    "port": 3035
+    "port": "SERVICE_PORT"
   },
   "mongodb": {
-    "database": "fw_teams_db",
-    "host": "localhost",
-    "port": "27017"
+    "host": "MONGODB_HOST",
+    "port": "MONGODB_PORT",
+    "database": "fw_teams_db"
   },
   "jwt": {
     "token": "JWT_SECRET"
@@ -23,7 +26,10 @@
     "queueUrl": "API_GATEWAY_QUEUE_URL",
     "queueName": "API_GATEWAY_QUEUE_NAME"
   },
-  "application": {
-    "url": "APP_URL"
+  "usersApi": {
+    "url": "USERS_API_URL"
+  },
+  "controlTower": {
+    "url": "CONTROL_TOWER_URL"
   }
 }

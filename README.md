@@ -1,10 +1,10 @@
 # FW teams Microservice
-
+ 
 This repository is the node skeleton microservice to create node microservice for WRI API
 
 ## Dependencies
 
-The FW teams microservice is built using [Node.js](https://nodejs.org/en/), and can be executed either natively or using Docker, each of which has its own set of requirements.
+The FW teams microservice is built using [Node.js](https://nodejs.org/en/), and can be executed ~~either natively or~~ using Docker~~, each of which has its own set of requirements~~.
 
 Execution using Docker requires:
 - [Docker](https://www.docker.com/)
@@ -25,40 +25,35 @@ After that, follow one of the instructions below:
 
 ### Using Docker
 
-1 - Create and complete your `dev.env` file with your configuration. The meaning of the variables is available in this [section](#configuration-environment-variables). You can find an example `dev.env.sample` file in the project root.
+1 - Execute the following command to run Docker:
 
-2 - Execute the following command to run Control tower:
-
-```
-make build
-make develop
+```shell
+make up-and-build   # First time building Docker or you've made changes to the Dockerfile
+make up             # When Docker has already been built and you're starting from where you left off
 ```
 
-The endpoints provided by this microservice should now be available.
+The endpoints provided by this microservice should now be available: [localhost:3035](http://localhost:3035)
+
+2 - Run the following command to lint the project:
+
+```shell
+make lint
+```
+
+3 - To close Docker:
+
+```shell
+make down
+```
 
 ## Testing
 
 ### Using Docker
 
 Follow the instruction above for setting up the runtime environment for Docker execution, then run:
+```shell
+make test-and-build
 ```
-make build
-make test
-```
-
-## Configuration
-
-It is necessary to define these environment variables:
-
-* CT_URL => Control Tower URL
-* NODE_ENV => Environment (prod, staging, dev)
-* JWT_SECRET => The secret used to generate JWT tokens.
-* API_GATEWAY_URI => Gateway Service API URL
-* API_GATEWAY_EXTERNAL_URI
-* API_GATEWAY_QUEUE_URL => Url of async queue
-* API_GATEWAY_QUEUE_NAME => mail
-
-You can optionally set other variables, see [this file](config/custom-environment-variables.json) for an extended list.
 
 ## Quick Overview
 

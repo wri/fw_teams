@@ -3,3 +3,5 @@
 /.vscode
 /npm-debug.log
 /.idea
+**.terraform**
+.terraform*
