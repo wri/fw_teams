@@ -50,7 +50,7 @@ make attach  # Ctrl-C to exit
 make ssh     # `exit` to exit
 ```
 
-Here you should run commands here just like you would if they were developing locally. For example, `yarn add [package-name]` `yarn remove [package-name]`
+Here you should run commands just like you would if they were developing locally. For example, `yarn add [package-name]` `yarn remove [package-name]`
 
 5 - To close Docker:
 
