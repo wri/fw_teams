@@ -50,8 +50,7 @@ make attach  # Ctrl-C to exit
 make ssh     # `exit` to exit
 ```
 
-Here you should run commands such as `yarn add [package-name]` while developing locally.\
-`node_modules` within docker are synced with your local file system so your IDE's IntelliSense works.
+Here you should run commands here just like you would if they were developing locally. For example, `yarn add [package-name]` `yarn remove [package-name]`
 
 5 - To close Docker:
 
