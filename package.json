@@ -10,7 +10,7 @@
   "keywords": [],
   "license": "MIT",
   "scripts": {
-    "lint": "eslint app --fix"
+    "lint": "eslint app -c ./config/.eslintrc --fix"
   },
   "devDependencies": {
     "@3sidedcube/prettier-config": "^1.0.0",

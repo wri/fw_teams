@@ -21,13 +21,17 @@ services:
       CONTROL_TOWER_URL: https://api.resourcewatch.org
     volumes:
       - ./app:/opt/fw-teams/app
+      - ./config:/opt/fw-teams/config
+      - ./node_modules:/opt/fw-teams/node_modules
+      - ./package.json:/opt/fw-teams/package.json
+      - ./yarn.lock:/opt/fw-teams/yarn.lock
     depends_on:
       - mongo
       - redis
     networks:
       - gfw-teams-network
       - gfw-network
-    command: node node_modules/.bin/grunt --gruntfile app/Gruntfile.js
+    command: sh -c "yarn install && node node_modules/.bin/grunt --gruntfile app/Gruntfile.js"
 
   mongo:
     image: mongo:3.4

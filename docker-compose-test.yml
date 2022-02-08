@@ -3,14 +3,14 @@ services:
   test:
     build: .
     ports:
-      - "3035:3035"
+      - "3036:3036"
     container_name: fw-teams-test
     environment:
       NODE_PATH: app/src
       NODE_ENV: test
       SUPPRESS_NO_CONFIG_WARNING: "true"
       LOGGER_LEVEL: debug
-      SERVICE_PORT: 3035
+      SERVICE_PORT: 3036
       JWT_SECRET: reallyunguessablesecretkey
       MONGODB_HOST: mongo
       MONGODB_PORT: 27017
@@ -22,7 +22,9 @@ services:
     depends_on:
       - mongo
       - redis
-    command: node node_modules/.bin/grunt --gruntfile app/Gruntfile.js e2eTest
+    volumes:
+      - ./node_modules:/opt/fw-teams/node_modules
+    command: sh -c "yarn install && node node_modules/.bin/grunt --gruntfile app/Gruntfile.js e2eTest"
 
   mongo:
     image: mongo:3.4
