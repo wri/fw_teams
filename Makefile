@@ -9,7 +9,7 @@ up:
 attach:
 	docker container attach fw-teams-develop --sig-proxy=false
 
-cli:
+ssh:
 	docker exec -it fw-teams-develop /bin/sh
 
 down:

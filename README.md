@@ -1,10 +1,8 @@
 # FW teams Microservice
- 
-This repository is the node skeleton microservice to create node microservice for WRI API
 
 ## Dependencies
 
-The FW teams microservice is built using [Node.js](https://nodejs.org/en/), and can be executed ~~either natively or~~ using Docker~~, each of which has its own set of requirements~~.
+The FW teams microservice is built using [Node.js](https://nodejs.org/en/), and can be executed using Docker.
 
 Execution using Docker requires:
 - [Docker](https://www.docker.com/)
@@ -40,7 +38,22 @@ The endpoints provided by this microservice should now be available: [localhost:
 make lint
 ```
 
-3 - To close Docker:
+3 - To attach to the image's terminal output to view debugger messages etc:
+
+```shell
+make attach  # Ctrl-C to exit
+```
+
+4 - To SSH into the image:
+
+```shell
+make ssh     # `exit` to exit
+```
+
+Here you should run commands such as `yarn add [package-name]` while developing locally.\
+`node_modules` within docker are synced with your local file system so your IDE's IntelliSense works.
+
+5 - To close Docker:
 
 ```shell
 make down
