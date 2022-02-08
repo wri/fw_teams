@@ -40,5 +40,6 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_dev }}
         AWS_REGION: ${{ secrets.aws_region_dev }}
       run: |
-        ./scripts/infra plan
-        ./scripts/infra apply
+        ./scripts/infra destroy
+        # ./scripts/infra plan
+        # ./scripts/infra apply
