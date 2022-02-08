@@ -32,3 +32,11 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_dev }}
         AWS_REGION: ${{ secrets.aws_region_Dev }}
       run: ./scripts/delete_workspace -f -g "no_sha_awailable"
+    - name: Destroy state and delete dev workspace
+      if: github.ref == 'refs/heads/dev-george'
+      env:
+        ENV: dev
+        AWS_ACCESS_KEY_ID: ${{ secrets.aws_key_dev }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_dev }}
+        AWS_REGION: ${{ secrets.aws_region_Dev }}
+      run: ./scripts/infra destroy
