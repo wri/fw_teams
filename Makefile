@@ -10,7 +10,7 @@ attach:
 	docker container attach fw-teams-develop --sig-proxy=false
 
 ssh:
-	docker exec -it fw-teams-develop /bin/sh
+	docker exec -it fw-teams-develop /bin/bash
 
 down:
 	docker-compose -f docker-compose-develop.yml down
