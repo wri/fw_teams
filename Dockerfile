@@ -31,4 +31,4 @@ RUN chown -R $USER:$USER /opt/$NAME
 EXPOSE 3035
 USER $USER
 
-CMD node app/index.js
+CMD sudo node app/index.js
