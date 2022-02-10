@@ -46,7 +46,7 @@ module "fargate_autoscaling" {
   load_balancer_security_group = data.terraform_remote_state.fw_core.outputs.lb_security_group_id
   cluster_id                   = data.terraform_remote_state.fw_core.outputs.ecs_cluster_id
   cluster_name                 = data.terraform_remote_state.fw_core.outputs.ecs_cluster_name
-  security_group_ids = [
+  security_group_ids = [data.terraform_remote_state.core.outputs.document_db_security_group_id,
   data.terraform_remote_state.core.outputs.redis_security_group_id]
   task_role_policies = []
   task_execution_role_policies = [
