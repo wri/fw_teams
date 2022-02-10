@@ -7,6 +7,8 @@ const mongoose = require("mongoose");
 const koaSimpleHealthCheck = require("koa-simple-healthcheck");
 const loggedInUserService = require("./services/LoggedInUserService");
 
+console.log(config)
+
 mongoose.Promise = Promise;
 const ErrorSerializer = require("serializers/error.serializer");
 
