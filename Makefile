@@ -6,8 +6,8 @@ up-and-build:
 up:
 	docker-compose -f docker-compose-develop.yml up -d
 
-attach:
-	docker container attach fw-teams-develop --sig-proxy=false
+logs:
+	docker logs -f fw-teams-develop
 
 ssh:
 	docker exec -it fw-teams-develop /bin/bash
