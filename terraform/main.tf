@@ -50,9 +50,9 @@ module "fargate_autoscaling" {
   lb_target_group_arn = module.fargate_autoscaling.lb_target_group_arn
   listener_arn        = data.terraform_remote_state.fw_core.outputs.lb_listener_arn
   project_prefix      = var.project_prefix
-  path_pattern        = ["/api/v1/fw_teams/heathcheck", "/api/v1/teams*"]
+  path_pattern        = ["/api/v1/fw_teams/healthcheck", "/api/v1/teams*"]
   priority            = 4
-  health_check_path = "/api/v1/fw_teams/heathcheck"
+  health_check_path = "/api/v1/fw_teams/healthcheck"
 
   depends_on = [
     module.app_docker_image
