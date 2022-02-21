@@ -4,10 +4,7 @@ const koaLogger = require("koa-logger");
 const config = require("config");
 const loader = require("loader");
 const mongoose = require("mongoose");
-const koaSimpleHealthCheck = require("koa-simple-healthcheck");
 const loggedInUserService = require("./services/LoggedInUserService");
-
-console.log(config)
 
 mongoose.Promise = Promise;
 const ErrorSerializer = require("serializers/error.serializer");
@@ -65,7 +62,6 @@ app.use(async (ctx, next) => {
 });
 
 app.use(koaLogger());
-app.use(koaSimpleHealthCheck());
 
 app.use(async function (ctx, next) {
   await loggedInUserService.setLoggedInUser(ctx, logger);
