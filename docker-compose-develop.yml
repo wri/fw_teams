@@ -14,6 +14,8 @@ services:
       JWT_SECRET: reallyunguessablesecretkey
       MONGODB_HOST: mongo
       MONGODB_PORT: 27017
+      DB_SECRET: '{ "username": "admin", "password": "password" }'
+      DB_DATABASE: fw_teams_db
       REDIS_URL: redis://redis:6379
       REDIS_QUEUE_NAME: mail
       APP_URL: http://127.0.0.1:3035
@@ -34,8 +36,13 @@ services:
     container_name: fw-teams-mongo-develop
     ports:
       - "27022:27017"
+    environment:
+      MONGO_INITDB_DATABASE: fw_teams_db
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_USERNAME: admin
     volumes:
-      - $HOME/docker/data/fw-teams/mongodb:/data/db
+      - ./data/mongo/001_users.js:/docker-entrypoint-initdb.d/001_users.js:ro
+      - fw-teams-mongodb-data:/data/db
     restart: always
     networks:
       - gfw-network
@@ -48,6 +55,10 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
     networks:
       - gfw-teams-network
+
+volumes:
+  fw-teams-mongodb-data:
+
 networks:
   gfw-teams-network:
     name: gfw-teams-network
