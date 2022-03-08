@@ -10,7 +10,9 @@
   },
   "mongodb": {
     "host": "MONGODB_HOST",
-    "port": "MONGODB_PORT"
+    "port": "MONGODB_PORT",
+    "secret": "DB_SECRET",
+    "database": "DB_DATABASE"
   },
   "jwt": {
     "token": "JWT_SECRET"

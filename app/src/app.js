@@ -9,9 +9,6 @@ const loggedInUserService = require("./services/LoggedInUserService");
 mongoose.Promise = Promise;
 const ErrorSerializer = require("serializers/error.serializer");
 
-const mongoUri = `mongodb://${config.get("mongodb.host")}:${config.get("mongodb.port")}/${config.get(
-  "mongodb.database"
-)}`;
 const validate = require("koa-validate");
 
 const koaBody = require("koa-body")({
@@ -21,6 +18,17 @@ const koaBody = require("koa-body")({
   textLimit: "50mb"
 });
 
+let dbSecret = config.get("mongodb.secret");
+if (typeof dbSecret === "string") {
+  dbSecret = JSON.parse(dbSecret);
+}
+
+const mongoURL =
+  "mongodb://" +
+  `${dbSecret.username}:${dbSecret.password}` +
+  `@${config.get("mongodb.host")}:${config.get("mongodb.port")}` +
+  `/${config.get("mongodb.database")}`;
+
 const onDbReady = err => {
   if (err) {
     logger.error(err);
@@ -28,7 +36,7 @@ const onDbReady = err => {
   }
 };
 
-mongoose.connect(mongoUri, onDbReady);
+mongoose.connect(mongoURL, onDbReady);
 
 const app = new Koa();
 
