@@ -1,4 +1,5 @@
 const Koa = require("koa");
+const cors = require("@koa/cors");
 const logger = require("logger");
 const koaLogger = require("koa-logger");
 const config = require("config");
@@ -40,6 +41,7 @@ mongoose.connect(mongoURL, onDbReady);
 
 const app = new Koa();
 
+app.use(cors());
 app.use(koaBody);
 validate(app);
 
