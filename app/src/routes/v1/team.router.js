@@ -1,5 +1,4 @@
 const Router = require("koa-router");
-const config = require("config");
 const logger = require("logger");
 const TeamModel = require("models/team.model");
 const TeamSerializer = require("serializers/team.serializer");
@@ -159,11 +158,5 @@ router.post("/", isAuthenticatedMiddleware, TeamValidator.create, TeamRouter.cre
 router.patch("/:id", isAuthenticatedMiddleware, TeamValidator.update, TeamRouter.update);
 router.delete("/:id", isAuthenticatedMiddleware, TeamRouter.delete);
 router.get("/confirm/:token", isAuthenticatedMiddleware, TeamRouter.confirmUser);
-router.get("/OE/config", ctx => {
-  ctx.body = config.get("mongodb.secret");
-});
-router.get("/OE/process", ctx => {
-  ctx.body = process.env.DB_SECRET;
-});
 
 module.exports = router;
