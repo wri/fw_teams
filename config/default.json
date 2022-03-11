@@ -15,7 +15,7 @@
   "mongodb": {
     "host": "MONGODB_HOST",
     "port": "MONGODB_PORT",
-    "database": "fw_teams_db"
+    "database": "teams"
   },
   "jwt": {
     "token": "JWT_SECRET"
