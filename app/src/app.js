@@ -33,7 +33,6 @@ app.on("error", (err, ctx) => {
     Sentry.captureException(err);
   });
 });
-myUndefinedFunction();
 /** */
 
 let dbSecret = config.get("mongodb.secret");
