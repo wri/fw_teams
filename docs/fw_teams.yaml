@@ -3,7 +3,12 @@ info:
   title: fw_teams
   version: '1.0'
 servers:
-  - url: 'http://localhost:3000'
+  - url: 'https://api.resourcewatch.org/v1'
+    description: Production
+  - url: 'https://gfw-staging.globalforestwatch.org/v1'
+    description: Staging
+  - url: 'http://localhost:3035/v1'
+    description: Local
 paths:
   /teams:
     post:
