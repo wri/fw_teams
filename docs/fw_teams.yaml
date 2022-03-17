@@ -1,0 +1,309 @@
+openapi: 3.1.0
+info:
+  title: fw_teams
+  version: '1.0'
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /teams:
+    post:
+      summary: Create Team
+      operationId: post-team
+      responses:
+        '200':
+          $ref: '#/components/responses/Team'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        $ref: '#/components/requestBodies/Team'
+  '/teams/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        description: Team ObjectId
+    get:
+      summary: Get Team
+      operationId: get-team
+      responses:
+        '200':
+          $ref: '#/components/responses/Team'
+        '401':
+          $ref: '#/components/responses/Error'
+      description: ''
+    patch:
+      summary: Update Team
+      operationId: patch-team
+      responses:
+        '200':
+          $ref: '#/components/responses/Team'
+        '401':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        $ref: '#/components/requestBodies/Team'
+    delete:
+      summary: Delete Team
+      operationId: delete-team
+      responses:
+        '204':
+          description: No Content
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  '/teams/user/{userId}':
+    parameters:
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+    get:
+      summary: Get Team By User Id
+      operationId: get-team-by-user-id
+      responses:
+        '200':
+          $ref: '#/components/responses/Team'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+      description: Retrieve team by given user id
+  '/teams/confirm/{token}':
+    parameters:
+      - schema:
+          type: string
+        name: token
+        in: path
+        required: true
+        description: Valid user JWT token
+    get:
+      summary: Confirm user is within team
+      operationId: confirm-user-is-within-team
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    status: 200
+                    detail: User confirmed
+                properties:
+                  status:
+                    type: number
+                    example: 200
+                  detail:
+                    type: string
+                    minLength: 1
+                    example: User confirmed
+                required:
+                  - status
+                  - detail
+              examples:
+                example-1:
+                  value:
+                    status: 200
+                    detail: User confirmed
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+      description: |-
+        Confirms the user is within the team with the id given in the JWT token.
+        If not then the user is added to that team and if needed remove from an existing team.
+  /fw_teams/healthcheck:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Healthcheck'
+      operationId: get-fw_teams-healthcheck
+components:
+  schemas:
+    Team:
+      title: Team
+      type: object
+      properties:
+        name:
+          type: string
+        managers:
+          type: array
+          items: {}
+        users:
+          type: array
+          items: {}
+        sentInvitations:
+          type: array
+          items: {}
+        areas:
+          type: array
+          items: {}
+        layers:
+          type: array
+          items: {}
+        confirmedUsers:
+          type: array
+          items: {}
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - createdAt
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+  requestBodies:
+    Team:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Team'
+          examples:
+            Team:
+              value:
+                name: string
+                managers:
+                  - null
+                users:
+                  - null
+                sentInvitations:
+                  - null
+                areas:
+                  - null
+                layers:
+                  - null
+                confirmedUsers:
+                  - null
+                createdAt: '2019-08-24T14:15:22Z'
+  responses:
+    Error:
+      description: Error Response
+      content:
+        application/json:
+          schema:
+            description: ''
+            type: object
+            properties:
+              errors:
+                type: array
+                uniqueItems: true
+                minItems: 1
+                items:
+                  required:
+                    - status
+                    - detail
+                  properties:
+                    status:
+                      type: number
+                    detail:
+                      type: string
+                      minLength: 1
+            required:
+              - errors
+          examples: {}
+    Team:
+      description: Team response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: teams
+                  id:
+                    type: string
+                    description: ObjectId
+                  attributes:
+                    $ref: '#/components/schemas/Team'
+                required:
+                  - type
+                  - id
+          examples:
+            Team:
+              value:
+                data:
+                  type: teams
+                  id: string
+                  attributes:
+                    name: string
+                    managers:
+                      - null
+                    users:
+                      - null
+                    sentInvitations:
+                      - null
+                    areas:
+                      - null
+                    layers:
+                      - null
+                    confirmedUsers:
+                      - null
+                    createdAt: '2019-08-24T14:15:22Z'
+    Teams:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                    attributes:
+                      $ref: '#/components/schemas/Team'
+                  required:
+                    - id
+                    - type
+          examples:
+            Teams:
+              value:
+                data:
+                  - id: string
+                    type: string
+                    attributes:
+                      name: string
+                      managers:
+                        - null
+                      users:
+                        - null
+                      sentInvitations:
+                        - null
+                      areas:
+                        - null
+                      layers:
+                        - null
+                      confirmedUsers:
+                        - null
+                      createdAt: '2019-08-24T14:15:22Z'
+    Healthcheck:
+      description: Healthcheck response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              uptime:
+                type: number
+          examples: {}

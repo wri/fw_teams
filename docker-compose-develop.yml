@@ -31,6 +31,15 @@ services:
       - gfw-network
     command: node node_modules/.bin/grunt --gruntfile app/Gruntfile.js
 
+  docs:
+    build: .
+    ports:
+      - "30350:30350"
+    container_name: fw-teams-docs
+    volumes:
+      - ./docs:/opt/fw-teams/docs
+    command: yarn run docs -l 30350
+
   mongo:
     image: mongo:3.4
     container_name: fw-teams-mongo-develop
