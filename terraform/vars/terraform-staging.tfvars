@@ -9,7 +9,7 @@ container_port            = "80"
 NODE_PATH         = "app/src"
 JWT_SECRET        = "@@JWT_SECRET@@"
 redis_queue_name  = "mail"
-APP_URL           = "http://127.0.0.1:80"
+APP_URL           = "https://gfw-web-staging.cube-cdn.com"
 USERS_API_URL     = "https://gfw-staging.globalforestwatch.org/v1"
 CONTROL_TOWER_URL = "https://staging-api.resourcewatch.org"
 
