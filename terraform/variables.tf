@@ -63,7 +63,7 @@ variable "APP_URL" {
 }
 variable "USERS_API_URL" {
   type    = string
-  default = "https://api.resourcewatch.org"
+  default = "https://api.resourcewatch.org/v1"
 }
 variable "CONTROL_TOWER_URL" {
   type    = string
