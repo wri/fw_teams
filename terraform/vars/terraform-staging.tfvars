@@ -10,7 +10,7 @@ NODE_PATH         = "app/src"
 JWT_SECRET        = "@@JWT_SECRET@@"
 redis_queue_name  = "mail"
 APP_URL           = "http://127.0.0.1:80"
-USERS_API_URL     = "https://staging-fw-api.globalforestwatch.org/v1"
+USERS_API_URL     = "https://gfw-staging.globalforestwatch.org/v1"
 CONTROL_TOWER_URL = "https://staging-api.resourcewatch.org"
 
 healthcheck_path = "/v1/fw_teams/healthcheck"
