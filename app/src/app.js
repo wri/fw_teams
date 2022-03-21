@@ -6,6 +6,7 @@ const config = require("config");
 const loader = require("loader");
 const mongoose = require("mongoose");
 const loggedInUserService = require("./services/LoggedInUserService");
+const Sentry = require("@sentry/node");
 
 mongoose.Promise = Promise;
 const ErrorSerializer = require("serializers/error.serializer");
@@ -18,6 +19,21 @@ const koaBody = require("koa-body")({
   formLimit: "50mb",
   textLimit: "50mb"
 });
+
+/**
+ * Sentry
+ */
+Sentry.init({ dsn: "https://46ce74022b26498abf1f7c62837983c6@o163691.ingest.sentry.io/6262324" });
+
+app.on("error", (err, ctx) => {
+  Sentry.withScope(function (scope) {
+    scope.addEventProcessor(function (event) {
+      return Sentry.Handlers.parseRequest(event, ctx.request);
+    });
+    Sentry.captureException(err);
+  });
+});
+/** */
 
 let dbSecret = config.get("mongodb.secret");
 if (typeof dbSecret === "string") {
@@ -58,6 +74,7 @@ app.use(async (ctx, next) => {
     }
     ctx.status = error.status || ctx.status || 500;
     if (ctx.status >= 500) {
+      Sentry.captureException(error); // send error to sentry
       logger.error(error);
     } else {
       logger.info(error);
