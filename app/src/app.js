@@ -57,8 +57,6 @@ const onDbReady = err => {
 
 mongoose.connect(mongoURL, onDbReady);
 
-
-
 app.use(cors());
 app.use(koaBody);
 validate(app);
