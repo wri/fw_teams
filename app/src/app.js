@@ -20,6 +20,8 @@ const koaBody = require("koa-body")({
   textLimit: "50mb"
 });
 
+const app = new Koa();
+
 /**
  * Sentry
  */
@@ -54,8 +56,6 @@ const onDbReady = err => {
 };
 
 mongoose.connect(mongoURL, onDbReady);
-
-const app = new Koa();
 
 app.use(cors());
 app.use(koaBody);
