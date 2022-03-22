@@ -25,7 +25,11 @@ const app = new Koa();
 /**
  * Sentry
  */
-Sentry.init({ dsn: "https://46ce74022b26498abf1f7c62837983c6@o163691.ingest.sentry.io/6262324" });
+
+Sentry.init({
+  dsn: "https://46ce74022b26498abf1f7c62837983c6@o163691.ingest.sentry.io/6262324",
+  environment: process.env.NODE_ENV
+});
 
 app.on("error", (err, ctx) => {
   Sentry.withScope(function (scope) {
@@ -81,7 +85,7 @@ app.use(async (ctx, next) => {
     }
 
     ctx.body = ErrorSerializer.serializeError(ctx.status, error.message);
-    if (process.env.NODE_ENV === "prod" && ctx.status === 500) {
+    if (process.env.NODE_ENV === "production" && ctx.status === 500) {
       ctx.body = "Unexpected error";
     }
     ctx.response.type = "application/vnd.api+json";
