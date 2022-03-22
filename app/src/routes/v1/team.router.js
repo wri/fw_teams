@@ -158,5 +158,9 @@ router.post("/", isAuthenticatedMiddleware, TeamValidator.create, TeamRouter.cre
 router.patch("/:id", isAuthenticatedMiddleware, TeamValidator.update, TeamRouter.update);
 router.delete("/:id", isAuthenticatedMiddleware, TeamRouter.delete);
 router.get("/confirm/:token", isAuthenticatedMiddleware, TeamRouter.confirmUser);
+router.get("/fail", ctx => {
+  ctx.status = 500;
+  throw new Error("Test Fail");
+});
 
 module.exports = router;
