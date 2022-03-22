@@ -152,6 +152,9 @@ const isAuthenticatedMiddleware = async (ctx, next) => {
   await next();
 };
 
+router.get("/fail", ctx => {
+  ctx.throw(500, "Test Fail");
+});
 router.get("/:id", isAuthenticatedMiddleware, TeamRouter.getById);
 router.get("/user/:userId", isAuthenticatedMiddleware, TeamRouter.getByUserId);
 router.post("/", isAuthenticatedMiddleware, TeamValidator.create, TeamRouter.create);
