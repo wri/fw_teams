@@ -133,6 +133,8 @@ paths:
         '200':
           $ref: '#/components/responses/Healthcheck'
       operationId: get-fw_teams-healthcheck
+      security: []
+      description: ''
 components:
   schemas:
     Team:
@@ -312,3 +314,5 @@ components:
               uptime:
                 type: number
           examples: {}
+security:
+  - Authorization: []
