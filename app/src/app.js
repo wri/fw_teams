@@ -61,6 +61,11 @@ const onDbReady = err => {
 
 mongoose.connect(mongoURL, onDbReady);
 
+app.use((ctx, next) => {
+  return next().then(function () {
+    ctx.set("Cache-Control", "private");
+  });
+});
 app.use(cors());
 app.use(koaBody);
 validate(app);
