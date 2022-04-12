@@ -6,7 +6,6 @@ services:
     ports:
         - "3035:3035"
     environment:
-      NODE_PATH: app/src
       NODE_ENV: dev
       SUPPRESS_NO_CONFIG_WARNING: "true"
       LOGGER_LEVEL: debug
@@ -23,13 +22,41 @@ services:
       CONTROL_TOWER_URL: https://api.resourcewatch.org
     volumes:
       - ./app:/opt/fw-teams/app
+      - ./nodemon.json:/opt/fw-teams/nodemon.json # Change NAME to the value of $NAME in the Dockerfile
     depends_on:
       - mongo
       - redis
     networks:
       - gfw-teams-network
       - gfw-network
-    command: node node_modules/.bin/grunt --gruntfile app/Gruntfile.js
+    command: yarn dev #node node_modules/.bin/grunt --gruntfile app/Gruntfile.js
+
+  test:
+    build: .
+    container_name: fw-teams-test
+    environment:
+      NODE_ENV: test
+      SUPPRESS_NO_CONFIG_WARNING: "true"
+      LOGGER_LEVEL: debug
+      SERVICE_PORT: 3035
+      JWT_SECRET: reallyunguessablesecretkey
+      MONGODB_HOST: mongo
+      MONGODB_PORT: 27017
+      DB_SECRET: '{ "username": "admin", "password": "password" }'
+      DB_DATABASE: fw_teams_db
+      REDIS_URL: redis://redis:6379
+      REDIS_QUEUE_NAME: mail
+      APP_URL: http://127.0.0.1:3035
+      USERS_API_URL: http://127.0.0.1:9000
+      CONTROL_TOWER_URL: http://127.0.0.1:9000
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ./app:/opt/fw-teams/app    # Change NAME to the value of $NAME in the Dockerfile
+      - ./nodemon.json:/opt/fw-teams/nodemon.json
+      - ./jest.config.js:/opt/fw-teams/jest.config.js
+    command: yarn test
 
   docs:
     build: .

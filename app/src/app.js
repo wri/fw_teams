@@ -101,7 +101,9 @@ app.use(async function (ctx, next) {
 
 loader.loadRoutes(app);
 
-const server = app.listen(config.get("service.port"), () => {});
+const server = app.listen(config.get("service.port"), () => {
+  // comment for eslint
+});
 
 logger.info("Server started in ", config.get("service.port"));
 
