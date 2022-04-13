@@ -22,14 +22,13 @@ services:
       CONTROL_TOWER_URL: https://api.resourcewatch.org
     volumes:
       - ./app:/opt/fw-teams/app
-      - ./nodemon.json:/opt/fw-teams/nodemon.json # Change NAME to the value of $NAME in the Dockerfile
-    depends_on:
+      - ./nodemon.json:/opt/fw-teams/nodemon.json
       - mongo
       - redis
     networks:
       - gfw-teams-network
       - gfw-network
-    command: yarn dev #node node_modules/.bin/grunt --gruntfile app/Gruntfile.js
+    command: yarn dev
 
   test:
     build: .
@@ -53,7 +52,7 @@ services:
       - mongo
       - redis
     volumes:
-      - ./app:/opt/fw-teams/app    # Change NAME to the value of $NAME in the Dockerfile
+      - ./app:/opt/fw-teams/app
       - ./nodemon.json:/opt/fw-teams/nodemon.json
       - ./jest.config.js:/opt/fw-teams/jest.config.js
     command: yarn test
