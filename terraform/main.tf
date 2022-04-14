@@ -77,7 +77,6 @@ data "template_file" "container_definition" {
     gfw_data_api_key           = data.terraform_remote_state.fw_core.outputs.gfw_data_api_key_secret_arn
     document_db_endpoint       = data.terraform_remote_state.core.outputs.document_db_endpoint
     document_db_port           = data.terraform_remote_state.core.outputs.document_db_port
-    NODE_PATH                  = var.NODE_PATH
     NODE_ENV                   = var.environment
     SUPPRESS_NO_CONFIG_WARNING = "true"
     SERVICE_PORT               = var.container_port

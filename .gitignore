@@ -5,3 +5,4 @@
 /.idea
 **.terraform**
 .terraform*
+dist/
