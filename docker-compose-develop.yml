@@ -23,6 +23,7 @@ services:
     volumes:
       - ./app:/opt/fw-teams/app
       - ./nodemon.json:/opt/fw-teams/nodemon.json
+    depends_on:
       - mongo
       - redis
     networks:
