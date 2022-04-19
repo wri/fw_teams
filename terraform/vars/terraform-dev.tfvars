@@ -8,9 +8,9 @@ auto_scaling_max_capacity = 5
 
 JWT_SECRET        = "@@JWT_SECRET@@"
 redis_queue_name  = "mail"
-APP_URL           = "http://127.0.0.1:80"
-USERS_API_URL     = "https://api.resourcewatch.org/v1"
-CONTROL_TOWER_URL = "https://api.resourcewatch.org"
+APP_URL           = "https://gfw-web-dev.cube-cdn.com"
+USERS_API_URL     = "https://gfw-staging.globalforestwatch.org/v1"
+CONTROL_TOWER_URL = "https://staging-api.resourcewatch.org"
 
 healthcheck_path = "/v1/fw_teams/healthcheck"
 healthcheck_sns_emails = ["server@3sidedcube.com"]
