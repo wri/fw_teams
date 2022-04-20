@@ -4,6 +4,12 @@ const routersPath = `${__dirname}/routes`;
 const logger = require("logger");
 const mount = require("koa-mount");
 
+const requireESModuleDefault = path => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const module = require(path);
+  return module.__esModule ? module.default : module;
+};
+
 /**
  * Load routers
  */
@@ -21,9 +27,9 @@ module.exports = (() => {
           } else {
             logger.debug("Loading route %s, in path %s", newPath, pathApi);
             if (pathApi) {
-              app.use(mount(pathApi, require(newPath).middleware()));
+              app.use(mount(pathApi, requireESModuleDefault(newPath).middleware()));
             } else {
-              app.use(require(newPath).middleware());
+              app.use(requireESModuleDefault(newPath).middleware());
             }
           }
         }
@@ -38,9 +44,9 @@ module.exports = (() => {
       const newPath = path ? `${path}/indexRouter.js` : "indexRouter.js";
       logger.debug("Loading route %s, in path %s", newPath, pathApi);
       if (pathApi) {
-        app.use(mount(pathApi, require(newPath).middleware()));
+        app.use(mount(pathApi, requireESModuleDefault(newPath).middleware()));
       } else {
-        app.use(require(newPath).middleware());
+        app.use(requireESModuleDefault(newPath).middleware());
       }
     }
   };
