@@ -3,7 +3,7 @@ const JWT = require("jsonwebtoken");
 const config = require("config");
 const MailService = require("services/MailService");
 const UserService = require("services/user.service");
-const TeamModel = require("models/team.model");
+const TeamModel = require("models/team.model").default;
 
 class TeamService {
   // eslint-disable-next-line consistent-return
