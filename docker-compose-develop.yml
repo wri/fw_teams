@@ -38,7 +38,7 @@ services:
       NODE_ENV: test
       SUPPRESS_NO_CONFIG_WARNING: "true"
       LOGGER_LEVEL: debug
-      SERVICE_PORT: 3035
+      SERVICE_PORT: 0
       JWT_SECRET: reallyunguessablesecretkey
       MONGODB_HOST: mongo
       MONGODB_PORT: 27017
@@ -52,11 +52,14 @@ services:
     depends_on:
       - mongo
       - redis
+    networks:
+      - gfw-teams-network
+      - gfw-network
     volumes:
       - ./app:/opt/fw-teams/app
       - ./nodemon.json:/opt/fw-teams/nodemon.json
       - ./jest.config.js:/opt/fw-teams/jest.config.js
-    command: yarn test
+    command: yarn run test:jest
 
   docs:
     build: .

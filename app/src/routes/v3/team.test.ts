@@ -5,9 +5,8 @@ import server from "app";
 
 const TeamResponse = [
   {
-    _id: "626001714b1679004969607c",
-    name: "20-04-T13:49",
-    __v: 0,
+    id: "1234",
+    name: "TestDBResponse",
     createdAt: "2022-04-20T12:49:53.521Z",
     confirmedUsers: [],
     layers: [],
@@ -26,9 +25,9 @@ const TeamResponse = [
 jest.mock("models", () => {
   return {
     __esModule: true,
-    TeamModel: jest.fn(() => ({
-      find: () => TeamResponse
-    }))
+    TeamModel: {
+      find: jest.fn(() => TeamResponse)
+    }
   };
 });
 
@@ -47,9 +46,15 @@ describe("/v3/teams", () => {
     expect(res.status).toBe(200);
   });
 
-  it("should return pong", async () => {
+  it("should return one entry in the data array", async () => {
     const res = await exec();
 
-    expect(res.body).toBe("test");
+    expect(res.body.data.length).toBe(1);
+  });
+
+  it("the returned team id should match the one in the DB", async () => {
+    const res = await exec();
+
+    expect(res.body.data[0].id).toBe("1234");
   });
 });

@@ -12,7 +12,7 @@ const router = new Router({
 router.get("/", async ctx => {
   const teams = await TeamModel.find();
 
-  ctx.body = teams;
+  ctx.body = TeamSerializer.serialize(teams);
 });
 
 export default router;
