@@ -5,7 +5,6 @@ const logger = require("logger");
 const mount = require("koa-mount");
 
 const requireESModuleDefault = path => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const module = require(path);
   return module.__esModule ? module.default : module;
 };
