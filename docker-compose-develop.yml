@@ -18,8 +18,8 @@ services:
       REDIS_URL: redis://redis:6379
       REDIS_QUEUE_NAME: mail
       APP_URL: http://127.0.0.1:3035
-      USERS_API_URL: https://api.resourcewatch.org
-      CONTROL_TOWER_URL: https://api.resourcewatch.org
+      USERS_API_URL: https://staging-api.resourcewatch.org
+      CONTROL_TOWER_URL: https://staging-api.resourcewatch.org
     volumes:
       - ./app:/opt/fw-teams/app
       - ./nodemon.json:/opt/fw-teams/nodemon.json

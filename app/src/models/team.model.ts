@@ -1,8 +1,8 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-const Team = new Schema({
+const TeamSchema = new Schema({
   name: { type: String, required: false, trim: true },
   managers: { type: Array, default: [] },
   users: { type: Array, default: [] },
@@ -13,4 +13,6 @@ const Team = new Schema({
   createdAt: { type: Date, required: true, default: Date.now }
 });
 
-module.exports = mongoose.model("Team", Team);
+export const TeamModel = mongoose.model("Team", TeamSchema);
+
+export default TeamModel;
