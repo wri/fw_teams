@@ -27,12 +27,10 @@ class TeamService {
       const link = `${config.get("application.url")}/login?callbackUrl=${config.get(
         "application.url"
       )}/settings?confirmToken=${generatedToken}&confirmToken=${generatedToken}`;
-      if (!team.sentInvitations.includes(email)) {
-        const invitationMailId = `team-invitation-${locale || "en"}`;
-        MailService.sendMail(invitationMailId, { link }, [{ address: { email } }]);
-        team.sentInvitations = team.sentInvitations.concat(email);
-        await team.save();
-      }
+
+      logger.info(`Sent team invitation to: ${email}`)
+      const invitationMailId = `team-invitation-${locale || "en"}`;
+      MailService.sendMail(invitationMailId, { link }, [{ address: { email } }]);
     });
   }
 
