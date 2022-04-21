@@ -113,8 +113,8 @@ class TeamRouter {
       // Only allow sentInvitations array to contain email addresses of current
       // users on the team. This means if a user is removed from the team and
       // then added again the invitation email will be resent.
-      team.sentInvitations = team.sentInvitations.filter(email => {
-        return team.users.some(user => user.email === email);
+      team.sentInvitations = team.sentInvitations.filter(sentEmailAddress => {
+        return team.users.some(userEmail => userEmail === sentEmailAddress);
       });
     }
     if (body.confirmedUsers) {
