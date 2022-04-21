@@ -40,7 +40,6 @@ class TeamRouter {
         TeamService.deleteConfirmedUserFromPreviousTeams(userId);
         team.users = team.users.filter(user => user !== email);
         team.confirmedUsers = team.confirmedUsers.concat({ id: userId, email });
-        team.sentInvitations = team.sentInvitations.filter(sentEmail => sentEmail !== email);
         TeamService.sendManagerConfirmation(email, team.managers, ctx.request.body.locale);
         await team.save();
       }
@@ -109,13 +108,6 @@ class TeamRouter {
     if (body.users) {
       logger.info(`Users ${body.users}`);
       team.users = body.users.filter(user => user !== userId);
-
-      // Only allow sentInvitations array to contain email addresses of current
-      // users on the team. This means if a user is removed from the team and
-      // then added again the invitation email will be resent.
-      team.sentInvitations = team.sentInvitations.filter(sentEmailAddress => {
-        return team.users.some(userEmail => userEmail === sentEmailAddress);
-      });
     }
     if (body.confirmedUsers) {
       logger.info(`Users ${body.confirmedUsers}`);
