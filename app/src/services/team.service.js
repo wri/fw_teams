@@ -28,7 +28,7 @@ class TeamService {
         "application.url"
       )}/settings?confirmToken=${generatedToken}&confirmToken=${generatedToken}`;
 
-      logger.info(`Sent team invitation to: ${email}`)
+      logger.info(`Sent team invitation to: ${email}`);
       const invitationMailId = `team-invitation-${locale || "en"}`;
       MailService.sendMail(invitationMailId, { link }, [{ address: { email } }]);
     });
