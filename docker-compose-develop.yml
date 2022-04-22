@@ -5,6 +5,7 @@ services:
     container_name: fw-teams-develop
     ports:
         - "3035:3035"
+        - "9229:9229"
     environment:
       NODE_ENV: dev
       SUPPRESS_NO_CONFIG_WARNING: "true"
@@ -29,7 +30,7 @@ services:
     networks:
       - gfw-teams-network
       - gfw-network
-    command: yarn dev
+    command: yarn run dev
 
   test:
     build: .

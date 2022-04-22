@@ -105,9 +105,20 @@ class TeamRouter {
       }
       team.managers = body.managers;
     }
+
+    let newUsers = [];
     if (body.users) {
       logger.info(`Users ${body.users}`);
-      team.users = body.users.filter(user => user !== userId);
+
+      const validUsers = body.users.filter(user => user !== userId);
+
+      newUsers = validUsers.filter(bodyUserEmail => {
+        return !team.users.includes(bodyUserEmail);
+      });
+
+      logger.info(`New users ${newUsers}`);
+
+      team.users = validUsers;
     }
     if (body.confirmedUsers) {
       logger.info(`Users ${body.confirmedUsers}`);
@@ -123,7 +134,7 @@ class TeamRouter {
     }
 
     await team.save();
-    TeamService.sendNotifications(body.users, team, locale);
+    TeamService.sendNotifications(newUsers, team, locale);
     ctx.body = TeamSerializer.serialize(team);
   }
 
