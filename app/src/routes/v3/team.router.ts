@@ -13,25 +13,30 @@ const router = new Router();
 // GET /v3/myteams
 router.get("/myteams", authMiddleware, async ctx => {
   const query = <TQuery>ctx.request.query;
-  const { id: userId, email: userEmail } = JSON.parse(query.loggedUser);
+  const { id: userId, email: userEmail } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
 
-  const { userRole = "manager,monitor,invitations" } = query;
+  const { userRole = Object.values(EUserRole).join(",") } = query;
   const userRoles = userRole.split(",");
 
   const orFilter: any[] = [];
   userRoles.forEach(filter => {
     switch (filter) {
-      case "manager":
+      case EUserRole.Manager:
         orFilter.push({ "managers.id": userId });
         break;
-      case "monitor":
+      case EUserRole.Monitor:
         orFilter.push({ "confirmedUsers.id": userId });
         break;
-      case "invitations":
+      case EUserRole.Invited:
         orFilter.push({ users: userEmail });
         break;
     }
   });
+
+  if (!orFilter.length) {
+    ctx.status = 400;
+    throw new Error("userRole query string incorrect");
+  }
 
   let teams = await TeamModel.find({
     $or: orFilter
@@ -39,10 +44,25 @@ router.get("/myteams", authMiddleware, async ctx => {
 
   teams = teams.map(team => {
     // Find the role the current user has for this team
-    // team.userRole = EUserRole.Manager; ToDO
+    // Is the user a manager?
+    if (team.managers.some(manager => manager.id === userId)) {
+      team.userRole = EUserRole.Manager;
+    }
+
+    // Is the user a confirmedUser? (Monitor)
+    if (team.confirmedUsers.some(confirmedUser => confirmedUser.id === userId)) {
+      team.userRole = EUserRole.Monitor;
+    }
+
+    // Is the user a user? (Invited but not confirmed)
+    if (team.users.some(user => user === userEmail)) {
+      team.userRole = EUserRole.Invited;
+    }
+
     return team;
   });
 
+  ctx.status = 200;
   ctx.body = teamSerializer(teams);
 });
 

@@ -11,13 +11,13 @@ export enum EUserRole {
 export interface ITeamModel extends mongoose.Document {
   name?: string;
   userRole?: EUserRole;
-  managers: [];
-  users: [];
-  sentInvitations: [];
-  areas: [];
+  managers: [{ id: string; email?: string }];
+  users: string[];
+  sentInvitations: string[];
+  areas: string[];
   layers: [];
-  confirmedUsers: [];
-  createdAt: [];
+  confirmedUsers: [{ id: string; email?: string }];
+  createdAt: string[];
 }
 
 const TeamSchema = new Schema({
