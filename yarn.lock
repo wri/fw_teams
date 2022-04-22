@@ -1661,6 +1661,11 @@
     jest-matcher-utils "^27.0.0"
     pretty-format "^27.0.0"
 
+"@types/json-api-serializer@^2.6.3":
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/@types/json-api-serializer/-/json-api-serializer-2.6.3.tgz#fc1c1afa64ad1b87abdb33ffa0359a5f5a12a5e5"
+  integrity sha512-u+lY4YjPQ4BbwXH+W5rWopjkKESOElbnSZXaRFTfYOyw4QPOE8dX/9PeWQ8CScC8tBgCRb18hVb8vewaHwXa1A==
+
 "@types/json-schema@^7.0.9":
   version "7.0.11"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.11.tgz#d421b6c527a3037f7c84433fd2c4229e016863d3"
@@ -5031,6 +5036,13 @@ jsesc@~0.5.0:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0=
 
+json-api-serializer@^2.6.6:
+  version "2.6.6"
+  resolved "https://registry.yarnpkg.com/json-api-serializer/-/json-api-serializer-2.6.6.tgz#fa5d283b913e0ea25653f4d04f981dc44d66dd4f"
+  integrity sha512-l7/e2O5/0+GU38RTMowRUKxRlT8zFc1oryAYBxqK54sFZnvJOJI2bo4XbbxnkTtvSzwkyv5DoBUuFm0hvG3avg==
+  dependencies:
+    setimmediate "^1.0.5"
+
 json-buffer@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/json-buffer/-/json-buffer-3.0.0.tgz#5b1f397afc75d677bde8bcfc0e47e1f9a3d9a898"
@@ -6728,6 +6740,11 @@ set-blocking@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/set-blocking/-/set-blocking-2.0.0.tgz#045f9782d011ae9a6803ddd382b24392b3d890f7"
   integrity sha1-BF+XgtARrppoA93TgrJDkrPYkPc=
+
+setimmediate@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
+  integrity sha1-KQy7Iy4waULX1+qbg3Mqt4VvgoU=
 
 setprototypeof@1.1.1:
   version "1.1.1"

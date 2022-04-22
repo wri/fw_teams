@@ -23,6 +23,7 @@ services:
       CONTROL_TOWER_URL: https://staging-api.resourcewatch.org
     volumes:
       - ./app:/opt/fw-teams/app
+      - ./debug:/opt/fw-teams/debug
       - ./nodemon.json:/opt/fw-teams/nodemon.json
     depends_on:
       - mongo
@@ -30,7 +31,7 @@ services:
     networks:
       - gfw-teams-network
       - gfw-network
-    command: yarn run dev
+    command: yarn run dev:debug
 
   test:
     build: .

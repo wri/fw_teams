@@ -1,29 +1,49 @@
 import Router from "koa-router";
-import { TeamModel } from "models";
+import { TeamModel, EUserRole } from "models/team.model";
 import { authMiddleware } from "middlewares";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import TeamSerializer from "serializers/team.serializer";
+import teamSerializer from "serializers/teamWithUserRole.serializer";
+
+type TQuery = {
+  loggedUser: string;
+  userRole?: string;
+};
 
 const router = new Router();
 
-// GET v3/teams
+// GET /v3/myteams
 router.get("/myteams", authMiddleware, async ctx => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const loggedUser = JSON.parse(ctx.request.query.loggedUser);
+  const query = <TQuery>ctx.request.query;
+  const { id: userId, email: userEmail } = JSON.parse(query.loggedUser);
 
-  console.log(loggedUser.id);
+  const { userRole = "manager,monitor,invitations" } = query;
+  const userRoles = userRole.split(",");
 
-  const teams = await TeamModel.find({
-    $or: [
-      { "managers.id": loggedUser.id },
-      { "confirmedUsers.id": loggedUser.id },
-      { "sentInvitations.id": loggedUser.id }
-    ]
+  const orFilter: any[] = [];
+  userRoles.forEach(filter => {
+    switch (filter) {
+      case "manager":
+        orFilter.push({ "managers.id": userId });
+        break;
+      case "monitor":
+        orFilter.push({ "confirmedUsers.id": userId });
+        break;
+      case "invitations":
+        orFilter.push({ users: userEmail });
+        break;
+    }
   });
 
-  ctx.body = teams;
+  let teams = await TeamModel.find({
+    $or: orFilter
+  });
+
+  teams = teams.map(team => {
+    // Find the role the current user has for this team
+    // team.userRole = EUserRole.Manager; ToDO
+    return team;
+  });
+
+  ctx.body = teamSerializer(teams);
 });
 
 export default router;
