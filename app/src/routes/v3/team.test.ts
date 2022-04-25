@@ -38,7 +38,7 @@ jest.mock("models/team.model", () => {
   };
 });
 
-describe("GET /v3/teams", () => {
+describe("GET /v3/myteams", () => {
   let teamDBMockedResponse: ITeamResponse[];
 
   afterAll(() => {
@@ -53,7 +53,7 @@ describe("GET /v3/teams", () => {
   });
 
   const exec = (query = "") => {
-    return request(server).get(`/v3/teams${query}`);
+    return request(server).get(`/v3/myteams${query}`);
   };
 
   it("should return 200 status", async () => {
