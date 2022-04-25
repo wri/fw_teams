@@ -8,16 +8,16 @@ export enum EUserRole {
   Invited = "invited"
 }
 
-export interface ITeamModel extends mongoose.Document {
+export interface ITeam {
   name?: string;
   userRole?: EUserRole;
-  managers: [{ id: string; email?: string }];
+  managers: never[] | [{ id: string; email?: string }];
   users: string[];
   sentInvitations: string[];
   areas: string[];
-  layers: [];
-  confirmedUsers: [{ id: string; email?: string }];
-  createdAt: string[];
+  layers: any[];
+  confirmedUsers: never[] | [{ id: string; email?: string }];
+  createdAt: string;
 }
 
 const TeamSchema = new Schema({
@@ -30,6 +30,8 @@ const TeamSchema = new Schema({
   confirmedUsers: { type: Array, default: [] },
   createdAt: { type: Date, required: true, default: Date.now }
 });
+
+export interface ITeamModel extends ITeam, mongoose.Document {}
 
 export const TeamModel = mongoose.model<ITeamModel>("Team", TeamSchema);
 
