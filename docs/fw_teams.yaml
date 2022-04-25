@@ -3,14 +3,16 @@ info:
   title: fw_teams
   version: '1.0'
 servers:
-  - url: 'https://api.resourcewatch.org/v1'
+  - url: 'https://api.resourcewatch.org'
     description: Production
-  - url: 'https://gfw-staging.globalforestwatch.org/v1'
+  - url: 'https://gfw-staging.globalforestwatch.org'
     description: Staging
-  - url: 'http://localhost:3035/v1'
-    description: Local
+  - url: 'https://dev-fw-api.globalforestwatch.org'
+    description: Dev
+  - description: Local
+    url: 'http://localhost:3035'
 paths:
-  /teams:
+  /v1/teams:
     post:
       summary: Create Team
       operationId: post-team
@@ -23,7 +25,9 @@ paths:
           $ref: '#/components/responses/Error'
       requestBody:
         $ref: '#/components/requestBodies/Team'
-  '/teams/{id}':
+      tags:
+        - v1
+  '/v1/teams/{id}':
     parameters:
       - schema:
           type: string
@@ -40,6 +44,8 @@ paths:
         '401':
           $ref: '#/components/responses/Error'
       description: ''
+      tags:
+        - v1
     patch:
       summary: Update Team
       operationId: patch-team
@@ -50,6 +56,8 @@ paths:
           $ref: '#/components/responses/Error'
       requestBody:
         $ref: '#/components/requestBodies/Team'
+      tags:
+        - v1
     delete:
       summary: Delete Team
       operationId: delete-team
@@ -60,7 +68,9 @@ paths:
           $ref: '#/components/responses/Error'
         '404':
           $ref: '#/components/responses/Error'
-  '/teams/user/{userId}':
+      tags:
+        - v1
+  '/v1/teams/user/{userId}':
     parameters:
       - schema:
           type: string
@@ -78,7 +88,9 @@ paths:
         '404':
           $ref: '#/components/responses/Error'
       description: Retrieve team by given user id
-  '/teams/confirm/{token}':
+      tags:
+        - v1
+  '/v1/teams/confirm/{token}':
     parameters:
       - schema:
           type: string
@@ -125,33 +137,93 @@ paths:
       description: |-
         Confirms the user is within the team with the id given in the JWT token.
         If not then the user is added to that team and if needed remove from an existing team.
-  /fw_teams/healthcheck:
+      tags:
+        - v1
+  /v1/fw_teams/healthcheck:
     get:
       summary: Your GET endpoint
-      tags: []
+      tags:
+        - v1
       responses:
         '200':
           $ref: '#/components/responses/Healthcheck'
       operationId: get-fw_teams-healthcheck
       security: []
       description: ''
+  /v3/myteams:
+    get:
+      summary: Get all Teams associated with Authenticated user
+      tags:
+        - v3
+      responses:
+        '200':
+          $ref: '#/components/responses/Teams-v3'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+      operationId: get-v3-myteams
+      description: |-
+        Receive all Teams the authenticated user is associated with.
+
+        To filter the respoonse pass the query param `?userRole=` with the available options (comma-seperated):
+         - `manager`
+         - `monitor`
+         - `invited`
+      parameters:
+        - schema:
+            type: string
+            default: 'manager,monitor,invited'
+          in: query
+          name: userRole
+          description: 'Roles to filter the teams by either `manager`, `monitor` or `invited`'
+    parameters: []
 components:
   schemas:
     Team:
       title: Team
       type: object
+      examples:
+        - name: string
+          managers:
+            - id: string
+              email: string
+          users:
+            - string
+          sentInvitations:
+            - string
+          areas:
+            - null
+          layers:
+            - null
+          confirmedUsers:
+            - id: string
+              email: string
+          createdAt: '2019-08-24T14:15:22Z'
+      x-tags:
+        - v1
       properties:
         name:
           type: string
         managers:
           type: array
-          items: {}
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              email:
+                type: string
         users:
           type: array
-          items: {}
+          items:
+            type: string
         sentInvitations:
           type: array
-          items: {}
+          items:
+            type: string
         areas:
           type: array
           items: {}
@@ -160,13 +232,86 @@ components:
           items: {}
         confirmedUsers:
           type: array
-          items: {}
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              email:
+                type: string
         createdAt:
           type: string
           format: date-time
           readOnly: true
       required:
         - createdAt
+    Team-v3:
+      title: Team v3
+      type: object
+      examples:
+        - name: string
+          managers:
+            - id: string
+              email: string
+          users:
+            - string
+          sentInvitations:
+            - string
+          areas:
+            - null
+          layers:
+            - null
+          confirmedUsers:
+            - id: string
+              email: string
+          createdAt: '2019-08-24T14:15:22Z'
+          userRole: string
+      properties:
+        name:
+          type: string
+        managers:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              email:
+                type: string
+        users:
+          type: array
+          items:
+            type: string
+        sentInvitations:
+          type: array
+          items:
+            type: string
+        areas:
+          type: array
+          items: {}
+        layers:
+          type: array
+          items: {}
+        confirmedUsers:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              email:
+                type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        userRole:
+          type: string
+      required:
+        - createdAt
+      description: ''
+      x-tags:
+        - v3
   securitySchemes:
     Authorization:
       type: http
@@ -314,5 +459,47 @@ components:
               uptime:
                 type: number
           examples: {}
+    Teams-v3:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    type:
+                      type: string
+                    attrbiutes:
+                      $ref: '#/components/schemas/Team-v3'
+          examples:
+            Teams:
+              value:
+                data:
+                  - id: string
+                    type: string
+                    attrbiutes:
+                      name: string
+                      managers:
+                        - id: string
+                          email: string
+                      users:
+                        - string
+                      sentInvitations:
+                        - string
+                      areas:
+                        - null
+                      layers:
+                        - null
+                      confirmedUsers:
+                        - id: string
+                          email: string
+                      createdAt: '2019-08-24T14:15:22Z'
+                      userRole: string
 security:
   - Authorization: []
