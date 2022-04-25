@@ -11,11 +11,15 @@ export enum EUserRole {
 export interface ITeam {
   name?: string;
   userRole?: EUserRole;
+  // Managers of the Team
   managers: never[] | [{ id: string; email?: string }];
+  // Users who have been invited but have not confirmed their invitation
   users: string[];
+  // Deprecated
   sentInvitations: string[];
   areas: string[];
   layers: any[];
+  // Users who have accepted their invitation to the team
   confirmedUsers: never[] | [{ id: string; email?: string }];
   createdAt: string;
 }
