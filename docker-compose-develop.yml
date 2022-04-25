@@ -5,6 +5,7 @@ services:
     container_name: fw-teams-develop
     ports:
         - "3035:3035"
+        - "9229:9229"
     environment:
       NODE_ENV: dev
       SUPPRESS_NO_CONFIG_WARNING: "true"
@@ -18,10 +19,11 @@ services:
       REDIS_URL: redis://redis:6379
       REDIS_QUEUE_NAME: mail
       APP_URL: http://127.0.0.1:3035
-      USERS_API_URL: https://api.resourcewatch.org
-      CONTROL_TOWER_URL: https://api.resourcewatch.org
+      USERS_API_URL: https://staging-api.resourcewatch.org
+      CONTROL_TOWER_URL: https://staging-api.resourcewatch.org
     volumes:
       - ./app:/opt/fw-teams/app
+      - ./debug:/opt/fw-teams/debug
       - ./nodemon.json:/opt/fw-teams/nodemon.json
     depends_on:
       - mongo
@@ -29,7 +31,7 @@ services:
     networks:
       - gfw-teams-network
       - gfw-network
-    command: yarn dev
+    command: yarn run dev:debug
 
   test:
     build: .
@@ -38,7 +40,7 @@ services:
       NODE_ENV: test
       SUPPRESS_NO_CONFIG_WARNING: "true"
       LOGGER_LEVEL: debug
-      SERVICE_PORT: 3035
+      SERVICE_PORT: 0
       JWT_SECRET: reallyunguessablesecretkey
       MONGODB_HOST: mongo
       MONGODB_PORT: 27017
@@ -52,11 +54,14 @@ services:
     depends_on:
       - mongo
       - redis
+    networks:
+      - gfw-teams-network
+      - gfw-network
     volumes:
       - ./app:/opt/fw-teams/app
       - ./nodemon.json:/opt/fw-teams/nodemon.json
       - ./jest.config.js:/opt/fw-teams/jest.config.js
-    command: yarn test
+    command: yarn run test:jest
 
   docs:
     build: .

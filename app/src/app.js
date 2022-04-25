@@ -5,7 +5,7 @@ const koaLogger = require("koa-logger");
 const config = require("config");
 const loader = require("loader");
 const mongoose = require("mongoose");
-const loggedInUserService = require("./services/LoggedInUserService");
+const loggedInUserService = require("services/LoggedInUserService");
 const Sentry = require("@sentry/node");
 
 mongoose.Promise = Promise;
