@@ -48,11 +48,12 @@ describe("/v3/teams", () => {
   beforeEach(() => {
     teamDBMockedResponse = [standardTeamResponse];
 
+    (TeamModel.find as jest.Mock).mockReset();
     (TeamModel.find as jest.Mock).mockImplementation(() => teamDBMockedResponse);
   });
 
-  const exec = () => {
-    return request(server).get("/v3/teams");
+  const exec = (query = "") => {
+    return request(server).get(`/v3/teams${query}`);
   };
 
   it("should return 200 status", async () => {
@@ -79,11 +80,113 @@ describe("/v3/teams", () => {
     expect(res.body.data[0].attributes.userRole).toBe("manager");
   });
 
+  it("should filter the database by 'manager', 'monitor' and 'invited' by default", async () => {
+    await exec();
+
+    expect(TeamModel.find).toHaveBeenLastCalledWith({
+      $or: [
+        { "managers.id": "1234TestAuthUser" },
+        { "confirmedUsers.id": "1234TestAuthUser" },
+        { users: "testAuthUser@test.com" }
+      ]
+    });
+  });
+
+  it("should filter the database by 'manager' if query string is '?userRole=manager", async () => {
+    await exec("?userRole=manager");
+
+    expect(TeamModel.find).toHaveBeenLastCalledWith({
+      $or: [{ "managers.id": "1234TestAuthUser" }]
+    });
+  });
+
+  it("should filter the database by 'monitor' and 'invited' if query string is '?userRole=monitor,invited", async () => {
+    await exec("?userRole=monitor,invited");
+
+    expect(TeamModel.find).toHaveBeenLastCalledWith({
+      $or: [{ "confirmedUsers.id": "1234TestAuthUser" }, { users: "testAuthUser@test.com" }]
+    });
+  });
+
+  it("should return 400 error if query string is wrong", async () => {
+    const res = await exec("?userRole=NotCorrect");
+
+    expect(res.status).toBe(400);
+  });
+
+  it("should mark a response as 'userRole: monitor' if the logged in user is a monitor of the team", async () => {
+    teamDBMockedResponse = [
+      {
+        ...standardTeamResponse,
+        managers: [
+          {
+            id: "1234NotLoggedInUser",
+            email: "user@test.com"
+          }
+        ],
+        confirmedUsers: [
+          {
+            id: "1234TestAuthUser",
+            email: "testAuthUser@test.com"
+          }
+        ]
+      }
+    ];
+
+    const res = await exec();
+
+    expect(res.body.data[0].attributes.userRole).toBe("monitor");
+  });
+
+  it("should mark a response as 'userRole: invited' if the logged in user is invited to the team", async () => {
+    teamDBMockedResponse = [
+      {
+        ...standardTeamResponse,
+        managers: [
+          {
+            id: "1234NotLoggedInUser",
+            email: "user@test.com"
+          }
+        ],
+        users: ["testAuthUser@test.com"]
+      }
+    ];
+
+    const res = await exec();
+
+    expect(res.body.data[0].attributes.userRole).toBe("invited");
+  });
+
   it("should return multiple teams", async () => {
     teamDBMockedResponse = [
       standardTeamResponse,
-      { ...standardTeamResponse, id: "234567" },
-      { ...standardTeamResponse, id: "345678" }
+      {
+        ...standardTeamResponse,
+        id: "234567",
+        managers: [
+          {
+            id: "1234NotLoggedInUser",
+            email: "user@test.com"
+          }
+        ],
+        confirmedUsers: [
+          {
+            id: "1234TestAuthUser",
+            email: "testAuthUser@test.com"
+          }
+        ]
+      },
+      {
+        ...standardTeamResponse,
+        id: "345678",
+        managers: [
+          {
+            id: "1234NotLoggedInUser",
+            email: "user@test.com"
+          }
+        ],
+        users: ["testAuthUser@test.com"]
+      }
     ];
 
     const res = await exec();
@@ -93,7 +196,7 @@ describe("/v3/teams", () => {
     expect(res.body.data[1].id).toBe("234567");
     expect(res.body.data[2].id).toBe("345678");
     expect(res.body.data[0].attributes.userRole).toBe("manager");
-    expect(res.body.data[1].attributes.userRole).toBe("manager");
-    expect(res.body.data[2].attributes.userRole).toBe("manager");
+    expect(res.body.data[1].attributes.userRole).toBe("monitor");
+    expect(res.body.data[2].attributes.userRole).toBe("invited");
   });
 });
