@@ -19,8 +19,8 @@ const standardTeamResponse: ITeamResponse = {
   users: [],
   managers: [
     {
-      id: "1234",
-      email: "user@test.com"
+      id: "1234TestAuthUser",
+      email: "testAuthUser@test.com"
     }
   ]
 };
@@ -53,7 +53,7 @@ describe("/v3/teams", () => {
   });
 
   const exec = () => {
-    return request(server).get("/v3/myteams");
+    return request(server).get("/v3/teams");
   };
 
   it("should return 200 status", async () => {
@@ -74,6 +74,12 @@ describe("/v3/teams", () => {
     expect(res.body.data[0].id).toBe("123456");
   });
 
+  it("should mark the standard response as 'userRole: manager'", async () => {
+    const res = await exec();
+
+    expect(res.body.data[0].attributes.userRole).toBe("manager");
+  });
+
   it("should return multiple teams", async () => {
     teamDBMockedResponse = [
       standardTeamResponse,
@@ -87,5 +93,8 @@ describe("/v3/teams", () => {
     expect(res.body.data[0].id).toBe("123456");
     expect(res.body.data[1].id).toBe("234567");
     expect(res.body.data[2].id).toBe("345678");
+    expect(res.body.data[0].attributes.userRole).toBe("manager");
+    expect(res.body.data[1].attributes.userRole).toBe("manager");
+    expect(res.body.data[2].attributes.userRole).toBe("manager");
   });
 });

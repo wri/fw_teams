@@ -2,8 +2,8 @@
 // See: https://jestjs.io/docs/configuration#setupfilesafterenv-array
 
 const user = {
-  id: "1234TestUser",
-  email: "testUser@test.com"
+  id: "1234TestAuthUser",
+  email: "testAuthUser@test.com"
 };
 
 class LoggedInUserServiceMock {

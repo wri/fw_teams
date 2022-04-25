@@ -10,8 +10,8 @@ type TQuery = {
 
 const router = new Router();
 
-// GET /v3/myteams
-router.get("/myteams", authMiddleware, async ctx => {
+// GET /v3/teams
+router.get("/teams", authMiddleware, async ctx => {
   const query = <TQuery>ctx.request.query;
   const { id: userId, email: userEmail } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
 
