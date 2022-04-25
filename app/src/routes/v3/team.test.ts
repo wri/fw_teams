@@ -32,6 +32,7 @@ jest.mock("models/team.model", () => {
     __esModule: true,
     ...originalModule,
     TeamModel: {
+      ...originalModule.TeamModel,
       find: jest.fn()
     }
   };
@@ -47,9 +48,7 @@ describe("/v3/teams", () => {
   beforeEach(() => {
     teamDBMockedResponse = [standardTeamResponse];
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    TeamModel.find.mockImplementation(() => teamDBMockedResponse);
+    (TeamModel.find as jest.Mock).mockImplementation(() => teamDBMockedResponse);
   });
 
   const exec = () => {
