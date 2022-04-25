@@ -45,7 +45,7 @@ services:
       MONGODB_HOST: mongo
       MONGODB_PORT: 27017
       DB_SECRET: '{ "username": "admin", "password": "password" }'
-      DB_DATABASE: fw_teams_db
+      DB_DATABASE: fw_teams_db_test
       REDIS_URL: redis://redis:6379
       REDIS_QUEUE_NAME: mail
       APP_URL: http://127.0.0.1:3035
