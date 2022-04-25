@@ -38,7 +38,7 @@ jest.mock("models/team.model", () => {
   };
 });
 
-describe("/v3/teams", () => {
+describe("GET /v3/teams", () => {
   let teamDBMockedResponse: ITeamResponse[];
 
   afterAll(() => {
@@ -74,12 +74,6 @@ describe("/v3/teams", () => {
     expect(res.body.data[0].id).toBe("123456");
   });
 
-  it("should mark the standard response as 'userRole: manager'", async () => {
-    const res = await exec();
-
-    expect(res.body.data[0].attributes.userRole).toBe("manager");
-  });
-
   it("should filter the database by 'manager', 'monitor' and 'invited' by default", async () => {
     await exec();
 
@@ -112,6 +106,12 @@ describe("/v3/teams", () => {
     const res = await exec("?userRole=NotCorrect");
 
     expect(res.status).toBe(400);
+  });
+
+  it("should mark the standard response as 'userRole: manager'", async () => {
+    const res = await exec();
+
+    expect(res.body.data[0].attributes.userRole).toBe("manager");
   });
 
   it("should mark a response as 'userRole: monitor' if the logged in user is a monitor of the team", async () => {
