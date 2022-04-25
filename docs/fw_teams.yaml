@@ -141,9 +141,7 @@ paths:
         - v1
   /v1/fw_teams/healthcheck:
     get:
-      summary: Your GET endpoint
-      tags:
-        - v1
+      summary: Healthcheck
       responses:
         '200':
           $ref: '#/components/responses/Healthcheck'
