@@ -51,7 +51,7 @@ module "fargate_autoscaling" {
   lb_target_group_arn = module.fargate_autoscaling.lb_target_group_arn
   listener_arn        = data.terraform_remote_state.fw_core.outputs.lb_listener_arn
   project_prefix      = var.project_prefix
-  path_pattern        = ["/v1/fw_teams/healthcheck", "/v1/teams*", "/v3/myteams"]
+  path_pattern        = ["/v1/fw_teams/healthcheck", "/v1/teams*", "/v3/myteams", "/v3/teams*"]
   priority            = 4
   health_check_path = "/v1/fw_teams/healthcheck"
 
