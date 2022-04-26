@@ -51,8 +51,13 @@ router.get("/teams/reject/:teamId", authMiddleware, async ctx => {
   // Find the team in DB
   const team = await TeamModel.findById(teamId);
 
-  // Remove user from users (Invited but not confirmed users)
-  team.users = team.users.filter(users => users !== userEmail);
+  if (team.users.some(users => users === userEmail)) {
+    // Remove user from users (Invited but not confirmed users)
+    team.users = team.users.filter(users => users !== userEmail);
+  } else {
+    ctx.status = 400;
+    throw new Error("User not invited to the team");
+  }
 
   await team.save();
 
