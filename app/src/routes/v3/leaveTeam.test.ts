@@ -33,7 +33,7 @@ const standardTeamDocument: TTeamDocument = {
   ]
 };
 
-describe("GET /v3/teams/leave/:teamId", () => {
+describe("PATCH /v3/teams/leave/:teamId", () => {
   let teamDocument: TTeamDocument, team: ITeamModel;
 
   afterAll(async () => {
@@ -48,7 +48,9 @@ describe("GET /v3/teams/leave/:teamId", () => {
   const exec = async (teamId?: string) => {
     team = await new TeamModel(teamDocument).save();
 
-    return request(server).get(`/v3/teams/leave/${teamId || team.id}`);
+    return request(server)
+      .patch(`/v3/teams/leave/${teamId || team.id}`)
+      .send();
   };
 
   it("should return 200 status", async () => {
@@ -168,7 +170,7 @@ describe("GET /v3/teams/leave/:teamId", () => {
   });
 });
 
-describe("GET /v3/teams/reject/:teamId", () => {
+describe("PATCH /v3/teams/reject/:teamId", () => {
   let teamDocument: TTeamDocument, team: ITeamModel;
 
   afterAll(async () => {
@@ -187,7 +189,9 @@ describe("GET /v3/teams/reject/:teamId", () => {
   const exec = async (teamId?: string) => {
     team = await new TeamModel(teamDocument).save();
 
-    return request(server).get(`/v3/teams/reject/${teamId || team.id}`);
+    return request(server)
+      .patch(`/v3/teams/reject/${teamId || team.id}`)
+      .send();
   };
 
   it("should return 200 status", async () => {

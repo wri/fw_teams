@@ -1,3 +1,4 @@
+import { Request } from "koa";
 import Router from "koa-router";
 import { TeamModel } from "models/team.model";
 import { authMiddleware } from "middlewares";
@@ -5,19 +6,21 @@ import teamSerializer from "serializers/teamWithUserRole.serializer";
 
 const router = new Router();
 
-type TQuery = {
-  loggedUser: string;
-};
+type TRequest = {
+  body: {
+    loggedUser: any;
+  };
+} & Request;
 
 type TParams = {
   teamId: string;
 };
 
-// GET /v3/teams/leave/:teamId
-router.get("/teams/leave/:teamId", authMiddleware, async ctx => {
+// PATCH /v3/teams/leave/:teamId
+router.patch("/teams/leave/:teamId", authMiddleware, async ctx => {
   const { teamId } = <TParams>ctx.params;
-  const query = <TQuery>ctx.request.query;
-  const { id: userId } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
+  const { body } = <TRequest>ctx.request;
+  const { id: userId } = body.loggedUser; // ToDo: loggedUser Type
 
   // Find the team in DB
   const team = await TeamModel.findById(teamId);
@@ -42,11 +45,11 @@ router.get("/teams/leave/:teamId", authMiddleware, async ctx => {
   ctx.body = teamSerializer(team);
 });
 
-// GET /v3/reject/:teamId
-router.get("/teams/reject/:teamId", authMiddleware, async ctx => {
+// PATCH /v3/reject/:teamId
+router.patch("/teams/reject/:teamId", authMiddleware, async ctx => {
   const { teamId } = <TParams>ctx.params;
-  const query = <TQuery>ctx.request.query;
-  const { email: userEmail } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
+  const { body } = <TRequest>ctx.request;
+  const { email: userEmail } = body.loggedUser; // ToDo: loggedUser Type
 
   // Find the team in DB
   const team = await TeamModel.findById(teamId);
