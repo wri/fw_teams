@@ -213,7 +213,7 @@ describe("PATCH /v3/teams/reject/:teamId", () => {
 
     expect(res.body.data.id).toBe(team.id);
     expect(res.body.data.type).toBe("team");
-    expect(res.body.data.attributes.users).toEqual(expect.not.arrayContaining(["tesusertAuthUser@test.com"]));
+    expect(res.body.data.attributes.users).toEqual(expect.not.arrayContaining(["testAuthUser@test.com"]));
   });
 
   it("should return 404 when team isn't found", async () => {
