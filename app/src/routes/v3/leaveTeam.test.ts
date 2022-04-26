@@ -72,6 +72,14 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
 
     expect(res.body.data.id).toBe(team.id);
     expect(res.body.data.type).toBe("team");
+    expect(res.body.data.attributes.confirmedUsers).toEqual(
+      expect.not.arrayContaining([
+        {
+          id: "1234TestAuthUser",
+          email: "testAuthUser@test.com"
+        }
+      ])
+    );
   });
 
   it("should remove 1234TestAuthUser from confirmed users array in the DB", async () => {
@@ -205,6 +213,7 @@ describe("PATCH /v3/teams/reject/:teamId", () => {
 
     expect(res.body.data.id).toBe(team.id);
     expect(res.body.data.type).toBe("team");
+    expect(res.body.data.attributes.users).toEqual(expect.not.arrayContaining(["tesusertAuthUser@test.com"]));
   });
 
   it("should return 404 when team isn't found", async () => {
