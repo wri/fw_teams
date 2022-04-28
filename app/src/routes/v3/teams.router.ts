@@ -9,6 +9,11 @@ type TRequest = {
   body: any; // ToDo: request body
 } & Request;
 
+type TQuery = {
+  loggedUser: string;
+  userRole?: string;
+};
+
 const router = new Router({
   prefix: "/teams"
 });
@@ -100,11 +105,6 @@ router.patch("/:teamId", authMiddleware, isAdminOrManager, async ctx => {
 
 // DELETE /v3/teams/:teamId
 // Need to be admin
-type TQuery = {
-  loggedUser: string;
-  userRole?: string;
-};
-
 router.delete("/:teamId", authMiddleware, isAdmin, async ctx => {
   const query = <TQuery>ctx.request.query;
   const { teamId } = ctx.params;
