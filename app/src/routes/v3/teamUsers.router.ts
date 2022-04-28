@@ -10,7 +10,7 @@ const router = new Router({
 
 type TRequest = {
   body: {
-    user: ITeamUserRelation;
+    loggedUser: any;
     users: ITeamUserRelation[];
   }; // ToDo: request body
 } & Request;
@@ -106,17 +106,85 @@ router.patch("/", authMiddleware, isAdminOrManager, async ctx => {
 // PATCH /v3/teams/:teamId/users/:userId/accept
 // Update user's role to "confirmed"
 // Only if JWT's userid match the one in the URL
-router.patch("/:userId/accept", authMiddleware, async () => {});
+router.patch("/:userId/accept", authMiddleware, async ctx => {
+  const { teamId, userId } = ctx.params;
+  const { body } = <TRequest>ctx.request;
+  const { id: loggedUserId, email: loggedEmailId } = body.loggedUser; // ToDo: loggedUser Type
+
+  if (userId !== loggedUserId) {
+    ctx.status = 401;
+    throw new Error("Login with the correct user");
+  }
+
+  const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
+    { teamId, email: loggedEmailId },
+    {
+      userId: loggedUserId,
+      status: EUserStatus.Confirmed
+    },
+    { new: true }
+  );
+
+  ctx.body = updatedUser;
+});
 
 // PATCH /v3/teams/:teamId/users/:userId/decline
 // Update user's role to "declined"
 // Only if JWT's userid match the one in the URL
-router.patch("/:userId/decline", authMiddleware, async () => {});
+router.patch("/:userId/decline", authMiddleware, async ctx => {
+  const { teamId, userId } = ctx.params;
+  const { body } = <TRequest>ctx.request;
+  const { id: loggedUserId, email: loggedEmailId } = body.loggedUser; // ToDo: loggedUser Type
+
+  if (userId !== loggedUserId) {
+    ctx.status = 401;
+    throw new Error("Log in with the correct user");
+  }
+
+  const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
+    { teamId, email: loggedEmailId },
+    {
+      status: EUserStatus.Declined
+    },
+    { new: true }
+  );
+
+  ctx.body = updatedUser;
+});
 
 // PATCH /v3/teams/:teamId/users/:userId/leave
 // Update user's role to "left"
 // Only if JWT's userid match the one in the URL
 // Unless auth user is admin
-router.patch("/:userId/leave", authMiddleware, async () => {});
+router.patch("/:userId/leave", authMiddleware, async ctx => {
+  const { teamId, userId } = ctx.params;
+  const { body } = <TRequest>ctx.request;
+  const { id: loggedUserId, email: loggedEmailId } = body.loggedUser; // ToDo: loggedUser Type
+
+  if (userId !== loggedUserId) {
+    ctx.status = 401;
+    throw new Error("Log in with the correct user");
+  }
+
+  const teamUserRelation = await TeamUserRelationModel.findOne({
+    teamId,
+    userId
+  });
+
+  if (teamUserRelation && teamUserRelation.role === EUserRole.Administrator) {
+    ctx.status = 400;
+    throw new Error("Administrator can't leave team");
+  }
+
+  const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
+    { teamId, email: loggedEmailId },
+    {
+      role: EUserRole.Left
+    },
+    { new: true }
+  );
+
+  ctx.body = updatedUser;
+});
 
 export default router;
