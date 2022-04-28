@@ -4,7 +4,7 @@ import { TeamModel, validateTeam } from "models/team.model";
 import { TeamUserRelationModel, EUserRole, EUserStatus } from "models/teamUserRelation.model";
 import teamUserRelationService from "services/teamUserRelation.service";
 import gfwTeamSerializer from "serializers/gfwTeam.serializer";
-import { Request, Middleware } from "koa";
+import { Request } from "koa";
 import { isAdmin, isUser } from "middlewares";
 
 type TRequest = {

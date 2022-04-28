@@ -37,7 +37,7 @@ const TeamUserJoiSchema = Joi.object<ITeamUserRelation>({
 
 const TeamUserRelationSchema = new Schema({
   teamId: { type: Schema.Types.ObjectId, required: true },
-  userId: { type: Schema.Types.ObjectId, required: true },
+  userId: { type: Schema.Types.ObjectId },
   email: { type: String, required: true },
   role: { type: String, required: true },
   status: { type: String, required: true }
