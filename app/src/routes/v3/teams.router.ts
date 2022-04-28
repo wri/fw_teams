@@ -1,8 +1,9 @@
 import Router from "koa-router";
-import { authMiddleware, validatorMiddleware } from "middlewares";
+import { authMiddleware, validatorMiddleware, isAdminOrManager } from "middlewares";
 import { TeamModel, validateTeam } from "models/team.model";
 import { TeamUserRelationModel, EUserRole, EUserStatus } from "models/teamUserRelation.model";
 import { Request } from "koa";
+import { isAdmin } from "../../middlewares";
 
 type TRequest = {
   body: any; // ToDo: request body
@@ -47,11 +48,31 @@ router.post("/", authMiddleware, async ctx => {
 });
 
 // PATCH /v3/teams/:teamId
-// Need to be admin
-router.patch("/:teamId", authMiddleware, validatorMiddleware(validateTeam), async () => {});
+// Need to be admin or manager
+router.patch("/:teamId", authMiddleware, isAdminOrManager, validatorMiddleware(validateTeam), async () => {});
 
 // DELETE /v3/teams/:teamId
 // Need to be admin
-router.delete("/:teamId", authMiddleware, async () => {});
+type TQuery = {
+  loggedUser: string;
+  userRole?: string;
+};
+
+router.delete("/:teamId", authMiddleware, isAdmin, async ctx => {
+  const query = <TQuery>ctx.request.query;
+  const { teamId } = ctx.params;
+  const { id: userId } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
+
+  await TeamModel.findByIdAndRemove(teamId);
+
+  // Remove all team user relations
+  await TeamUserRelationModel.remove({
+    teamId,
+    userId
+  });
+
+  ctx.status = 200;
+  ctx.body = "";
+});
 
 export default router;
