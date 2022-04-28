@@ -3,6 +3,9 @@ import { TeamModel, ITeam } from "models/team.model";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import server from "app";
+import mongoose from "mongoose";
+
+const { ObjectId } = mongoose.Types;
 
 interface ITeamResponse extends ITeam {
   id: string;
@@ -17,9 +20,10 @@ const standardTeamResponse: ITeamResponse = {
   areas: [],
   sentInvitations: [],
   users: [],
+  administrator: new ObjectId("addaddaddaddaddaddaddadd"),
   managers: [
     {
-      id: "1234TestAuthUser",
+      id: "addaddaddaddaddaddaddadd",
       email: "testAuthUser@test.com"
     }
   ]
@@ -79,8 +83,8 @@ describe("GET /v3/myteams", () => {
 
     expect(TeamModel.find).toHaveBeenLastCalledWith({
       $or: [
-        { "managers.id": "1234TestAuthUser" },
-        { "confirmedUsers.id": "1234TestAuthUser" },
+        { "managers.id": "addaddaddaddaddaddaddadd" },
+        { "confirmedUsers.id": "addaddaddaddaddaddaddadd" },
         { users: "testAuthUser@test.com" }
       ]
     });
@@ -90,7 +94,7 @@ describe("GET /v3/myteams", () => {
     await exec("?userRole=manager");
 
     expect(TeamModel.find).toHaveBeenLastCalledWith({
-      $or: [{ "managers.id": "1234TestAuthUser" }]
+      $or: [{ "managers.id": "addaddaddaddaddaddaddadd" }]
     });
   });
 
@@ -98,7 +102,7 @@ describe("GET /v3/myteams", () => {
     await exec("?userRole=monitor,invited");
 
     expect(TeamModel.find).toHaveBeenLastCalledWith({
-      $or: [{ "confirmedUsers.id": "1234TestAuthUser" }, { users: "testAuthUser@test.com" }]
+      $or: [{ "confirmedUsers.id": "addaddaddaddaddaddaddadd" }, { users: "testAuthUser@test.com" }]
     });
   });
 
@@ -126,7 +130,7 @@ describe("GET /v3/myteams", () => {
         ],
         confirmedUsers: [
           {
-            id: "1234TestAuthUser",
+            id: "addaddaddaddaddaddaddadd",
             email: "testAuthUser@test.com"
           }
         ]
@@ -171,7 +175,7 @@ describe("GET /v3/myteams", () => {
         ],
         confirmedUsers: [
           {
-            id: "1234TestAuthUser",
+            id: "addaddaddaddaddaddaddadd",
             email: "testAuthUser@test.com"
           }
         ]

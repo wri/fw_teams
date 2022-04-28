@@ -1,4 +1,5 @@
 import request from "supertest";
+import mongoose from "mongoose";
 import { TeamModel, ITeam, ITeamModel } from "models/team.model";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -7,13 +8,16 @@ import loggedInUserService from "services/LoggedInUserService";
 // @ts-ignore
 import server from "app";
 
+const { ObjectId } = mongoose.Types;
+
 type TTeamDocument = Omit<ITeam, "createdAt">;
 
 const standardTeamDocument: TTeamDocument = {
   name: "test",
+  administrator: new ObjectId("123456789012345678901234"),
   confirmedUsers: [
     {
-      id: "1234TestAuthUser",
+      id: "addaddaddaddaddaddaddadd",
       email: "testAuthUser@test.com"
     },
     {
@@ -75,14 +79,14 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
     expect(res.body.data.attributes.confirmedUsers).toEqual(
       expect.not.arrayContaining([
         {
-          id: "1234TestAuthUser",
+          id: "addaddaddaddaddaddaddadd",
           email: "testAuthUser@test.com"
         }
       ])
     );
   });
 
-  it("should remove 1234TestAuthUser from confirmed users array in the DB", async () => {
+  it("should remove addaddaddaddaddaddaddadd from confirmed users array in the DB", async () => {
     await exec();
 
     const updatedTeam = await TeamModel.findById(team._id);
@@ -90,19 +94,20 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
     expect(updatedTeam.confirmedUsers).toEqual(
       expect.not.arrayContaining([
         {
-          id: "1234TestAuthUser",
+          id: "addaddaddaddaddaddaddadd",
           email: "testAuthUser@test.com"
         }
       ])
     );
   });
 
-  it("should return 400, when authorised user is the only manager of the team", async () => {
+  it("should return 400, when authorised user is the administrator of the team", async () => {
     teamDocument = {
       ...standardTeamDocument,
+      administrator: "addaddaddaddaddaddaddadd",
       managers: [
         {
-          id: "1234TestAuthUser",
+          id: "addaddaddaddaddaddaddadd",
           email: "testAuthUser@test.com"
         }
       ],
@@ -117,7 +122,7 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
     const res = await exec();
 
     expect(res.status).toBe(400);
-    expect(res.body.errors[0].detail).toContain("only manager");
+    expect(res.body.errors[0].detail).toContain("administrator");
   });
 
   it("should return 400, when the authorised user isn't a member of the team", async () => {
@@ -142,12 +147,12 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
     expect(res.status).toBe(400);
   });
 
-  it("should remove 1234TestAuthUser from managers array in the DB, when authorised user is not the only manager of the team", async () => {
+  it("should remove addaddaddaddaddaddaddadd from managers array in the DB, when authorised user is not the administrator", async () => {
     teamDocument = {
       ...standardTeamDocument,
       managers: [
         {
-          id: "1234TestAuthUser",
+          id: "addaddaddaddaddaddaddadd",
           email: "testAuthUser@test.com"
         },
         {
@@ -170,7 +175,7 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
     expect(updatedTeam.managers).toEqual(
       expect.not.arrayContaining([
         {
-          id: "1234TestAuthUser",
+          id: "addaddaddaddaddaddaddadd",
           email: "testAuthUser@test.com"
         }
       ])
