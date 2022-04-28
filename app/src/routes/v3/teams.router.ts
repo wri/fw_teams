@@ -10,6 +10,7 @@ const router = new Router({
 router.get("/:teamId", authMiddleware, async () => {});
 
 // GET /v3/teams/user/:userId
+// Get Teams by user id
 router.get("/user/:userId", authMiddleware, async () => {});
 
 // POST /v3/teams

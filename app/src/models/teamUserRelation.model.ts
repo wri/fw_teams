@@ -26,7 +26,6 @@ export interface ITeamUserRelation {
 
 const TeamUserJoiSchema = Joi.object<ITeamUserRelation>({
   teamId: Joi.string().hex().required(),
-  userId: Joi.string().hex().required(),
   email: Joi.string().email().required(),
   role: Joi.string()
     .valid(...Object.values(EUserRole))
