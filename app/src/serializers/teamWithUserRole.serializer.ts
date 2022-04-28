@@ -10,7 +10,7 @@ Serializer.register("team", {
   convertCase: "camelCase"
 });
 
-const serializeTeam = (data: ITeamModel[]) => {
+const serializeTeam = (data: ITeamModel | ITeamModel[]) => {
   return Serializer.serialize("team", data);
 };
 

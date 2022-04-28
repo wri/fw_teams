@@ -178,6 +178,52 @@ paths:
           name: userRole
           description: 'Roles to filter the teams by either `manager`, `monitor` or `invited`'
     parameters: []
+  '/v3/teams/leave/{teamID}':
+    parameters:
+      - schema:
+          type: string
+        name: teamID
+        in: path
+        required: true
+        description: The team id the user would like to be removed from
+    patch:
+      summary: Remove authenticated user from team
+      operationId: patch-v3-teams-leave-teamID
+      responses:
+        '200':
+          $ref: '#/components/responses/Team-v3'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+      tags:
+        - v3
+      description: 'Remove the authenticated user from the give team. This will remove the authenticated user is they are a monitor *or* manager, unless they are the only manager.'
+  '/v3/teams/reject/{teamID}':
+    parameters:
+      - schema:
+          type: string
+        name: teamID
+        in: path
+        required: true
+        description: The team id the user would like to reject their invite from
+    patch:
+      summary: Reject the authenticated user's invite to a team
+      operationId: patch-v3-teams-reject-teamID
+      responses:
+        '200':
+          $ref: '#/components/responses/Team-v3'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+      tags:
+        - v3
+      description: ''
 components:
   schemas:
     Team:
@@ -502,5 +548,45 @@ components:
                           email: string
                       createdAt: '2019-08-24T14:15:22Z'
                       userRole: string
+    Team-v3:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  id:
+                    type: string
+                  attributes:
+                    $ref: '#/components/schemas/Team-v3'
+          examples:
+            Team:
+              value:
+                data:
+                  type: string
+                  id: string
+                  attributes:
+                    name: string
+                    managers:
+                      - id: string
+                        email: string
+                    users:
+                      - string
+                    sentInvitations:
+                      - string
+                    areas:
+                      - null
+                    layers:
+                      - null
+                    confirmedUsers:
+                      - id: string
+                        email: string
+                    createdAt: '2019-08-24T14:15:22Z'
+                    userRole: string
 security:
   - Authorization: []
