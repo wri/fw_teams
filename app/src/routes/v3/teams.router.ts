@@ -3,7 +3,8 @@ import { authMiddleware, validatorMiddleware, isAdminOrManager } from "middlewar
 import { TeamModel, validateTeam } from "models/team.model";
 import { TeamUserRelationModel, EUserRole, EUserStatus } from "models/teamUserRelation.model";
 import teamUserRelationService from "services/teamUserRelation.service";
-import { Request } from "koa";
+import gfwTeamSerializer from "serializers/gfwTeam.serializer";
+import { Request, Middleware } from "koa";
 import { isAdmin, isUser } from "middlewares";
 
 type TRequest = {
@@ -29,7 +30,7 @@ router.get("/myinvites", authMiddleware, async ctx => {
     status: EUserStatus.Invited
   });
 
-  ctx.body = teams; // ToDo: add serializer
+  ctx.body = gfwTeamSerializer(teams);
 });
 
 // GET /v3/teams/:teamId
@@ -38,7 +39,7 @@ router.get("/:teamId", authMiddleware, isUser, async ctx => {
 
   const team = await TeamModel.findById(teamId);
 
-  ctx.body = team; // ToDo: add serializer
+  ctx.body = gfwTeamSerializer(team);
 });
 
 // GET /v3/teams/user/:userId
@@ -50,7 +51,7 @@ router.get("/user/:userId", authMiddleware, async ctx => {
 
   const teams = await teamUserRelationService.getTeamsByUserId(userId);
 
-  ctx.body = teams; // ToDo: add serializer
+  ctx.body = gfwTeamSerializer(teams);
 });
 
 // POST /v3/teams
@@ -73,7 +74,7 @@ router.post("/", authMiddleware, async ctx => {
     status: EUserStatus.Confirmed
   }).save();
 
-  ctx.body = team; // ToDo: add serializer
+  ctx.body = gfwTeamSerializer(team);
 });
 
 // PATCH /v3/teams/:teamId
@@ -90,7 +91,7 @@ router.patch("/:teamId", authMiddleware, isAdminOrManager, async ctx => {
     { new: true }
   );
 
-  ctx.body = team; // ToDo: add serializer
+  ctx.body = gfwTeamSerializer(team);
 });
 
 // DELETE /v3/teams/:teamId

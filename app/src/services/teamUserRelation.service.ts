@@ -1,5 +1,5 @@
-import { TeamModel, ITeamModel } from "models/team.model";
-import { TeamUserRelationModel, EUserRole, EUserStatus } from "models/teamUserRelation.model";
+import { TeamModel } from "models/team.model";
+import { TeamUserRelationModel } from "models/teamUserRelation.model";
 
 class TeamUserRelationService {
   async getTeamsByUserId(userId: string, conditions = {}) {
