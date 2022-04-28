@@ -3,7 +3,7 @@ import { authMiddleware, validatorMiddleware, isAdminOrManager } from "middlewar
 import { TeamModel, validateTeam } from "models/team.model";
 import { TeamUserRelationModel, EUserRole, EUserStatus } from "models/teamUserRelation.model";
 import { Request } from "koa";
-import { isAdmin } from "../../middlewares";
+import { isAdmin, isUser } from "middlewares";
 
 type TRequest = {
   body: any; // ToDo: request body
@@ -14,10 +14,16 @@ const router = new Router({
 });
 
 // GET /v3/teams/myinvites
-// Find teams the that auth user is invited to
+// Find teams that auth user is invited to
 
 // GET /v3/teams/:teamId
-router.get("/:teamId", authMiddleware, async () => {});
+router.get("/:teamId", authMiddleware, isUser, async ctx => {
+  const { teamId } = ctx.params;
+
+  const team = await TeamModel.findById(teamId);
+
+  ctx.body = team; // ToDo: add serializer
+});
 
 // GET /v3/teams/user/:userId
 // Get Teams by user id
