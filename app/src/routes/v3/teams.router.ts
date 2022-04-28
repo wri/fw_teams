@@ -15,6 +15,21 @@ const router = new Router({
 
 // GET /v3/teams/myinvites
 // Find teams that auth user is invited to
+router.get("/myinvites", authMiddleware, async ctx => {
+  const query = <TQuery>ctx.request.query;
+  const { id: userId } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
+
+  const teamUserRelations = await TeamUserRelationModel.find({
+    userId,
+    status: EUserStatus.Invited
+  });
+
+  const teamIdsToFind = teamUserRelations.map(teamUserRelation => teamUserRelation.teamId);
+
+  const teams = await TeamModel.find({ _id: { $in: teamIdsToFind } });
+
+  ctx.body = teams; // ToDo: add serializer
+});
 
 // GET /v3/teams/:teamId
 router.get("/:teamId", authMiddleware, isUser, async ctx => {
