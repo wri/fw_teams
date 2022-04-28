@@ -4,7 +4,7 @@ import { AnySchema } from "joi";
 // @ts-ignore
 import logger from "logger";
 
-export function validator(validator: AnySchema["validate"]): Middleware {
+export function validatorMiddleware(validator: AnySchema["validate"]): Middleware {
   return function (ctx, next) {
     logger.info("Validating body data");
 

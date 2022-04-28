@@ -25,11 +25,15 @@ export interface ITeamUserRelation {
 }
 
 const TeamUserJoiSchema = Joi.object<ITeamUserRelation>({
-  teamId: Joi.string().hex(),
-  userId: Joi.string().hex(),
-  email: Joi.string().email(),
-  role: Joi.string().valid(...Object.values(EUserRole)),
-  status: Joi.string().valid(...Object.values(EUserStatus))
+  teamId: Joi.string().hex().required(),
+  userId: Joi.string().hex().required(),
+  email: Joi.string().email().required(),
+  role: Joi.string()
+    .valid(...Object.values(EUserRole))
+    .required(),
+  status: Joi.string()
+    .valid(...Object.values(EUserStatus))
+    .required()
 });
 
 const TeamUserRelationSchema = new Schema({

@@ -1,5 +1,6 @@
 import Router from "koa-router";
-import { authMiddleware } from "middlewares";
+import { authMiddleware, validatorMiddleware } from "middlewares";
+import { validateTeam } from "models/team.model";
 
 const router = new Router({
   prefix: "/teams"
@@ -12,10 +13,10 @@ router.get("/:teamId", authMiddleware, async () => {});
 router.get("/user/:userId", authMiddleware, async () => {});
 
 // POST /v3/teams
-router.post("/", authMiddleware, async () => {});
+router.post("/", authMiddleware, validatorMiddleware(validateTeam), async () => {});
 
 // PATCH /v3/teams/:teamId
-router.patch("/:teamId", authMiddleware, async () => {});
+router.patch("/:teamId", authMiddleware, validatorMiddleware(validateTeam), async () => {});
 
 // DELETE /v3/teams/:teamId
 router.delete("/:teamId", authMiddleware, async () => {});
