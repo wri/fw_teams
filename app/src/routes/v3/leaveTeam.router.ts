@@ -1,6 +1,6 @@
 import { Request } from "koa";
 import Router from "koa-router";
-import { TeamModel } from "models/team.model";
+import { Legacy_teamModel } from "models/legacy_team.model";
 import { authMiddleware } from "middlewares";
 import teamSerializer from "serializers/teamWithUserRole.serializer";
 
@@ -23,7 +23,7 @@ router.patch("/teams/leave/:teamId", authMiddleware, async ctx => {
   const { id: userId } = body.loggedUser; // ToDo: loggedUser Type
 
   // Find the team in DB
-  const team = await TeamModel.findById(teamId);
+  const team = await Legacy_teamModel.findById(teamId);
 
   if (team.confirmedUsers.some(confirmedUser => confirmedUser.id === userId)) {
     // Remove user from confirmedUsers (Monitor)
@@ -52,7 +52,7 @@ router.patch("/teams/reject/:teamId", authMiddleware, async ctx => {
   const { email: userEmail } = body.loggedUser; // ToDo: loggedUser Type
 
   // Find the team in DB
-  const team = await TeamModel.findById(teamId);
+  const team = await Legacy_teamModel.findById(teamId);
 
   if (team.users.some(users => users === userEmail)) {
     // Remove user from users (Invited but not confirmed users)

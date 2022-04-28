@@ -1,6 +1,6 @@
 const Router = require("koa-router");
 const logger = require("logger");
-const TeamModel = require("models/team.model").default;
+const TeamModel = require("models/legacy_team.model").default;
 const TeamSerializer = require("serializers/team.serializer");
 const TeamValidator = require("validators/team.validator");
 const TeamService = require("services/team.service");

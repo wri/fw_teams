@@ -1,5 +1,5 @@
 import JSONAPISerializer from "json-api-serializer";
-import { ITeamModel } from "models/team.model";
+import { ITeamModel } from "models/legacy_team.model";
 
 const Serializer = new JSONAPISerializer();
 

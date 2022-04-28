@@ -1,5 +1,5 @@
 import request from "supertest";
-import { TeamModel, ITeam } from "models/team.model";
+import { Legacy_teamModel, ITeam } from "models/legacy_team.model";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import server from "app";
@@ -25,14 +25,14 @@ const standardTeamResponse: ITeamResponse = {
   ]
 };
 
-jest.mock("models/team.model", () => {
-  const originalModule = jest.requireActual("models/team.model");
+jest.mock("models/legacy_team.model", () => {
+  const originalModule = jest.requireActual("models/legacy_team.model");
 
   return {
     __esModule: true,
     ...originalModule,
-    TeamModel: {
-      ...originalModule.TeamModel,
+    Legacy_teamModel: {
+      ...originalModule.Legacy_teamModel,
       find: jest.fn()
     }
   };
@@ -48,8 +48,8 @@ describe("GET /v3/myteams", () => {
   beforeEach(() => {
     teamDBMockedResponse = [standardTeamResponse];
 
-    (TeamModel.find as jest.Mock).mockReset();
-    (TeamModel.find as jest.Mock).mockImplementation(() => teamDBMockedResponse);
+    (Legacy_teamModel.find as jest.Mock).mockReset();
+    (Legacy_teamModel.find as jest.Mock).mockImplementation(() => teamDBMockedResponse);
   });
 
   const exec = (query = "") => {
@@ -77,7 +77,7 @@ describe("GET /v3/myteams", () => {
   it("should filter the database by 'manager', 'monitor' and 'invited' by default", async () => {
     await exec();
 
-    expect(TeamModel.find).toHaveBeenLastCalledWith({
+    expect(Legacy_teamModel.find).toHaveBeenLastCalledWith({
       $or: [
         { "managers.id": "1234TestAuthUser" },
         { "confirmedUsers.id": "1234TestAuthUser" },
@@ -89,7 +89,7 @@ describe("GET /v3/myteams", () => {
   it("should filter the database by 'manager' if query string is '?userRole=manager", async () => {
     await exec("?userRole=manager");
 
-    expect(TeamModel.find).toHaveBeenLastCalledWith({
+    expect(Legacy_teamModel.find).toHaveBeenLastCalledWith({
       $or: [{ "managers.id": "1234TestAuthUser" }]
     });
   });
@@ -97,7 +97,7 @@ describe("GET /v3/myteams", () => {
   it("should filter the database by 'monitor' and 'invited' if query string is '?userRole=monitor,invited", async () => {
     await exec("?userRole=monitor,invited");
 
-    expect(TeamModel.find).toHaveBeenLastCalledWith({
+    expect(Legacy_teamModel.find).toHaveBeenLastCalledWith({
       $or: [{ "confirmedUsers.id": "1234TestAuthUser" }, { users: "testAuthUser@test.com" }]
     });
   });

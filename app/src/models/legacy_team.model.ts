@@ -37,6 +37,6 @@ const TeamSchema = new Schema({
 
 export interface ITeamModel extends ITeam, mongoose.Document {}
 
-export const TeamModel = mongoose.model<ITeamModel>("Team", TeamSchema);
+export const Legacy_teamModel = mongoose.model<ITeamModel>("Team", TeamSchema);
 
-export default TeamModel;
+export default Legacy_teamModel;
