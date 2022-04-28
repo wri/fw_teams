@@ -3,6 +3,9 @@ import Router from "koa-router";
 import { TeamModel } from "models/team.model";
 import { authMiddleware } from "middlewares";
 import teamSerializer from "serializers/teamWithUserRole.serializer";
+import mongoose from "mongoose";
+
+const { ObjectId } = mongoose.Types;
 
 const router = new Router();
 
@@ -25,15 +28,17 @@ router.patch("/teams/leave/:teamId", authMiddleware, async ctx => {
   // Find the team in DB
   const team = await TeamModel.findById(teamId);
 
+  if (team.administrator.toString() === userId) {
+    ctx.status = 400;
+    throw new Error("User is the administrator of the team and can't leave");
+  }
+
   if (team.confirmedUsers.some(confirmedUser => confirmedUser.id === userId)) {
     // Remove user from confirmedUsers (Monitor)
     team.confirmedUsers = team.confirmedUsers.filter(confirmedUser => confirmedUser.id !== userId);
-  } else if (team.managers.some(manager => manager.id !== userId) && team.managers.length > 1) {
-    // Remove user from managers array, if not the only manager
+  } else if (team.managers.some(manager => manager.id === userId)) {
+    // Remove user from managers array
     team.managers = team.managers.filter(manager => manager.id !== userId);
-  } else if (team.managers.some(manager => manager.id === userId) && team.managers.length === 1) {
-    ctx.status = 400;
-    throw new Error("User is the only manager of the team and can't leave");
   } else {
     ctx.status = 400;
     throw new Error("User not member of team");
