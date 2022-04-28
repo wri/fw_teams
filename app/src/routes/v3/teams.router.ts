@@ -28,7 +28,20 @@ router.get("/:teamId", authMiddleware, isUser, async ctx => {
 // GET /v3/teams/user/:userId
 // Get Teams by user id
 // Return the user's teams that have admin, manager or monitor roles
-router.get("/user/:userId", authMiddleware, async () => {});
+// ToDo: What security is need?
+router.get("/user/:userId", authMiddleware, async ctx => {
+  const { userId } = ctx.params;
+
+  const teamUserRelations = await TeamUserRelationModel.find({
+    userId
+  });
+
+  const teamIdsToFind = teamUserRelations.map(teamUserRelation => teamUserRelation.teamId);
+
+  const teams = await TeamModel.find({ _id: { $in: teamIdsToFind } });
+
+  ctx.body = teams; // ToDo: add serializer
+});
 
 // POST /v3/teams
 // Add user as admin to teamUserRelation model
