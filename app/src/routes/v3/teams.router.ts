@@ -2,6 +2,7 @@ import Router from "koa-router";
 import { authMiddleware, validatorMiddleware, isAdminOrManager } from "middlewares";
 import { TeamModel, validateTeam } from "models/team.model";
 import { TeamUserRelationModel, EUserRole, EUserStatus } from "models/teamUserRelation.model";
+import teamUserRelationService from "services/teamUserRelation.service";
 import { Request } from "koa";
 import { isAdmin, isUser } from "middlewares";
 
@@ -24,14 +25,9 @@ router.get("/myinvites", authMiddleware, async ctx => {
   const query = <TQuery>ctx.request.query;
   const { id: userId } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
 
-  const teamUserRelations = await TeamUserRelationModel.find({
-    userId,
+  const teams = await teamUserRelationService.getTeamsByUserId(userId, {
     status: EUserStatus.Invited
   });
-
-  const teamIdsToFind = teamUserRelations.map(teamUserRelation => teamUserRelation.teamId);
-
-  const teams = await TeamModel.find({ _id: { $in: teamIdsToFind } });
 
   ctx.body = teams; // ToDo: add serializer
 });
@@ -52,13 +48,7 @@ router.get("/:teamId", authMiddleware, isUser, async ctx => {
 router.get("/user/:userId", authMiddleware, async ctx => {
   const { userId } = ctx.params;
 
-  const teamUserRelations = await TeamUserRelationModel.find({
-    userId
-  });
-
-  const teamIdsToFind = teamUserRelations.map(teamUserRelation => teamUserRelation.teamId);
-
-  const teams = await TeamModel.find({ _id: { $in: teamIdsToFind } });
+  const teams = await teamUserRelationService.getTeamsByUserId(userId);
 
   ctx.body = teams; // ToDo: add serializer
 });
