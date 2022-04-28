@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
+import Joi from "joi";
 
 const { Schema } = mongoose;
 
 export enum EUserRole {
-  Administrator = "Administrator",
+  Administrator = "administrator",
   Manager = "manager",
   Monitor = "monitor",
   Left = "left"
@@ -23,6 +24,14 @@ export interface ITeamUserRelation {
   status: EUserStatus;
 }
 
+const TeamUserJoiSchema = Joi.object<ITeamUserRelation>({
+  teamId: Joi.string().hex(),
+  userId: Joi.string().hex(),
+  email: Joi.string().email(),
+  role: Joi.string().valid(...Object.values(EUserRole)),
+  status: Joi.string().valid(...Object.values(EUserStatus))
+});
+
 const TeamUserRelationSchema = new Schema({
   teamId: { type: Schema.Types.ObjectId, required: true },
   userId: { type: Schema.Types.ObjectId, required: true },
@@ -34,5 +43,7 @@ const TeamUserRelationSchema = new Schema({
 export interface ITeamUserRelationModel extends ITeamUserRelation, mongoose.Document {}
 
 export const TeamUserRelationModel = mongoose.model<ITeamUserRelationModel>("TeamUserRelation", TeamUserRelationSchema);
+
+export const validateTeamUser = TeamUserJoiSchema.validate;
 
 export default TeamUserRelationModel;
