@@ -68,7 +68,20 @@ router.post("/", authMiddleware, async ctx => {
 
 // PATCH /v3/teams/:teamId
 // Need to be admin or manager
-router.patch("/:teamId", authMiddleware, isAdminOrManager, validatorMiddleware(validateTeam), async () => {});
+router.patch("/:teamId", authMiddleware, isAdminOrManager, async ctx => {
+  const { teamId } = ctx.params;
+  const { body } = <TRequest>ctx.request;
+
+  const team = await TeamModel.findByIdAndUpdate(
+    teamId,
+    {
+      name: body.name
+    },
+    { new: true }
+  );
+
+  ctx.body = team; // ToDo: add serializer
+});
 
 // DELETE /v3/teams/:teamId
 // Need to be admin

@@ -23,7 +23,7 @@ export const isAdminOrManager: Middleware = async (ctx, next) => {
   });
 
   if (teamUserRelation.role === EUserRole.Administrator || teamUserRelation.role === EUserRole.Manager) {
-    next();
+    await next();
   } else {
     ctx.status = 401;
     throw new Error("Authenticated User must be the Administrator or a Manager of the team");
