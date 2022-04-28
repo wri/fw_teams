@@ -19,7 +19,7 @@ const TeamSchema = new Schema({
 
 export interface ITeamModel extends ITeam, mongoose.Document {}
 
-export const TeamModel = mongoose.model<ITeamModel>("Team", TeamSchema);
+export const TeamModel = mongoose.model<ITeamModel>("GFWTeam", TeamSchema);
 
 export const validateTeam = TeamJoiSchema.validate;
 

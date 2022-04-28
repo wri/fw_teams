@@ -8,7 +8,9 @@ export function validatorMiddleware(validator: AnySchema["validate"]): Middlewar
   return function (ctx, next) {
     logger.info("Validating body data");
 
-    const { error } = validator(ctx.body);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const { error } = validator(ctx.request.body);
     if (error) {
       ctx.status = 400;
       throw error;
