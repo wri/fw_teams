@@ -6,7 +6,17 @@ const Serializer = new JSONAPISerializer();
 Serializer.register("team", {
   jsonapiObject: false,
   id: "id",
-  whitelist: ["name", "managers", "userRole", "users", "areas", "layers", "confirmedUsers", "createdAt"],
+  whitelist: [
+    "name",
+    "administrator",
+    "managers",
+    "userRole",
+    "users",
+    "areas",
+    "layers",
+    "confirmedUsers",
+    "createdAt"
+  ],
   convertCase: "camelCase"
 });
 

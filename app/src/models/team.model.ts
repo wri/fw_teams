@@ -11,6 +11,7 @@ export enum EUserRole {
 export interface ITeam {
   name?: string;
   userRole?: EUserRole;
+  administrator: typeof Schema.Types.ObjectId;
   // Managers of the Team
   managers: { id: string; email?: string }[];
   // Users who have been invited but have not confirmed their invitation
@@ -26,6 +27,7 @@ export interface ITeam {
 
 const TeamSchema = new Schema({
   name: { type: String, required: false, trim: true },
+  administrator: { type: Schema.Types.ObjectId },
   managers: { type: Array, default: [] },
   users: { type: Array, default: [] },
   sentInvitations: { type: Array, default: [] },
