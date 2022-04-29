@@ -1,8 +1,15 @@
 import Router from "koa-router";
 import { authMiddleware, isAdminOrManager, isUser } from "middlewares";
 import { TeamModel } from "models/team.model";
-import { TeamUserRelationModel, ITeamUserRelation, EUserRole, EUserStatus } from "models/teamUserRelation.model";
+import {
+  TeamUserRelationModel,
+  ITeamUserRelation,
+  ITeamUserRelationModel,
+  EUserRole,
+  EUserStatus
+} from "models/teamUserRelation.model";
 import { Request } from "koa";
+import serializeTeamUser from "serializers/teamUserRelation.serializer";
 
 const router = new Router({
   prefix: "/teams/:teamId/users"
@@ -28,14 +35,14 @@ router.get("/", authMiddleware, isUser, async ctx => {
     userId
   });
 
-  let users: ITeamUserRelation[] = [];
+  let users: ITeamUserRelationModel[] = [];
   if (teamUserRelation.role === EUserRole.Administrator || teamUserRelation.role === EUserRole.Manager) {
     users = await TeamUserRelationModel.find({ teamId });
   } else {
     users = await TeamUserRelationModel.find({ teamId }).select("-status");
   }
 
-  return users;
+  return serializeTeamUser(users);
 });
 
 // POST /v3/teams/:teamId/users
@@ -77,7 +84,7 @@ router.post("/", authMiddleware, isAdminOrManager, async ctx => {
 
   // ToDo: Send Invitations "userEmails"
 
-  ctx.body = userDocuments;
+  ctx.body = serializeTeamUser(userDocuments);
 });
 
 // PATCH /v3/teams/:teamId/users
@@ -97,7 +104,7 @@ router.patch("/", authMiddleware, isAdminOrManager, async ctx => {
     throw new Error("Team not found");
   }
 
-  const updatedUsers: ITeamUserRelation[] = [];
+  const updatedUsers: ITeamUserRelationModel[] = [];
   for (let i = 0; i < users.length; i++) {
     const user = users[i];
 
@@ -122,7 +129,7 @@ router.patch("/", authMiddleware, isAdminOrManager, async ctx => {
     updatedUsers.push(updatedUser);
   }
 
-  ctx.body = updatedUsers;
+  ctx.body = serializeTeamUser(updatedUsers);
 });
 
 // PATCH /v3/teams/:teamId/users/:userId/accept
@@ -147,7 +154,7 @@ router.patch("/:userId/accept", authMiddleware, async ctx => {
     { new: true }
   );
 
-  ctx.body = updatedUser;
+  ctx.body = serializeTeamUser(updatedUser);
 });
 
 // PATCH /v3/teams/:teamId/users/:userId/decline
@@ -171,7 +178,7 @@ router.patch("/:userId/decline", authMiddleware, async ctx => {
     { new: true }
   );
 
-  ctx.body = updatedUser;
+  ctx.body = serializeTeamUser(updatedUser);
 });
 
 // PATCH /v3/teams/:teamId/users/:userId/leave
@@ -206,7 +213,7 @@ router.patch("/:userId/leave", authMiddleware, async ctx => {
     { new: true }
   );
 
-  ctx.body = updatedUser;
+  ctx.body = serializeTeamUser(updatedUser);
 });
 
 export default router;
