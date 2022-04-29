@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
 import Joi from "joi";
+import { EUserRole } from "./teamUserRelation.model";
 
 const { Schema } = mongoose;
 
 export interface ITeam {
   name: string;
+  userRole: EUserRole;
   createdAt: string;
 }
 
