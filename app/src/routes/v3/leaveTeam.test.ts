@@ -1,5 +1,5 @@
 import request from "supertest";
-import { TeamModel, ITeam, ITeamModel } from "models/team.model";
+import { Legacy_teamModel, ITeam, ITeamModel } from "models/legacy_team.model";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import loggedInUserService from "services/LoggedInUserService";
@@ -37,7 +37,7 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
   let teamDocument: TTeamDocument, team: ITeamModel;
 
   afterAll(async () => {
-    await TeamModel.remove({});
+    await Legacy_teamModel.remove({});
     server.close();
   });
 
@@ -46,7 +46,7 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
   });
 
   const exec = async (teamId?: string) => {
-    team = await new TeamModel(teamDocument).save();
+    team = await new Legacy_teamModel(teamDocument).save();
 
     return request(server)
       .patch(`/v3/teams/leave/${teamId || team.id}`)
@@ -85,7 +85,7 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
   it("should remove 1234TestAuthUser from confirmed users array in the DB", async () => {
     await exec();
 
-    const updatedTeam = await TeamModel.findById(team._id);
+    const updatedTeam = await Legacy_teamModel.findById(team._id);
 
     expect(updatedTeam.confirmedUsers).toEqual(
       expect.not.arrayContaining([
@@ -165,7 +165,7 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
 
     await exec();
 
-    const updatedTeam = await TeamModel.findById(team._id);
+    const updatedTeam = await Legacy_teamModel.findById(team._id);
 
     expect(updatedTeam.managers).toEqual(
       expect.not.arrayContaining([
@@ -182,7 +182,7 @@ describe("PATCH /v3/teams/reject/:teamId", () => {
   let teamDocument: TTeamDocument, team: ITeamModel;
 
   afterAll(async () => {
-    await TeamModel.remove({});
+    await Legacy_teamModel.remove({});
     server.close();
   });
 
@@ -195,7 +195,7 @@ describe("PATCH /v3/teams/reject/:teamId", () => {
   });
 
   const exec = async (teamId?: string) => {
-    team = await new TeamModel(teamDocument).save();
+    team = await new Legacy_teamModel(teamDocument).save();
 
     return request(server)
       .patch(`/v3/teams/reject/${teamId || team.id}`)
@@ -225,7 +225,7 @@ describe("PATCH /v3/teams/reject/:teamId", () => {
   it("should remove testAuthUser@test.com from users array in the DB", async () => {
     await exec();
 
-    const updatedTeam = await TeamModel.findById(team._id);
+    const updatedTeam = await Legacy_teamModel.findById(team._id);
 
     expect(updatedTeam.users).toEqual(expect.not.arrayContaining(["testAuthUser@test.com"]));
   });

@@ -1,5 +1,5 @@
 import Router from "koa-router";
-import { TeamModel, EUserRole } from "models/team.model";
+import { Legacy_teamModel, EUserRole } from "models/legacy_team.model";
 import { authMiddleware } from "middlewares";
 import teamSerializer from "serializers/teamWithUserRole.serializer";
 
@@ -38,7 +38,7 @@ router.get("/myteams", authMiddleware, async ctx => {
     throw new Error("userRole query string incorrect");
   }
 
-  let teams = await TeamModel.find({
+  let teams = await Legacy_teamModel.find({
     $or: orFilter
   });
 

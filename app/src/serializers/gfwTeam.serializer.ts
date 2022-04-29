@@ -1,12 +1,12 @@
 import JSONAPISerializer from "json-api-serializer";
-import { ITeamModel } from "models/legacy_team.model";
+import { ITeamModel } from "models/team.model";
 
 const Serializer = new JSONAPISerializer();
 
 Serializer.register("team", {
   jsonapiObject: false,
   id: "id",
-  whitelist: ["name", "managers", "userRole", "users", "areas", "layers", "confirmedUsers", "createdAt"],
+  whitelist: ["name", "createdAt"],
   convertCase: "camelCase"
 });
 
