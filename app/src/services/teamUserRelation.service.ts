@@ -1,4 +1,4 @@
-import { TeamModel } from "models/team.model";
+import { ITeamModel, TeamModel } from "models/team.model";
 import { TeamUserRelationModel } from "models/teamUserRelation.model";
 
 class TeamUserRelationService {
@@ -8,9 +8,18 @@ class TeamUserRelationService {
       ...conditions
     });
 
-    const teamIdsToFind = teamUserRelations.map(teamUserRelation => teamUserRelation.teamId);
+    const teams: ITeamModel[] = [];
+    for (let i = 0; i < teamUserRelations.length; i++) {
+      const teamUser = teamUserRelations[i];
 
-    return TeamModel.find({ _id: { $in: teamIdsToFind } });
+      const team = await TeamModel.findById(teamUser.teamId);
+
+      team.userRole = teamUser.role;
+
+      teams.push(team);
+    }
+
+    return teams;
   }
 }
 

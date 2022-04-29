@@ -1,5 +1,5 @@
 import Router from "koa-router";
-import { authMiddleware, isAdminOrManager } from "middlewares";
+import { authMiddleware, isAdminOrManager, isUser } from "middlewares";
 import { TeamModel } from "models/team.model";
 import { TeamUserRelationModel, ITeamUserRelation, EUserRole, EUserStatus } from "models/teamUserRelation.model";
 import { Request } from "koa";
@@ -9,17 +9,39 @@ const router = new Router({
 });
 
 type TRequest = {
+  query: any;
   body: {
     loggedUser: any;
     users: ITeamUserRelation[];
   }; // ToDo: request body
 } & Request;
 
+// GET /v3/teams/:teamId/users
+// Return all users on a team
+router.get("/", authMiddleware, isUser, async ctx => {
+  const { teamId } = ctx.params;
+  const { query } = <TRequest>ctx.request;
+  const { id: userId } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
+
+  const teamUserRelation = await TeamUserRelationModel.findOne({
+    teamId,
+    userId
+  });
+
+  let users: ITeamUserRelation[] = [];
+  if (teamUserRelation.role === EUserRole.Administrator || teamUserRelation.role === EUserRole.Manager) {
+    users = await TeamUserRelationModel.find({ teamId });
+  } else {
+    users = await TeamUserRelationModel.find({ teamId }).select("-status");
+  }
+
+  return users;
+});
+
 // POST /v3/teams/:teamId/users
 // Add users to team, and send invitations
 // body: { users: [ { email, role } ] }
 // Only manager or admin can access this router
-// ToDo: add middleware for managers or admins
 router.post("/", authMiddleware, isAdminOrManager, async ctx => {
   const { teamId } = ctx.params;
   const {
