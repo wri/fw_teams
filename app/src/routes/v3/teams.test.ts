@@ -271,13 +271,84 @@ describe("/v3/teams", () => {
   });
 
   describe("POST /v3/teams", () => {
-    // should return 200 for happy case
-    // should return 401 when user is not authorised
-    // should return the newly created team
-    // should add a team-user relation for the authorised user
-    // should assign the team-user relation the authorised user's email and id
-    // should assign the team-user relation the "administrator" role
-    // should assign the team-user relation the "confirmed" status
+    const exec = () => {
+      return request(server).post("/v3/teams").send({
+        name: "TestTeam"
+      });
+    };
+
+    it("should return 200 for happy case", async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    // ToDo: should return 401 when user is not authorised
+    // ToDo: should return 400 is body validation fails
+
+    it("should return the newly created team", async () => {
+      const res = await exec();
+
+      expect(res.body.data).toEqual(
+        expect.objectContaining({
+          type: "team",
+          id: expect.any(String)
+        })
+      );
+    });
+
+    it("should add a team-user relation for the authorised user", async () => {
+      const res = await exec();
+
+      const teamId = res.body.data.id;
+
+      const teamUserRelation = await TeamUserRelationModel.count({
+        teamId,
+        userId: new ObjectId("addaddaddaddaddaddaddadd")
+      });
+
+      expect(teamUserRelation).toBe(1);
+    });
+
+    it("should assign the team-user relation the authorised user's email and id", async () => {
+      const res = await exec();
+
+      const teamId = res.body.data.id;
+
+      const teamUserRelation = await TeamUserRelationModel.findOne({
+        teamId,
+        userId: new ObjectId("addaddaddaddaddaddaddadd")
+      });
+
+      expect(teamUserRelation.email).toEqual("testAuthUser@test.com");
+      expect(teamUserRelation.userId.toString()).toEqual("addaddaddaddaddaddaddadd");
+    });
+
+    it("should assign the team-user relation the 'administrator' role", async () => {
+      const res = await exec();
+
+      const teamId = res.body.data.id;
+
+      const teamUserRelation = await TeamUserRelationModel.findOne({
+        teamId,
+        userId: new ObjectId("addaddaddaddaddaddaddadd")
+      });
+
+      expect(teamUserRelation.role).toEqual(EUserRole.Administrator);
+    });
+
+    it("should assign the team-user relation the 'confirmed' status", async () => {
+      const res = await exec();
+
+      const teamId = res.body.data.id;
+
+      const teamUserRelation = await TeamUserRelationModel.findOne({
+        teamId,
+        userId: new ObjectId("addaddaddaddaddaddaddadd")
+      });
+
+      expect(teamUserRelation.status).toEqual(EUserStatus.Confirmed);
+    });
   });
 
   describe("PATCH /v3/teams/:teamId", () => {
