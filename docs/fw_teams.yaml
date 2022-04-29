@@ -27,6 +27,7 @@ paths:
         $ref: '#/components/requestBodies/Team'
       tags:
         - v1
+      deprecated: true
   '/v1/teams/{id}':
     parameters:
       - schema:
@@ -46,6 +47,7 @@ paths:
       description: ''
       tags:
         - v1
+      deprecated: true
     patch:
       summary: Update Team
       operationId: patch-team
@@ -58,6 +60,7 @@ paths:
         $ref: '#/components/requestBodies/Team'
       tags:
         - v1
+      deprecated: true
     delete:
       summary: Delete Team
       operationId: delete-team
@@ -70,6 +73,7 @@ paths:
           $ref: '#/components/responses/Error'
       tags:
         - v1
+      deprecated: true
   '/v1/teams/user/{userId}':
     parameters:
       - schema:
@@ -90,6 +94,7 @@ paths:
       description: Retrieve team by given user id
       tags:
         - v1
+      deprecated: true
   '/v1/teams/confirm/{token}':
     parameters:
       - schema:
@@ -139,6 +144,7 @@ paths:
         If not then the user is added to that team and if needed remove from an existing team.
       tags:
         - v1
+      deprecated: true
   /v1/fw_teams/healthcheck:
     get:
       summary: Healthcheck
@@ -148,47 +154,162 @@ paths:
       operationId: get-fw_teams-healthcheck
       security: []
       description: ''
-  /v3/myteams:
-    get:
-      summary: Get all Teams associated with Authenticated user
-      tags:
-        - v3
-      responses:
-        '200':
-          $ref: '#/components/responses/Teams-v3'
-        '400':
-          $ref: '#/components/responses/Error'
-        '401':
-          $ref: '#/components/responses/Error'
-        '404':
-          $ref: '#/components/responses/Error'
-      operationId: get-v3-myteams
-      description: |-
-        Receive all Teams the authenticated user is associated with.
-
-        To filter the respoonse pass the query param `?userRole=` with the available options (comma-seperated):
-         - `manager`
-         - `monitor`
-         - `invited`
-      parameters:
-        - schema:
-            type: string
-            default: 'manager,monitor,invited'
-          in: query
-          name: userRole
-          description: 'Roles to filter the teams by either `manager`, `monitor` or `invited`'
+  /v3/teams/myinvites:
     parameters: []
-  '/v3/teams/leave/{teamID}':
+    get:
+      summary: Get authenticated user's invitations
+      operationId: get-v3-teams-myinvites
+      description: Get all the teams the authenticated user is invited to.
+      tags:
+        - v3
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                x-examples:
+                  example-1:
+                    data:
+                      - id: string
+                        type: string
+                        attributes:
+                          name: string
+                          userRole: administrator
+                          createdAt: '2019-08-24T14:15:22Z'
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        attributes:
+                          type: object
+                          required:
+                            - name
+                            - userRole
+                            - createdAt
+                          properties:
+                            name:
+                              type: string
+                            userRole:
+                              type: string
+                              enum:
+                                - administrator
+                                - manager
+                                - monitor
+                                - left
+                            createdAt:
+                              type: string
+                              format: date-time
+                              readOnly: true
+                      required:
+                        - id
+                        - type
+                        - attributes
+                required:
+                  - data
+        '401':
+          $ref: '#/components/responses/Error'
+  '/v3/teams/user/{userId}':
     parameters:
       - schema:
           type: string
-        name: teamID
+        name: userId
         in: path
         required: true
-        description: The team id the user would like to be removed from
+    get:
+      summary: Get Teams by user id
+      operationId: get-v3-teams-by-userid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                        attributes:
+                          type: object
+                          required:
+                            - name
+                            - userRole
+                            - createdAt
+                          properties:
+                            name:
+                              type: string
+                            userRole:
+                              type: string
+                              enum:
+                                - administrator
+                                - manager
+                                - monitor
+                                - left
+                            createdAt:
+                              type: string
+                              format: date-time
+                              readOnly: true
+                      required:
+                        - id
+                        - type
+                        - attributes
+                required:
+                  - data
+              examples:
+                Teams:
+                  value:
+                    data:
+                      - id: string
+                        type: string
+                        attributes:
+                          name: string
+                          userRole: administrator
+                          createdAt: '2019-08-24T14:15:22Z'
+        '401':
+          $ref: '#/components/responses/Error'
+      description: Get all the teams a user is a member of.
+      tags:
+        - v3
+  '/v3/teams/{teamId}':
+    parameters:
+      - schema:
+          type: string
+        name: teamId
+        in: path
+        required: true
+    get:
+      summary: Get Team by team id
+      operationId: get-v3-teams-teamId
+      responses:
+        '200':
+          $ref: '#/components/responses/Team-v3'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+      description: |-
+        Get a team by a team id.
+
+        The authenticated user must be a member of the team.
+      tags:
+        - v3
     patch:
-      summary: Remove authenticated user from team
-      operationId: patch-v3-teams-leave-teamID
+      summary: Update a Team
+      operationId: patch-v3-teams-teamId
       responses:
         '200':
           $ref: '#/components/responses/Team-v3'
@@ -198,20 +319,32 @@ paths:
           $ref: '#/components/responses/Error'
         '404':
           $ref: '#/components/responses/Error'
+      requestBody:
+        $ref: '#/components/requestBodies/Team-v3'
+      description: 'Update a team, the authenticated user must be the "Administrator" or "Manager" of the team.'
       tags:
         - v3
-      description: 'Remove the authenticated user from the give team. This will remove the authenticated user is they are a monitor *or* manager, unless they are the only manager.'
-  '/v3/teams/reject/{teamID}':
-    parameters:
-      - schema:
-          type: string
-        name: teamID
-        in: path
-        required: true
-        description: The team id the user would like to reject their invite from
-    patch:
-      summary: Reject the authenticated user's invite to a team
-      operationId: patch-v3-teams-reject-teamID
+    delete:
+      summary: Delete a Team
+      operationId: delete-v3-teams-teamId
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+      description: |-
+        Delete a team, the authenticated user must be the "Administrator" of the team.
+
+        When a team is delete all the members of the team will be removed from the TeamUserRelation model.
+      tags:
+        - v3
+  /v3/teams:
+    parameters: []
+    post:
+      summary: Create a Team
+      operationId: post-v3-teams
       responses:
         '200':
           $ref: '#/components/responses/Team-v3'
@@ -219,11 +352,11 @@ paths:
           $ref: '#/components/responses/Error'
         '401':
           $ref: '#/components/responses/Error'
-        '404':
-          $ref: '#/components/responses/Error'
       tags:
         - v3
-      description: ''
+      requestBody:
+        $ref: '#/components/requestBodies/Team-v3'
+      description: 'Create a team, the authenticated user will be created as the ''Administrator'' of the team.'
 components:
   schemas:
     Team:
@@ -296,67 +429,17 @@ components:
       type: object
       examples:
         - name: string
-          managers:
-            - id: string
-              email: string
-          users:
-            - string
-          sentInvitations:
-            - string
-          areas:
-            - null
-          layers:
-            - null
-          confirmedUsers:
-            - id: string
-              email: string
           createdAt: '2019-08-24T14:15:22Z'
-          userRole: string
       description: ''
       x-tags:
         - v3
       properties:
         name:
           type: string
-        managers:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-              email:
-                type: string
-        users:
-          type: array
-          items:
-            type: string
-        sentInvitations:
-          type: array
-          deprecated: true
-          items:
-            type: string
-        areas:
-          type: array
-          items: {}
-        layers:
-          type: array
-          items: {}
-        confirmedUsers:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-              email:
-                type: string
         createdAt:
           type: string
           format: date-time
           readOnly: true
-        userRole:
-          type: string
       required:
         - createdAt
   securitySchemes:
@@ -386,6 +469,12 @@ components:
                 confirmedUsers:
                   - null
                 createdAt: '2019-08-24T14:15:22Z'
+    Team-v3:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Team-v3'
+          examples: {}
   responses:
     Error:
       description: Error Response
@@ -532,22 +621,7 @@ components:
                     type: string
                     attrbiutes:
                       name: string
-                      managers:
-                        - id: string
-                          email: string
-                      users:
-                        - string
-                      sentInvitations:
-                        - string
-                      areas:
-                        - null
-                      layers:
-                        - null
-                      confirmedUsers:
-                        - id: string
-                          email: string
                       createdAt: '2019-08-24T14:15:22Z'
-                      userRole: string
     Team-v3:
       description: Example response
       content:
@@ -572,21 +646,6 @@ components:
                   id: string
                   attributes:
                     name: string
-                    managers:
-                      - id: string
-                        email: string
-                    users:
-                      - string
-                    sentInvitations:
-                      - string
-                    areas:
-                      - null
-                    layers:
-                      - null
-                    confirmedUsers:
-                      - id: string
-                        email: string
                     createdAt: '2019-08-24T14:15:22Z'
-                    userRole: string
 security:
   - Authorization: []
