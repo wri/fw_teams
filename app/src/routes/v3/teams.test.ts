@@ -2,14 +2,111 @@ import request from "supertest";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import server from "app";
+import mongoose from "mongoose";
+import { ITeamModel, TeamModel } from "models/team.model";
+import {
+  EUserRole,
+  EUserStatus,
+  ITeamUserRelation,
+  ITeamUserRelationModel,
+  TeamUserRelationModel
+} from "models/teamUserRelation.model";
+
+const { ObjectId } = mongoose.Types;
 
 describe("/v3/teams", () => {
+  afterAll(async () => {
+    await TeamModel.remove({});
+    await TeamUserRelationModel.remove({});
+    await server.close();
+  });
+
   describe("GET /v3/teams/myinvites", () => {
-    // should return 200 for happy case
-    // should return 401 when user is not authorised
-    // should return an array of teams
-    // should return only the teams the authorised user is invited too
-    // should return 404 when no invites are pending for the authorised user
+    let teamUserDocuments: ITeamUserRelation[] = [],
+      teams: ITeamModel[] = [];
+
+    beforeAll(async () => {
+      teams = await TeamModel.insertMany([{ name: "TestTeam1" }, { name: "TestTeam2" }, { name: "TestTeam3" }]);
+    });
+
+    beforeEach(async () => {
+      await TeamUserRelationModel.remove({});
+
+      teamUserDocuments = [
+        {
+          teamId: new ObjectId(teams[0]._id),
+          userId: new ObjectId("addaddaddaddaddaddaddadd"),
+          email: "admin@user.com",
+          role: EUserRole.Manager,
+          status: EUserStatus.Invited
+        },
+        {
+          teamId: new ObjectId(teams[1]._id),
+          userId: new ObjectId("addaddaddaddaddaddaddadd"),
+          email: "admin@user.com",
+          role: EUserRole.Monitor,
+          status: EUserStatus.Confirmed
+        },
+        {
+          teamId: new ObjectId(teams[2]._id),
+          userId: new ObjectId("addaddaddaddaddaddaddadd"),
+          email: "admin@user.com",
+          role: EUserRole.Monitor,
+          status: EUserStatus.Invited
+        }
+      ];
+    });
+
+    const exec = async () => {
+      await TeamUserRelationModel.insertMany(teamUserDocuments);
+
+      return request(server).get("/v3/teams/myinvites");
+    };
+
+    it("should return 200 for happy case", async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    // ToDo "should return 401 when user is not authorised"
+
+    it("should return an array of teams", async () => {
+      const res = await exec();
+
+      expect(Array.isArray(res.body.data)).toBe(true);
+      expect(res.body.data[0].type).toBe("team");
+    });
+
+    it("should return only the teams the authorised user is invited too", async () => {
+      const res = await exec();
+
+      expect(res.body.data.length).toBe(2);
+      expect(res.body.data[0].id).toEqual(teams[0]._id.toString());
+      expect(res.body.data[1].id).toEqual(teams[2]._id.toString());
+    });
+
+    it("should return an empty array when no invites are pending for the authorised user", async () => {
+      teamUserDocuments = [
+        {
+          ...teamUserDocuments[0],
+          userId: new ObjectId()
+        },
+        {
+          ...teamUserDocuments[1],
+          userId: new ObjectId()
+        },
+        {
+          ...teamUserDocuments[2],
+          userId: new ObjectId()
+        }
+      ];
+
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.length).toBe(0);
+    });
   });
 
   describe("GET /v3/teams/:teamId", () => {

@@ -13,7 +13,7 @@ const standardTeamDocument: TTeamDocument = {
   name: "test",
   confirmedUsers: [
     {
-      id: "1234TestAuthUser",
+      id: "addaddaddaddaddaddaddadd",
       email: "testAuthUser@test.com"
     },
     {
@@ -75,14 +75,14 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
     expect(res.body.data.attributes.confirmedUsers).toEqual(
       expect.not.arrayContaining([
         {
-          id: "1234TestAuthUser",
+          id: "addaddaddaddaddaddaddadd",
           email: "testAuthUser@test.com"
         }
       ])
     );
   });
 
-  it("should remove 1234TestAuthUser from confirmed users array in the DB", async () => {
+  it("should remove addaddaddaddaddaddaddadd from confirmed users array in the DB", async () => {
     await exec();
 
     const updatedTeam = await Legacy_teamModel.findById(team._id);
@@ -90,7 +90,7 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
     expect(updatedTeam.confirmedUsers).toEqual(
       expect.not.arrayContaining([
         {
-          id: "1234TestAuthUser",
+          id: "addaddaddaddaddaddaddadd",
           email: "testAuthUser@test.com"
         }
       ])
@@ -102,7 +102,7 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
       ...standardTeamDocument,
       managers: [
         {
-          id: "1234TestAuthUser",
+          id: "addaddaddaddaddaddaddadd",
           email: "testAuthUser@test.com"
         }
       ],
@@ -142,12 +142,12 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
     expect(res.status).toBe(400);
   });
 
-  it("should remove 1234TestAuthUser from managers array in the DB, when authorised user is not the only manager of the team", async () => {
+  it("should remove addaddaddaddaddaddaddadd from managers array in the DB, when authorised user is not the only manager of the team", async () => {
     teamDocument = {
       ...standardTeamDocument,
       managers: [
         {
-          id: "1234TestAuthUser",
+          id: "addaddaddaddaddaddaddadd",
           email: "testAuthUser@test.com"
         },
         {
@@ -170,7 +170,7 @@ describe("PATCH /v3/teams/leave/:teamId", () => {
     expect(updatedTeam.managers).toEqual(
       expect.not.arrayContaining([
         {
-          id: "1234TestAuthUser",
+          id: "addaddaddaddaddaddaddadd",
           email: "testAuthUser@test.com"
         }
       ])

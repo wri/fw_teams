@@ -2,7 +2,7 @@
 // See: https://jestjs.io/docs/configuration#setupfilesafterenv-array
 
 const user = {
-  id: "1234TestAuthUser",
+  id: "addaddaddaddaddaddaddadd",
   email: "testAuthUser@test.com"
 };
 
