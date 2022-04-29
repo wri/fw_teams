@@ -17,12 +17,12 @@ export const isUser: Middleware = async (ctx, next) => {
   const { body, query } = <TRequest>ctx.request;
   const { id: userId } = body.loggedUser || JSON.parse(query.loggedUser); // ToDo: loggedUser Type
 
-  try {
-    await TeamUserRelationModel.findOne({
-      teamId,
-      userId
-    });
-  } catch (e) {
+  const teamUserRelation = await TeamUserRelationModel.findOne({
+    teamId,
+    userId
+  });
+
+  if (!teamUserRelation || teamUserRelation.role === EUserRole.Left) {
     ctx.status = 401;
     throw new Error("Authenticated User must be part of the team");
   }
