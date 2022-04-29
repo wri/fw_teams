@@ -3,7 +3,7 @@ import request from "supertest";
 // @ts-ignore
 import server from "app";
 import mongoose from "mongoose";
-import { ITeamModel, TeamModel } from "models/team.model";
+import { ITeam, ITeamModel, TeamModel } from "models/team.model";
 import {
   EUserRole,
   EUserStatus,
@@ -82,8 +82,8 @@ describe("/v3/teams", () => {
       const res = await exec();
 
       expect(res.body.data.length).toBe(2);
-      expect(res.body.data[0].id).toEqual(teams[0]._id.toString());
-      expect(res.body.data[1].id).toEqual(teams[2]._id.toString());
+      expect(res.body.data[0].id).toEqual(teams[0].id);
+      expect(res.body.data[1].id).toEqual(teams[2].id);
     });
 
     it("should return an empty array when no invites are pending for the authorised user", async () => {
@@ -110,12 +110,73 @@ describe("/v3/teams", () => {
   });
 
   describe("GET /v3/teams/:teamId", () => {
-    // should return 200 for happy case
-    // should return 401 when user is not authorised
-    // should return 401 when the authorised user is not part of the team
-    // should return singular team
-    // should return the correct team from the database
-    // should return 404 when teamId can't be found
+    let team: ITeamModel, teamDocument: Omit<ITeam, "createdAt">, teamUserDocument: ITeamUserRelation;
+
+    beforeEach(() => {
+      teamDocument = {
+        name: "TestTeam"
+      };
+      teamUserDocument = {
+        userId: new ObjectId("addaddaddaddaddaddaddadd"),
+        teamId: "dynamic",
+        email: "admin@user.com",
+        role: EUserRole.Administrator,
+        status: EUserStatus.Confirmed
+      };
+    });
+
+    const exec = async (teamId?: string) => {
+      team = await new TeamModel(teamDocument).save();
+
+      await new TeamUserRelationModel({
+        ...teamUserDocument,
+        teamId: new ObjectId(team._id)
+      }).save();
+
+      return request(server).get(`/v3/teams/${teamId || team.id}`);
+    };
+
+    it("should return 200 for happy case", async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    // ToDo: should return 401 when user is not authorised
+
+    it("should return 401 when the authorised user is not part of the team", async () => {
+      teamUserDocument = {
+        ...teamUserDocument,
+        userId: new ObjectId()
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return singular team", async () => {
+      const res = await exec();
+
+      expect(Array.isArray(res.body.data)).toBe(false);
+    });
+
+    it("should return the correct team from the database", async () => {
+      const res = await exec();
+
+      expect(res.body.data).toEqual(
+        expect.objectContaining({
+          type: "team",
+          id: team.id
+        })
+      );
+    });
+
+    it("should return 404 when teamId can't be found", async () => {
+      const res = await exec(new ObjectId());
+
+      expect(res.status).toBe(404);
+    });
   });
 
   describe("GET /v3/teams/user/:teamId", () => {
