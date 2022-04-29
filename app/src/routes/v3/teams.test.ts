@@ -16,14 +16,17 @@ const { ObjectId } = mongoose.Types;
 
 describe("/v3/teams", () => {
   afterAll(async () => {
-    await TeamModel.remove({});
-    await TeamUserRelationModel.remove({});
     await server.close();
   });
 
   describe("GET /v3/teams/myinvites", () => {
     let teamUserDocuments: ITeamUserRelation[] = [],
       teams: ITeamModel[] = [];
+
+    afterAll(async () => {
+      await TeamModel.remove({});
+      await TeamUserRelationModel.remove({});
+    });
 
     beforeAll(async () => {
       teams = await TeamModel.insertMany([{ name: "TestTeam1" }, { name: "TestTeam2" }, { name: "TestTeam3" }]);
@@ -112,6 +115,11 @@ describe("/v3/teams", () => {
   describe("GET /v3/teams/:teamId", () => {
     let team: ITeamModel, teamDocument: Omit<ITeam, "createdAt">, teamUserDocument: ITeamUserRelation;
 
+    afterEach(async () => {
+      await TeamModel.remove({});
+      await TeamUserRelationModel.remove({});
+    });
+
     beforeEach(() => {
       teamDocument = {
         name: "TestTeam"
@@ -180,12 +188,86 @@ describe("/v3/teams", () => {
   });
 
   describe("GET /v3/teams/user/:teamId", () => {
-    // should return 200 for happy case
-    // should return 401 when user is not authorised
-    // should return an array of teams
-    // should return only the teams the userId is a part of
-    // should return the role which the userId has as an attribute on each team
-    // should return 404 when userId is not part of any team
+    let teams: ITeamModel[], teamsDocument: Omit<ITeam, "createdAt">[];
+
+    afterEach(async () => {
+      await TeamModel.remove({});
+      await TeamUserRelationModel.remove({});
+    });
+
+    beforeEach(() => {
+      teamsDocument = [
+        {
+          name: "TestTeam1"
+        },
+        {
+          name: "TestTeam2"
+        },
+        {
+          name: "TestTeam3"
+        }
+      ];
+    });
+
+    const exec = async (userId = "addaddaddaddaddaddaddadd") => {
+      teams = await TeamModel.insertMany(teamsDocument);
+
+      await TeamUserRelationModel.insertMany([
+        {
+          userId: new ObjectId("addaddaddaddaddaddaddadd"),
+          teamId: new ObjectId(teams[0].id),
+          email: "admin@user.com",
+          role: EUserRole.Administrator,
+          status: EUserStatus.Confirmed
+        },
+        {
+          userId: new ObjectId("addaddaddaddaddaddaddadd"),
+          teamId: new ObjectId(teams[2].id),
+          email: "admin@user.com",
+          role: EUserRole.Monitor,
+          status: EUserStatus.Confirmed
+        }
+      ]);
+
+      return request(server).get(`/v3/teams/user/${userId}`);
+    };
+
+    it("should return 200 for happy case", async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    // ToDo: should return 401 when user is not authorised
+
+    it("should return an array of teams", async () => {
+      const res = await exec();
+
+      expect(Array.isArray(res.body.data)).toBe(true);
+      expect(res.body.data[0].type).toBe("team");
+    });
+
+    it("should return only the teams the userId is a part of", async () => {
+      const res = await exec();
+
+      expect(res.body.data.length).toBe(2);
+      expect(res.body.data[0].id).toEqual(teams[0].id);
+      expect(res.body.data[1].id).toEqual(teams[2].id);
+    });
+
+    it("should return the role which the userId has as an attribute on each team", async () => {
+      const res = await exec();
+
+      expect(res.body.data[0].attributes.userRole).toEqual(EUserRole.Administrator);
+      expect(res.body.data[1].attributes.userRole).toEqual(EUserRole.Monitor);
+    });
+
+    it("should return an empty array when userId is not part of any team", async () => {
+      const res = await exec(new ObjectId());
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.length).toBe(0);
+    });
   });
 
   describe("POST /v3/teams", () => {
