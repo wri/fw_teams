@@ -42,7 +42,7 @@ router.get("/", authMiddleware, isUser, async ctx => {
     users = await TeamUserRelationModel.find({ teamId }).select("-status");
   }
 
-  return serializeTeamUser(users);
+  ctx.body = serializeTeamUser(users);
 });
 
 // POST /v3/teams/:teamId/users
