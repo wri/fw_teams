@@ -19,7 +19,7 @@ const standardTeamResponse: ITeamResponse = {
   users: [],
   managers: [
     {
-      id: "1234TestAuthUser",
+      id: "addaddaddaddaddaddaddadd",
       email: "testAuthUser@test.com"
     }
   ]
@@ -79,8 +79,8 @@ describe("GET /v3/myteams", () => {
 
     expect(Legacy_teamModel.find).toHaveBeenLastCalledWith({
       $or: [
-        { "managers.id": "1234TestAuthUser" },
-        { "confirmedUsers.id": "1234TestAuthUser" },
+        { "managers.id": "addaddaddaddaddaddaddadd" },
+        { "confirmedUsers.id": "addaddaddaddaddaddaddadd" },
         { users: "testAuthUser@test.com" }
       ]
     });
@@ -90,7 +90,7 @@ describe("GET /v3/myteams", () => {
     await exec("?userRole=manager");
 
     expect(Legacy_teamModel.find).toHaveBeenLastCalledWith({
-      $or: [{ "managers.id": "1234TestAuthUser" }]
+      $or: [{ "managers.id": "addaddaddaddaddaddaddadd" }]
     });
   });
 
@@ -98,7 +98,7 @@ describe("GET /v3/myteams", () => {
     await exec("?userRole=monitor,invited");
 
     expect(Legacy_teamModel.find).toHaveBeenLastCalledWith({
-      $or: [{ "confirmedUsers.id": "1234TestAuthUser" }, { users: "testAuthUser@test.com" }]
+      $or: [{ "confirmedUsers.id": "addaddaddaddaddaddaddadd" }, { users: "testAuthUser@test.com" }]
     });
   });
 
@@ -126,7 +126,7 @@ describe("GET /v3/myteams", () => {
         ],
         confirmedUsers: [
           {
-            id: "1234TestAuthUser",
+            id: "addaddaddaddaddaddaddadd",
             email: "testAuthUser@test.com"
           }
         ]
@@ -171,7 +171,7 @@ describe("GET /v3/myteams", () => {
         ],
         confirmedUsers: [
           {
-            id: "1234TestAuthUser",
+            id: "addaddaddaddaddaddaddadd",
             email: "testAuthUser@test.com"
           }
         ]

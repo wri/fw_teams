@@ -6,7 +6,7 @@ const { Schema } = mongoose;
 
 export interface ITeam {
   name: string;
-  userRole: EUserRole;
+  userRole?: EUserRole;
   createdAt: string;
 }
 
