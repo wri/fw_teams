@@ -256,8 +256,8 @@ describe("/teams/:teamId/users", () => {
           attributes: expect.objectContaining({
             teamId: team._id.toString(),
             email: "member1@user.com",
-            role: "manager",
-            status: "invited"
+            role: EUserRole.Manager,
+            status: EUserStatus.Invited
           })
         })
       );
@@ -267,8 +267,8 @@ describe("/teams/:teamId/users", () => {
           attributes: expect.objectContaining({
             teamId: team._id.toString(),
             email: "member2@user.com",
-            role: "monitor",
-            status: "invited"
+            role: EUserRole.Monitor,
+            status: EUserStatus.Invited
           })
         })
       );
@@ -359,7 +359,7 @@ describe("/teams/:teamId/users", () => {
           },
           {
             email: "member1@user.com",
-            role: "manager"
+            role: "monitor"
           }
         ]
       };
@@ -373,8 +373,8 @@ describe("/teams/:teamId/users", () => {
       await new TeamUserRelationModel({
         teamId: new ObjectId(team.id),
         email: "member1@user.com",
-        role: "manager",
-        status: "invited"
+        role: EUserRole.Manager,
+        status: EUserStatus.Invited
       }).save();
 
       const res = await exec();
@@ -389,21 +389,6 @@ describe("/teams/:teamId/users", () => {
     // });
 
     // ToDo: Tests for "Send Invitations 'userEmails'"
-  });
-
-  describe("PATCH /v3/teams/:teamId/users", () => {
-    // should return 200 for happy case
-    // should return 200 when the authorised user is a manager of the team
-    // should return the updated users
-    // should update the team-user relations in the database
-    // should assign each team-user relation their updated role
-    // ToDo: should return 401 when user is not authorised
-    // ToDo: should return 400 when the body fails validation
-    // should return 401 when the authorised user is a monitor of the team
-    // should return 401 when the authorised user is not a member of the team
-    // should return 401 if attempting to set a user's role to 'administrator'
-    // should return 404 if a user isn't found on the team
-    // should return 404 if the team id isn't found
   });
 
   describe("PATCH /v3/teams/:teamId/users/:userId/accept", () => {

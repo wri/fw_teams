@@ -108,6 +108,7 @@ router.patch("/", authMiddleware, isAdminOrManager, async ctx => {
       throw new Error("Can't set user as administrator");
     }
 
+    // ToDo: add this to a transaction
     const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
       { teamId, userId: user.userId },
       {
