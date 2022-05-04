@@ -10,6 +10,8 @@ const { ObjectId } = mongoose.Types;
 
 describe("/v3/teams", () => {
   afterAll(async () => {
+    await TeamModel.remove({});
+    await TeamUserRelationModel.remove({});
     await server.close();
   });
 

@@ -57,13 +57,6 @@ router.post("/", authMiddleware, isAdminOrManager, async ctx => {
 
   const userEmails = users.map(user => user.email);
 
-  // Check for the team
-  const team = await TeamModel.count({ _id: teamId });
-  if (team === 0) {
-    ctx.status = 404;
-    throw new Error("Team not found");
-  }
-
   // Make sure no duplicate users are added
   const duplicateUsers = await TeamUserRelationModel.count({ teamId, email: { $in: userEmails } });
   if (duplicateUsers > 0) {
@@ -96,13 +89,6 @@ router.patch("/", authMiddleware, isAdminOrManager, async ctx => {
   const {
     body: { users }
   } = <TRequest>ctx.request;
-
-  // Check for the team
-  const team = await TeamModel.count({ _id: teamId });
-  if (team === 0) {
-    ctx.status = 404;
-    throw new Error("Team not found");
-  }
 
   const updatedUsers: ITeamUserRelationModel[] = [];
   for (let i = 0; i < users.length; i++) {
