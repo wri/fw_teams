@@ -480,10 +480,18 @@ describe("/v3/teams", () => {
     const exec = async (teamId?: string) => {
       team = await new TeamModel(teamDocument).save();
 
-      await new TeamUserRelationModel({
-        ...teamUserDocument,
-        teamId: new ObjectId(team._id)
-      }).save();
+      await TeamUserRelationModel.insertMany([
+        {
+          ...teamUserDocument,
+          teamId: new ObjectId(team._id)
+        },
+        {
+          ...teamUserDocument,
+          userId: new ObjectId(),
+          role: EUserRole.Monitor,
+          teamId: new ObjectId(team._id)
+        }
+      ]);
 
       return request(server).delete(`/v3/teams/${teamId || team.id}`);
     };
@@ -547,8 +555,7 @@ describe("/v3/teams", () => {
       await exec();
 
       const deletedTeam = await TeamUserRelationModel.find({
-        teamId: team._id,
-        userId: new ObjectId("addaddaddaddaddaddaddadd")
+        teamId: team._id
       });
 
       expect(deletedTeam.length).toBe(0);

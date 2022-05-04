@@ -97,16 +97,13 @@ router.patch("/:teamId", authMiddleware, isAdminOrManager, async ctx => {
 // DELETE /v3/teams/:teamId
 // Need to be admin
 router.delete("/:teamId", authMiddleware, isAdmin, async ctx => {
-  const query = <TQuery>ctx.request.query;
   const { teamId } = ctx.params;
-  const { id: userId } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
 
   await TeamModel.findByIdAndRemove(teamId);
 
   // Remove all team user relations
   await TeamUserRelationModel.remove({
-    teamId,
-    userId
+    teamId
   });
 
   ctx.status = 200;
