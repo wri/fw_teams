@@ -1,6 +1,5 @@
 import Router from "koa-router";
 import { authMiddleware, isAdminOrManager, isUser } from "middlewares";
-import { TeamModel } from "models/team.model";
 import {
   TeamUserRelationModel,
   ITeamUserRelation,
