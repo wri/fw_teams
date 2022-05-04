@@ -18,6 +18,7 @@ export const isUser: Middleware = async (ctx, next) => {
   const { body, query } = <TRequest>ctx.request;
   const { id: userId } = body.loggedUser || JSON.parse(query.loggedUser); // ToDo: loggedUser Type
 
+  // ToDo: move this to a new middleware
   const numOfTeams = await TeamModel.count({ _id: teamId });
   if (numOfTeams === 0) {
     ctx.status = 404;
