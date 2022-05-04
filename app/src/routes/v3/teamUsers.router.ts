@@ -89,6 +89,7 @@ router.post("/", authMiddleware, isAdminOrManager, async ctx => {
   ctx.body = serializeTeamUser(userDocuments);
 });
 
+// ToDo: Rewrite to PATCH /v3/teams/:teamId/users/:teamUserId
 // PATCH /v3/teams/:teamId/users
 // Update a user's role on a team
 // body: { users: [{ userId, role }] }
@@ -134,7 +135,7 @@ router.patch("/", authMiddleware, isAdminOrManager, async ctx => {
 router.patch("/:userId/accept", authMiddleware, async ctx => {
   const { teamId, userId } = ctx.params;
   const { body } = <TRequest>ctx.request;
-  const { id: loggedUserId, email: loggedEmailId } = body.loggedUser; // ToDo: loggedUser Type
+  const { id: loggedUserId, email: loggedEmail } = body.loggedUser; // ToDo: loggedUser Type
 
   if (userId !== loggedUserId) {
     ctx.status = 401;
@@ -142,7 +143,7 @@ router.patch("/:userId/accept", authMiddleware, async ctx => {
   }
 
   const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
-    { teamId, email: loggedEmailId },
+    { teamId, email: loggedEmail },
     {
       userId: loggedUserId,
       status: EUserStatus.Confirmed

@@ -18,7 +18,7 @@ export enum EUserStatus {
 
 export interface ITeamUserRelation {
   teamId: string;
-  userId: string;
+  userId?: string;
   email: string;
   role: EUserRole;
   status: EUserStatus;

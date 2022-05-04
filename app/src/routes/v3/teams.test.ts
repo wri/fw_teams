@@ -324,7 +324,7 @@ describe("/v3/teams", () => {
       });
 
       expect(teamUserRelation.email).toEqual("testAuthUser@test.com");
-      expect(teamUserRelation.userId.toString()).toEqual("addaddaddaddaddaddaddadd");
+      expect(teamUserRelation.userId?.toString()).toEqual("addaddaddaddaddaddaddadd");
     });
 
     it("should assign the team-user relation the 'administrator' role", async () => {

@@ -4,7 +4,13 @@ import request from "supertest";
 import server from "app";
 import mongoose from "mongoose";
 import { ITeamModel, TeamModel } from "models/team.model";
-import { EUserRole, EUserStatus, ITeamUserRelation, TeamUserRelationModel } from "../../models/teamUserRelation.model";
+import {
+  EUserRole,
+  EUserStatus,
+  ITeamUserRelation,
+  ITeamUserRelationModel,
+  TeamUserRelationModel
+} from "../../models/teamUserRelation.model";
 
 const { ObjectId } = mongoose.Types;
 
@@ -105,7 +111,7 @@ describe("/teams/:teamId/users", () => {
         expect.objectContaining({
           type: "teamUser",
           attributes: expect.objectContaining({
-            userId: teamUserDocuments[1].userId.toString()
+            userId: teamUserDocuments[1].userId?.toString()
           })
         })
       );
@@ -392,14 +398,93 @@ describe("/teams/:teamId/users", () => {
   });
 
   describe("PATCH /v3/teams/:teamId/users/:userId/accept", () => {
-    // should return 200 for happy case
-    // should return the updated user
-    // should set the user's id as the authorised user's id in the database
-    // should set the user's status as 'confirmed' in the database
+    let teamUserDocument: ITeamUserRelation, teamUserModel: ITeamUserRelationModel;
+
+    afterEach(async () => {
+      await TeamUserRelationModel.remove({});
+    });
+
+    beforeEach(async () => {
+      teamUserDocument = {
+        teamId: new ObjectId(team.id),
+        email: "testAuthUser@test.com",
+        role: EUserRole.Manager,
+        status: EUserStatus.Invited
+      };
+    });
+
+    const exec = async ({ teamId, userId = "addaddaddaddaddaddaddadd" }: { teamId?: string; userId?: string } = {}) => {
+      teamUserModel = await new TeamUserRelationModel(teamUserDocument).save();
+
+      return request(server)
+        .patch(`/v3/teams/${teamId || team.id}/users/${userId}/accept`)
+        .send();
+    };
+
+    it("should return 200 for happy case", async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it("should return the updated user", async () => {
+      const res = await exec();
+
+      expect(res.body.data).toEqual(
+        expect.objectContaining({
+          type: "teamUser",
+          attributes: expect.objectContaining({
+            userId: "addaddaddaddaddaddaddadd",
+            status: EUserStatus.Confirmed
+          })
+        })
+      );
+    });
+
+    it("should set the user's id as the authorised user's id in the database", async () => {
+      await exec();
+
+      const confirmedUser = await TeamUserRelationModel.findById(teamUserModel._id);
+
+      expect(confirmedUser.userId?.toString()).toEqual("addaddaddaddaddaddaddadd");
+    });
+
+    it("should set the user's status as 'confirmed' in the database", async () => {
+      await exec();
+
+      const confirmedUser = await TeamUserRelationModel.findById(teamUserModel._id);
+
+      expect(confirmedUser.status).toEqual(EUserStatus.Confirmed);
+    });
+
     // ToDo: should return 401 when user is not authorised
-    // should return 401 if the path's userId does not match the authorised user's id
-    // should return 404 if the team id isn't found
-    // should return 404 if a team-user relation isn't found
+
+    it("should return 401 if the path's userId does not match the authorised user's id", async () => {
+      const res = await exec({
+        userId: new ObjectId()
+      });
+
+      expect(res.status).toBe(401);
+    });
+
+    // ToDo: it("should return 404 if the team id isn't found", async () => {
+    //   const res = await exec({
+    //     teamId: new ObjectId()
+    //   });
+    //
+    //   expect(res.status).toBe(404);
+    // });
+
+    // ToDo: it("should return 404 if a team-user relation isn't found", async () => {
+    //   teamUserDocument = {
+    //     ...teamUserDocument,
+    //     email: "notme@user.com"
+    //   };
+    //
+    //   const res = await exec();
+    //
+    //   expect(res.status).toBe(404);
+    // });
   });
 
   describe("PATCH /v3/teams/:teamId/users/:userId/decline", () => {
