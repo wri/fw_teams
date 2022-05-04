@@ -4,13 +4,7 @@ import request from "supertest";
 import server from "app";
 import mongoose from "mongoose";
 import { ITeam, ITeamModel, TeamModel } from "models/team.model";
-import {
-  EUserRole,
-  EUserStatus,
-  ITeamUserRelation,
-  ITeamUserRelationModel,
-  TeamUserRelationModel
-} from "models/teamUserRelation.model";
+import { EUserRole, EUserStatus, ITeamUserRelation, TeamUserRelationModel } from "models/teamUserRelation.model";
 
 const { ObjectId } = mongoose.Types;
 
@@ -363,6 +357,7 @@ describe("/v3/teams", () => {
 
     afterEach(async () => {
       await TeamModel.remove({});
+      await TeamUserRelationModel.remove({});
     });
 
     beforeEach(async () => {
@@ -400,10 +395,32 @@ describe("/v3/teams", () => {
       expect(res.status).toBe(200);
     });
 
+    it("should return 200 when user is a manager of the team", async () => {
+      teamUserDocument = {
+        ...teamUserDocument,
+        role: EUserRole.Manager
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
     // ToDo: should return 401 when user is not authorised
     // ToDo: should return 400 is body validation fails
 
-    it("should return 401 when user is not an administrator or manager of the team", async () => {
+    it("should return 401 when user is a monitor of the team", async () => {
+      teamUserDocument = {
+        ...teamUserDocument,
+        role: EUserRole.Monitor
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 401 when user is not part of the team", async () => {
       teamUserDocument = {
         ...teamUserDocument,
         userId: new ObjectId()
@@ -444,12 +461,103 @@ describe("/v3/teams", () => {
   });
 
   describe("DELETE /v3/teams/:teamId", () => {
-    // should return 200 for happy case
-    // should return 401 when user is not authorised
-    // should return 401 when user is not an administrator of the team
-    // should return an empty response
-    // should remove the team in the database
-    // should return all team-user relations from the database
-    // should return 404 when the teamId can't be found
+    let teamDocument: Omit<ITeam, "createdAt">, team: ITeamModel, teamUserDocument: ITeamUserRelation;
+
+    beforeEach(async () => {
+      teamDocument = {
+        name: "TestTeam"
+      };
+
+      teamUserDocument = {
+        userId: new ObjectId("addaddaddaddaddaddaddadd"),
+        teamId: "dynamic",
+        email: "admin@user.com",
+        role: EUserRole.Administrator,
+        status: EUserStatus.Confirmed
+      };
+    });
+
+    const exec = async (teamId?: string) => {
+      team = await new TeamModel(teamDocument).save();
+
+      await new TeamUserRelationModel({
+        ...teamUserDocument,
+        teamId: new ObjectId(team._id)
+      }).save();
+
+      return request(server).delete(`/v3/teams/${teamId || team.id}`);
+    };
+
+    it("should return 200 for happy case", async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it("should return an empty response", async () => {
+      const res = await exec();
+
+      expect(res.body).toEqual({});
+    });
+
+    // ToDo: should return 401 when user is not authorised
+
+    it("should return 401 when user is a manager of the team", async () => {
+      teamUserDocument = {
+        ...teamUserDocument,
+        role: EUserRole.Manager
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 401 when user is a monitor of the team", async () => {
+      teamUserDocument = {
+        ...teamUserDocument,
+        role: EUserRole.Monitor
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 401 when user is not a member of the team", async () => {
+      teamUserDocument = {
+        ...teamUserDocument,
+        userId: new ObjectId()
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should remove the team in the database", async () => {
+      await exec();
+
+      const deletedTeam = await TeamModel.findById(team._id);
+
+      expect(deletedTeam).toBeNull();
+    });
+
+    it("should return all team-user relations from the database", async () => {
+      await exec();
+
+      const deletedTeam = await TeamUserRelationModel.find({
+        teamId: team._id,
+        userId: new ObjectId("addaddaddaddaddaddaddadd")
+      });
+
+      expect(deletedTeam.length).toBe(0);
+    });
+
+    it("should return 404 when the teamId can't be found", async () => {
+      const res = await exec(new ObjectId());
+
+      expect(res.status).toBe(404);
+    });
   });
 });
