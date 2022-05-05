@@ -2,6 +2,7 @@ import Router from "koa-router";
 import { authMiddleware, validatorMiddleware, isAdminOrManager } from "middlewares";
 import { TeamModel } from "models/team.model";
 import createTeamInput from "./dto/create-team.input";
+import updateTeamInput from "./dto/update-team.input";
 import { TeamUserRelationModel, EUserRole, EUserStatus } from "models/teamUserRelation.model";
 import teamUserRelationService from "services/teamUserRelation.service";
 import gfwTeamSerializer from "serializers/gfwTeam.serializer";
@@ -78,7 +79,7 @@ router.post("/", authMiddleware, validatorMiddleware(createTeamInput), async ctx
 
 // PATCH /v3/teams/:teamId
 // Need to be admin or manager
-router.patch("/:teamId", authMiddleware, isAdminOrManager, async ctx => {
+router.patch("/:teamId", authMiddleware, validatorMiddleware(updateTeamInput), isAdminOrManager, async ctx => {
   const { teamId } = ctx.params;
   const { body } = <TRequest>ctx.request;
 

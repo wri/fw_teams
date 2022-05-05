@@ -4,8 +4,9 @@ import request from "supertest";
 import server from "app";
 import mongoose from "mongoose";
 import { ITeam, ITeamModel, TeamModel } from "models/team.model";
-import { DTOCreateTeam } from "./dto/create-team.input";
 import { EUserRole, EUserStatus, ITeamUserRelation, TeamUserRelationModel } from "models/teamUserRelation.model";
+import { DTOCreateTeam } from "./dto/create-team.input";
+import { DTOUpdateTeam } from "./dto/update-team.input";
 
 const { ObjectId } = mongoose.Types;
 
@@ -369,7 +370,10 @@ describe("/v3/teams", () => {
   });
 
   describe("PATCH /v3/teams/:teamId", () => {
-    let teamDocument: Omit<ITeam, "createdAt">, team: ITeamModel, teamUserDocument: ITeamUserRelation;
+    let teamDocument: Omit<ITeam, "createdAt">,
+      team: ITeamModel,
+      teamUserDocument: ITeamUserRelation,
+      payload: DTOUpdateTeam & { wrongProperty?: string };
 
     afterEach(async () => {
       await TeamModel.remove({});
@@ -388,6 +392,10 @@ describe("/v3/teams", () => {
         role: EUserRole.Administrator,
         status: EUserStatus.Confirmed
       };
+
+      payload = {
+        name: "UpdatedTeamName"
+      };
     });
 
     const exec = async (teamId?: string) => {
@@ -400,9 +408,7 @@ describe("/v3/teams", () => {
 
       return request(server)
         .patch(`/v3/teams/${teamId || team.id}`)
-        .send({
-          name: "UpdatedTeamName"
-        });
+        .send(payload);
     };
 
     it("should return 200 for happy case", async () => {
@@ -423,7 +429,14 @@ describe("/v3/teams", () => {
     });
 
     // ToDo: should return 401 when user is not authorised
-    // ToDo: should return 400 is body validation fails
+
+    it("should return 400 is body validation fails", async () => {
+      payload.wrongProperty = "qwerty";
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
 
     it("should return 401 when user is a monitor of the team", async () => {
       teamUserDocument = {
