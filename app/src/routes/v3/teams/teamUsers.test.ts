@@ -10,7 +10,7 @@ import {
   ITeamUserRelation,
   ITeamUserRelationModel,
   TeamUserRelationModel
-} from "../../models/teamUserRelation.model";
+} from "models/teamUserRelation.model";
 
 const { ObjectId } = mongoose.Types;
 
