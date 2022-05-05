@@ -397,6 +397,19 @@ describe("/teams/:teamId/users", () => {
     // ToDo: Tests for "Send Invitations 'userEmails'"
   });
 
+  describe("PATCH /v3/teams/:teamId/users/:teamUserId", () => {
+    // should return 200 for happy case
+    // should return 200 when the authorised user is a manager of the team
+    // should return the updated team-user
+    // should update the team-user's role in the database
+    // ToDo: should return 401 when user is not authorised
+    // should return 401 when the authorised user is a monitor of the team
+    // should return 401 when the authorised user is not a member of the team
+    // should return 401 when attempting to update the team-user's role to administrator
+    // should return 404 if the team id isn't found
+    // should return 404 if a team-user relation isn't found
+  });
+
   describe("PATCH /v3/teams/:teamId/users/:userId/accept", () => {
     let teamUserDocument: ITeamUserRelation, teamUserModel: ITeamUserRelationModel;
 

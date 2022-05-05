@@ -94,9 +94,14 @@ router.post("/", authMiddleware, isAdminOrManager, async ctx => {
 // Update a user's role on a team
 // body: { role }
 // Only manager or admin can access this router
-router.patch("/teamUserId", authMiddleware, isAdminOrManager, async ctx => {
+router.patch("/:teamUserId", authMiddleware, isAdminOrManager, async ctx => {
   const { teamUserId } = ctx.params;
   const { body } = <TRequest>ctx.request;
+
+  if (body.role === EUserRole.Administrator) {
+    ctx.status = 401;
+    throw new Error("Can't set user as administrator");
+  }
 
   const updatedUser = await TeamUserRelationModel.findByIdAndUpdate(
     teamUserId,
