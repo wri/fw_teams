@@ -166,11 +166,11 @@ paths:
           $ref: '#/components/responses/Error'
         '401':
           $ref: '#/components/responses/Error'
-      tags:
-        - v3
       requestBody:
         $ref: '#/components/requestBodies/Team-v3'
       description: 'Create a team, the authenticated user will be created as the ''Administrator'' of the team.'
+      tags:
+        - v3 teams
   '/v3/teams/{teamId}':
     parameters:
       - schema:
@@ -193,7 +193,7 @@ paths:
 
         The authenticated user must be a member of the team.
       tags:
-        - v3
+        - v3 teams
     patch:
       summary: Update a Team
       operationId: patch-v3-teams-teamId
@@ -210,7 +210,7 @@ paths:
         $ref: '#/components/requestBodies/Team-v3'
       description: 'Update a team, the authenticated user must be the "Administrator" or a "Manager" of the team.'
       tags:
-        - v3
+        - v3 teams
     delete:
       summary: Delete a Team
       operationId: delete-v3-teams-teamId
@@ -226,15 +226,13 @@ paths:
 
         When a team is delete all the members of the team will be removed from the TeamUserRelation model.
       tags:
-        - v3
+        - v3 teams
   /v3/teams/myinvites:
     parameters: []
     get:
       summary: Get authenticated user's invitations
       operationId: get-v3-teams-myinvites
       description: Get all the teams the authenticated user is invited to.
-      tags:
-        - v3
       responses:
         '200':
           description: OK
@@ -289,6 +287,8 @@ paths:
                   - data
         '401':
           $ref: '#/components/responses/Error'
+      tags:
+        - v3 teams
   '/v3/teams/user/{userId}':
     parameters:
       - schema:
@@ -356,7 +356,7 @@ paths:
           $ref: '#/components/responses/Error'
       description: Get all the teams a user is a member of.
       tags:
-        - v3
+        - v3 teams
   '/v3/teams/{teamId}/users':
     parameters:
       - schema:
@@ -377,7 +377,7 @@ paths:
 
         If the authenticated user is an "administrator" or a "manager" of the team they will be able to see each user's `status`, otherwise this key will be hidden.
       tags:
-        - v3
+        - v3 team members
     post:
       summary: Add members to a team
       operationId: post-v3-teams-users
@@ -393,17 +393,29 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/TeamUserRelation'
       description: |-
-        Add multiple members to a team, when the user is add an invite will be sent to their email. Their `status` will be set to `invited`.
+        Add multiple members to a team, when the user is added an invite will be sent to their email. Their `status` will be set to `invited`.
 
         The authenticated user has to be either the "administrator" or a "manager" of the team.
       tags:
-        - v3
+        - v3 team members
+  '/v3/teams/{teamId}/users/{teamUserId}':
+    parameters:
+      - schema:
+          type: string
+        name: teamId
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: teamUserId
+        in: path
+        required: true
     patch:
-      summary: Update members of a team
-      operationId: patch-v3-teams-users
+      summary: Update a team member
+      operationId: patch-v3-teams-teamId-users-teamUserId
       responses:
         '200':
-          $ref: '#/components/responses/TeamUserRelations'
+          $ref: '#/components/responses/TeamUserRelation'
         '400':
           $ref: '#/components/responses/Error'
         '401':
@@ -411,13 +423,26 @@ paths:
         '404':
           $ref: '#/components/responses/Error'
       description: |-
-        Update multiple members of a team.
+        Update a team member's role.
+
+        Cannot change a member's role to "administrator"\
+        An administrator's role can't be changed
 
         The authenticated user has to be either the "administrator" or a "manager" of the team.
       requestBody:
-        $ref: '#/components/requestBodies/TeamUserRelation'
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum:
+                    - manager
+                    - monitor
+                    - left
       tags:
-        - v3
+        - v3 team members
   '/v3/teams/{teamId}/users/{userId}/accept':
     parameters:
       - schema:
@@ -432,8 +457,6 @@ paths:
         required: true
     patch:
       summary: Accept team invitation
-      tags:
-        - v3
       responses:
         '200':
           $ref: '#/components/responses/TeamUserRelation'
@@ -448,6 +471,8 @@ paths:
         The authenticated user's id must match the param's id.
 
         The memeber's `status` will be updated to `confirmed`.
+      tags:
+        - v3 team members
   '/v3/teams/{teamId}/users/{userId}/decline':
     parameters:
       - schema:
@@ -462,8 +487,6 @@ paths:
         required: true
     patch:
       summary: Decline team invitation
-      tags:
-        - v3
       responses:
         '200':
           $ref: '#/components/responses/TeamUserRelation'
@@ -478,6 +501,8 @@ paths:
         The authenticated user's id must match the param's `userId`.
 
         The memeber's `status` will be updated to `declined`.
+      tags:
+        - v3 team members
   '/v3/teams/{teamId}/users/{userId}/leave':
     parameters:
       - schema:
@@ -492,8 +517,6 @@ paths:
         required: true
     patch:
       summary: Leave team invitation
-      tags:
-        - v3
       responses:
         '200':
           $ref: '#/components/responses/TeamUserRelation'
@@ -510,6 +533,8 @@ paths:
         If the authenticated user is the "administrator" then they can't leave the team.
 
         The memeber's `role` will be updated to `left`.
+      tags:
+        - v3 team members
 components:
   schemas:
     Team:
