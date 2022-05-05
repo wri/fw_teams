@@ -4,6 +4,7 @@ import request from "supertest";
 import server from "app";
 import mongoose from "mongoose";
 import { ITeam, ITeamModel, TeamModel } from "models/team.model";
+import { DTOCreateTeam } from "./dto/create-team.input";
 import { EUserRole, EUserStatus, ITeamUserRelation, TeamUserRelationModel } from "models/teamUserRelation.model";
 
 const { ObjectId } = mongoose.Types;
@@ -267,15 +268,21 @@ describe("/v3/teams", () => {
   });
 
   describe("POST /v3/teams", () => {
+    let payload: DTOCreateTeam & { wrongProperty?: string };
+
     afterEach(async () => {
       await TeamModel.remove({});
       await TeamUserRelationModel.remove({});
     });
 
-    const exec = () => {
-      return request(server).post("/v3/teams").send({
+    beforeEach(() => {
+      payload = {
         name: "TestTeam"
-      });
+      };
+    });
+
+    const exec = () => {
+      return request(server).post("/v3/teams").send(payload);
     };
 
     it("should return 200 for happy case", async () => {
@@ -285,7 +292,14 @@ describe("/v3/teams", () => {
     });
 
     // ToDo: should return 401 when user is not authorised
-    // ToDo: should return 400 is body validation fails
+
+    it("should return 400 is body validation fails", async () => {
+      payload.wrongProperty = "qwerty";
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
 
     it("should return the newly created team", async () => {
       const res = await exec();
