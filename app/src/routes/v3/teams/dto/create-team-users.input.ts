@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { EUserRole, ITeamUserRelation } from "models/teamUserRelation.model";
 
-type TUserRole = Exclude<Exclude<EUserRole, EUserRole.Administrator>, EUserRole.Left>;
+export type TUserRole = Exclude<Exclude<EUserRole, EUserRole.Administrator>, EUserRole.Left>;
 
 export type DTOCreateTeamUsers = {
   users: {

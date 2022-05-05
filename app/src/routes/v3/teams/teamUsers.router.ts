@@ -1,6 +1,7 @@
 import Router from "koa-router";
 import { authMiddleware, isAdminOrManager, isUser, validatorMiddleware } from "middlewares";
 import createTeamUsersInput from "./dto/create-team-users.input";
+import updateTeamUsersInput from "./dto/update-team-user.input";
 import {
   TeamUserRelationModel,
   ITeamUserRelation,
@@ -94,7 +95,7 @@ router.post("/", authMiddleware, validatorMiddleware(createTeamUsersInput), isAd
 // Update a user's role on a team
 // body: { role }
 // Only manager or admin can access this router
-router.patch("/:teamUserId", authMiddleware, isAdminOrManager, async ctx => {
+router.patch("/:teamUserId", authMiddleware, validatorMiddleware(updateTeamUsersInput), isAdminOrManager, async ctx => {
   const { teamUserId } = ctx.params;
   const { body } = <TRequest>ctx.request;
 
