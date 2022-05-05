@@ -398,16 +398,131 @@ describe("/teams/:teamId/users", () => {
   });
 
   describe("PATCH /v3/teams/:teamId/users/:teamUserId", () => {
-    // should return 200 for happy case
-    // should return 200 when the authorised user is a manager of the team
-    // should return the updated team-user
-    // should update the team-user's role in the database
+    let teamAuthUser: ITeamUserRelation,
+      teamUserDocuments: ITeamUserRelation[],
+      teamUserRelations: ITeamUserRelationModel[],
+      payload: object;
+
+    afterEach(async () => {
+      await TeamUserRelationModel.remove({});
+    });
+
+    beforeEach(async () => {
+      teamAuthUser = {
+        teamId: new ObjectId(team.id),
+        userId: new ObjectId("addaddaddaddaddaddaddadd"),
+        email: "admin@user.com",
+        role: EUserRole.Administrator,
+        status: EUserStatus.Confirmed
+      };
+
+      payload = {
+        role: EUserRole.Manager
+      };
+    });
+
+    const exec = async ({ teamId, userToUpdate = 1 }: { teamId?: string; userToUpdate?: 0 | 1 } = {}) => {
+      teamUserDocuments = [
+        teamAuthUser,
+        {
+          teamId: new ObjectId(team.id),
+          userId: new ObjectId(),
+          email: "member1@user.com",
+          role: EUserRole.Monitor,
+          status: EUserStatus.Confirmed
+        }
+      ];
+
+      teamUserRelations = await TeamUserRelationModel.insertMany(teamUserDocuments);
+
+      return request(server)
+        .patch(`/v3/teams/${teamId || team.id}/users/${teamUserRelations[userToUpdate].id}`)
+        .send(payload);
+    };
+
+    it("should return 200 for happy case", async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it("should return 200 when the authorised user is a manager of the team", async () => {
+      teamAuthUser = {
+        ...teamAuthUser,
+        role: EUserRole.Manager
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it("should return the updated team-user", async () => {
+      const res = await exec();
+
+      expect(res.body.data).toEqual(
+        expect.objectContaining({
+          type: "teamUser",
+          attributes: expect.objectContaining({
+            userId: teamUserDocuments[1].userId?.toString(),
+            role: EUserRole.Manager
+          })
+        })
+      );
+    });
+
+    it("should update the team-user's role in the database", async () => {
+      await exec();
+
+      const teamUserRelation = await TeamUserRelationModel.findById(teamUserRelations[1]._id);
+
+      expect(teamUserRelation.role).toEqual(EUserRole.Manager);
+    });
+
+    it("should return 400 when attempting to update the team's administrator to a different role", async () => {
+      const res = await exec({
+        userToUpdate: 0
+      });
+
+      expect(res.status).toBe(400);
+    });
+
     // ToDo: should return 401 when user is not authorised
-    // should return 401 when the authorised user is a monitor of the team
-    // should return 401 when the authorised user is not a member of the team
-    // should return 401 when attempting to update the team-user's role to administrator
-    // should return 404 if the team id isn't found
-    // should return 404 if a team-user relation isn't found
+
+    it("should return 401 when the authorised user is a monitor of the team", async () => {
+      teamAuthUser = {
+        ...teamAuthUser,
+        role: EUserRole.Monitor
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 401 when the authorised user is not a member of the team", async () => {
+      teamAuthUser = {
+        ...teamAuthUser,
+        userId: new ObjectId()
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 401 when attempting to update the team-user's role to administrator", async () => {
+      payload = {
+        role: EUserRole.Administrator
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    // ToDo: should return 404 if the team id isn't found
+    // ToDo: should return 404 if a team-user relation isn't found
   });
 
   describe("PATCH /v3/teams/:teamId/users/:userId/accept", () => {

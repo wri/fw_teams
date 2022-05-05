@@ -103,15 +103,18 @@ router.patch("/:teamUserId", authMiddleware, isAdminOrManager, async ctx => {
     throw new Error("Can't set user as administrator");
   }
 
-  const updatedUser = await TeamUserRelationModel.findByIdAndUpdate(
-    teamUserId,
-    {
-      role: body.role
-    },
-    { new: true }
-  );
+  const teamUser = await TeamUserRelationModel.findById(teamUserId);
 
-  ctx.body = serializeTeamUser(updatedUser);
+  if (teamUser.role === EUserRole.Administrator) {
+    ctx.status = 400;
+    throw new Error("Can't change the administrator's role");
+  }
+
+  teamUser.role = body.role;
+
+  await teamUser.save();
+
+  ctx.body = serializeTeamUser(teamUser);
 });
 
 // PATCH /v3/teams/:teamId/users/:userId/accept
