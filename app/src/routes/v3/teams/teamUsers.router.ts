@@ -1,5 +1,7 @@
 import Router from "koa-router";
-import { authMiddleware, isAdminOrManager, isUser } from "middlewares";
+import { authMiddleware, isAdminOrManager, isUser, validatorMiddleware } from "middlewares";
+import createTeamUsersInput from "./dto/create-team-users.input";
+import updateTeamUsersInput from "./dto/update-team-user.input";
 import {
   TeamUserRelationModel,
   ITeamUserRelation,
@@ -11,7 +13,7 @@ import { Request } from "koa";
 import serializeTeamUser from "serializers/teamUserRelation.serializer";
 
 const router = new Router({
-  prefix: "/teams/:teamId/users"
+  prefix: "/:teamId/users"
 });
 
 type TRequest = {
@@ -47,9 +49,8 @@ router.get("/", authMiddleware, isUser, async ctx => {
 
 // POST /v3/teams/:teamId/users
 // Add users to team, and send invitations
-// body: { users: [ { email, role } ] }
 // Only manager or admin can access this router
-router.post("/", authMiddleware, isAdminOrManager, async ctx => {
+router.post("/", authMiddleware, validatorMiddleware(createTeamUsersInput), isAdminOrManager, async ctx => {
   const { teamId } = ctx.params;
   const {
     body: { users }
@@ -94,7 +95,7 @@ router.post("/", authMiddleware, isAdminOrManager, async ctx => {
 // Update a user's role on a team
 // body: { role }
 // Only manager or admin can access this router
-router.patch("/:teamUserId", authMiddleware, isAdminOrManager, async ctx => {
+router.patch("/:teamUserId", authMiddleware, validatorMiddleware(updateTeamUsersInput), isAdminOrManager, async ctx => {
   const { teamUserId } = ctx.params;
   const { body } = <TRequest>ctx.request;
 

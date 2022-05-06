@@ -10,7 +10,7 @@ import {
   ITeamUserRelation,
   ITeamUserRelationModel,
   TeamUserRelationModel
-} from "../../models/teamUserRelation.model";
+} from "models/teamUserRelation.model";
 
 const { ObjectId } = mongoose.Types;
 
@@ -332,7 +332,17 @@ describe("/teams/:teamId/users", () => {
     });
 
     // ToDo: should return 401 when user is not authorised
-    // ToDo: should return 400 when the body fails validation
+
+    it("should return 400 when the body fails validation", async () => {
+      payload = {
+        ...payload,
+        wrongProperty: "qwerty"
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
 
     it("should return 401 when the authorised user is a monitor of the team", async () => {
       teamAuthUser = {
@@ -489,6 +499,17 @@ describe("/teams/:teamId/users", () => {
 
     // ToDo: should return 401 when user is not authorised
 
+    it("should return 400 when the body fails validation", async () => {
+      payload = {
+        ...payload,
+        wrongProperty: "qwerty"
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
     it("should return 401 when the authorised user is a monitor of the team", async () => {
       teamAuthUser = {
         ...teamAuthUser,
@@ -511,14 +532,14 @@ describe("/teams/:teamId/users", () => {
       expect(res.status).toBe(401);
     });
 
-    it("should return 401 when attempting to update the team-user's role to administrator", async () => {
+    it("should return 400 when attempting to update the team-user's role to administrator", async () => {
       payload = {
         role: EUserRole.Administrator
       };
 
       const res = await exec();
 
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(400);
     });
 
     // ToDo: should return 404 if the team id isn't found

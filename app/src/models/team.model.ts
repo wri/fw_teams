@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Joi from "joi";
 import { EUserRole } from "./teamUserRelation.model";
 
 const { Schema } = mongoose;
