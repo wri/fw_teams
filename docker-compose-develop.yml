@@ -62,7 +62,7 @@ services:
       - ./app:/opt/fw-teams/app
       - ./nodemon.json:/opt/fw-teams/nodemon.json
       - ./jest.config.js:/opt/fw-teams/jest.config.js
-    command: yarn run test:jest app/src/routes/v3/teams.test.ts
+    command: yarn run test:jest app/src/routes/v3/teamUsers.test.ts
 
   docs:
     build: .

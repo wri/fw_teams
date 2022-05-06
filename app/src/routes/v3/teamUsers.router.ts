@@ -1,6 +1,5 @@
 import Router from "koa-router";
 import { authMiddleware, isAdminOrManager, isUser } from "middlewares";
-import { TeamModel } from "models/team.model";
 import {
   TeamUserRelationModel,
   ITeamUserRelation,
@@ -55,13 +54,16 @@ router.post("/", authMiddleware, isAdminOrManager, async ctx => {
     body: { users }
   } = <TRequest>ctx.request;
 
-  const userEmails = users.map(user => user.email);
+  const userEmails: string[] = [];
+  for (let i = 0; i < users.length; i++) {
+    const userEmail = users[i].email;
 
-  // Check for the team
-  const team = await TeamModel.count({ _id: teamId });
-  if (team === 0) {
-    ctx.status = 404;
-    throw new Error("Team not found");
+    if (!userEmails.includes(userEmail)) {
+      userEmails.push(userEmail);
+    } else {
+      ctx.status = 400;
+      throw new Error("Can't have duplicate users on a team");
+    }
   }
 
   // Make sure no duplicate users are added
@@ -87,6 +89,7 @@ router.post("/", authMiddleware, isAdminOrManager, async ctx => {
   ctx.body = serializeTeamUser(userDocuments);
 });
 
+// ToDo: Rewrite to PATCH /v3/teams/:teamId/users/:teamUserId
 // PATCH /v3/teams/:teamId/users
 // Update a user's role on a team
 // body: { users: [{ userId, role }] }
@@ -97,13 +100,6 @@ router.patch("/", authMiddleware, isAdminOrManager, async ctx => {
     body: { users }
   } = <TRequest>ctx.request;
 
-  // Check for the team
-  const team = await TeamModel.count({ _id: teamId });
-  if (team === 0) {
-    ctx.status = 404;
-    throw new Error("Team not found");
-  }
-
   const updatedUsers: ITeamUserRelationModel[] = [];
   for (let i = 0; i < users.length; i++) {
     const user = users[i];
@@ -113,6 +109,7 @@ router.patch("/", authMiddleware, isAdminOrManager, async ctx => {
       throw new Error("Can't set user as administrator");
     }
 
+    // ToDo: add this to a transaction
     const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
       { teamId, userId: user.userId },
       {
@@ -138,7 +135,7 @@ router.patch("/", authMiddleware, isAdminOrManager, async ctx => {
 router.patch("/:userId/accept", authMiddleware, async ctx => {
   const { teamId, userId } = ctx.params;
   const { body } = <TRequest>ctx.request;
-  const { id: loggedUserId, email: loggedEmailId } = body.loggedUser; // ToDo: loggedUser Type
+  const { id: loggedUserId, email: loggedEmail } = body.loggedUser; // ToDo: loggedUser Type
 
   if (userId !== loggedUserId) {
     ctx.status = 401;
@@ -146,7 +143,7 @@ router.patch("/:userId/accept", authMiddleware, async ctx => {
   }
 
   const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
-    { teamId, email: loggedEmailId },
+    { teamId, email: loggedEmail },
     {
       userId: loggedUserId,
       status: EUserStatus.Confirmed

@@ -10,6 +10,8 @@ const { ObjectId } = mongoose.Types;
 
 describe("/v3/teams", () => {
   afterAll(async () => {
+    await TeamModel.remove({});
+    await TeamUserRelationModel.remove({});
     await server.close();
   });
 
@@ -322,7 +324,7 @@ describe("/v3/teams", () => {
       });
 
       expect(teamUserRelation.email).toEqual("testAuthUser@test.com");
-      expect(teamUserRelation.userId.toString()).toEqual("addaddaddaddaddaddaddadd");
+      expect(teamUserRelation.userId?.toString()).toEqual("addaddaddaddaddaddaddadd");
     });
 
     it("should assign the team-user relation the 'administrator' role", async () => {
