@@ -390,14 +390,30 @@ paths:
           $ref: '#/components/responses/Error'
         '404':
           $ref: '#/components/responses/Error'
-      requestBody:
-        $ref: '#/components/requestBodies/TeamUserRelation'
       description: |-
         Add multiple members to a team, when the user is added an invite will be sent to their email. Their `status` will be set to `invited`.
 
         The authenticated user has to be either the "administrator" or a "manager" of the team.
       tags:
         - v3 team members
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                users:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                      role:
+                        type: string
+                        enum:
+                          - manager
+                          - monitor
   '/v3/teams/{teamId}/users/{teamUserId}':
     parameters:
       - schema:
@@ -440,7 +456,6 @@ paths:
                   enum:
                     - manager
                     - monitor
-                    - left
       tags:
         - v3 team members
   '/v3/teams/{teamId}/users/{userId}/accept':
@@ -516,7 +531,7 @@ paths:
         in: path
         required: true
     patch:
-      summary: Leave team invitation
+      summary: Leave team
       responses:
         '200':
           $ref: '#/components/responses/TeamUserRelation'
@@ -601,14 +616,13 @@ components:
           readOnly: true
       required:
         - createdAt
-      description: ''
+      description: '**Deprecated**'
       x-internal: false
     GFWTeam:
       title: GFW Team
       type: object
       examples:
         - name: string
-          createdAt: '2019-08-24T14:15:22Z'
       description: ''
       x-tags:
         - v3
@@ -653,6 +667,8 @@ components:
         - email
         - role
         - status
+      x-tags:
+        - v3
   securitySchemes:
     Authorization:
       type: http
