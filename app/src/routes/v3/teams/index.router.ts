@@ -1,6 +1,8 @@
 import Router from "koa-router";
 import { authMiddleware, validatorMiddleware, isAdminOrManager } from "middlewares";
-import { TeamModel, validateTeam } from "models/team.model";
+import { TeamModel } from "models/team.model";
+import createTeamInput from "./dto/create-team.input";
+import updateTeamInput from "./dto/update-team.input";
 import { TeamUserRelationModel, EUserRole, EUserStatus } from "models/teamUserRelation.model";
 import teamUserRelationService from "services/teamUserRelation.service";
 import gfwTeamSerializer from "serializers/gfwTeam.serializer";
@@ -16,9 +18,7 @@ type TQuery = {
   userRole?: string;
 };
 
-const router = new Router({
-  prefix: "/teams"
-});
+const router = new Router();
 
 // GET /v3/teams/myinvites
 // Find teams that auth user is invited to
@@ -56,7 +56,7 @@ router.get("/user/:userId", authMiddleware, async ctx => {
 
 // POST /v3/teams
 // Add user as admin to teamUserRelation model
-router.post("/", authMiddleware, async ctx => {
+router.post("/", authMiddleware, validatorMiddleware(createTeamInput), async ctx => {
   const { body } = <TRequest>ctx.request;
 
   const team = await new TeamModel({
@@ -79,7 +79,7 @@ router.post("/", authMiddleware, async ctx => {
 
 // PATCH /v3/teams/:teamId
 // Need to be admin or manager
-router.patch("/:teamId", authMiddleware, isAdminOrManager, async ctx => {
+router.patch("/:teamId", authMiddleware, validatorMiddleware(updateTeamInput), isAdminOrManager, async ctx => {
   const { teamId } = ctx.params;
   const { body } = <TRequest>ctx.request;
 

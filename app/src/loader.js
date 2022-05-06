@@ -21,7 +21,7 @@ module.exports = (() => {
       const stat = fs.statSync(newPath);
       if (!stat.isDirectory()) {
         if (file.endsWith(".router.js") || file.endsWith(".router.ts")) {
-          if (file === "index.router.ts" || file === "index.router.ts") {
+          if (file === "index.router.js" || file === "index.router.ts") {
             existIndexRouter = true;
           } else {
             logger.debug("Loading route %s, in path %s", newPath, pathApi);

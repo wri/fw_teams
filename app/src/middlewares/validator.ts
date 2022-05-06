@@ -4,18 +4,23 @@ import { AnySchema } from "joi";
 // @ts-ignore
 import logger from "logger";
 
-export function validatorMiddleware(validator: AnySchema["validate"]): Middleware {
-  return function (ctx, next) {
+export function validatorMiddleware(schema: AnySchema): Middleware {
+  return async function (ctx, next) {
     logger.info("Validating body data");
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const { error } = validator(ctx.request.body);
+    const body = { ...ctx.request.body };
+
+    delete body["loggedUser"];
+    delete body["token"];
+
+    const { error } = schema.validate(body);
     if (error) {
       ctx.status = 400;
       throw error;
     }
 
-    next();
+    await next();
   };
 }
