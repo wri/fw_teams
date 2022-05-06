@@ -19,6 +19,7 @@ type TRequest = {
   body: {
     loggedUser: any;
     users: ITeamUserRelation[];
+    role: ITeamUserRelation["role"];
   }; // ToDo: request body
 } & Request;
 
@@ -89,44 +90,31 @@ router.post("/", authMiddleware, isAdminOrManager, async ctx => {
   ctx.body = serializeTeamUser(userDocuments);
 });
 
-// ToDo: Rewrite to PATCH /v3/teams/:teamId/users/:teamUserId
-// PATCH /v3/teams/:teamId/users
+// PATCH /v3/teams/:teamId/users/:teamUserId
 // Update a user's role on a team
-// body: { users: [{ userId, role }] }
+// body: { role }
 // Only manager or admin can access this router
-router.patch("/", authMiddleware, isAdminOrManager, async ctx => {
-  const { teamId } = ctx.params;
-  const {
-    body: { users }
-  } = <TRequest>ctx.request;
+router.patch("/:teamUserId", authMiddleware, isAdminOrManager, async ctx => {
+  const { teamUserId } = ctx.params;
+  const { body } = <TRequest>ctx.request;
 
-  const updatedUsers: ITeamUserRelationModel[] = [];
-  for (let i = 0; i < users.length; i++) {
-    const user = users[i];
-
-    if (user.role === EUserRole.Administrator) {
-      ctx.status = 401;
-      throw new Error("Can't set user as administrator");
-    }
-
-    // ToDo: add this to a transaction
-    const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
-      { teamId, userId: user.userId },
-      {
-        role: user.role
-      },
-      { new: true }
-    );
-
-    if (!updatedUser) {
-      ctx.status = 404;
-      throw new Error(`User not found with ID: ${user.userId}`);
-    }
-
-    updatedUsers.push(updatedUser);
+  if (body.role === EUserRole.Administrator) {
+    ctx.status = 401;
+    throw new Error("Can't set user as administrator");
   }
 
-  ctx.body = serializeTeamUser(updatedUsers);
+  const teamUser = await TeamUserRelationModel.findById(teamUserId);
+
+  if (teamUser.role === EUserRole.Administrator) {
+    ctx.status = 400;
+    throw new Error("Can't change the administrator's role");
+  }
+
+  teamUser.role = body.role;
+
+  await teamUser.save();
+
+  ctx.body = serializeTeamUser(teamUser);
 });
 
 // PATCH /v3/teams/:teamId/users/:userId/accept
