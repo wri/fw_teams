@@ -4,6 +4,7 @@ import { TeamModel } from "models/team.model";
 import createTeamInput from "./dto/create-team.input";
 import updateTeamInput from "./dto/update-team.input";
 import { TeamUserRelationModel, EUserRole, EUserStatus } from "models/teamUserRelation.model";
+import TeamService from "services/team.service";
 import teamUserRelationService from "services/teamUserRelation.service";
 import gfwTeamSerializer from "serializers/gfwTeam.serializer";
 import { Request } from "koa";
@@ -37,7 +38,7 @@ router.get("/myinvites", authMiddleware, async ctx => {
 router.get("/:teamId", authMiddleware, validateObjectId("teamId"), isUser, async ctx => {
   const { teamId } = ctx.params;
 
-  const team = await TeamModel.findById(teamId);
+  const team = await TeamService.findById(teamId);
 
   ctx.body = gfwTeamSerializer(team);
 });
