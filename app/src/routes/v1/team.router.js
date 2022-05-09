@@ -3,7 +3,7 @@ const logger = require("logger");
 const TeamModel = require("models/legacy_team.model").default;
 const TeamSerializer = require("serializers/team.serializer");
 const TeamValidator = require("validators/team.validator");
-const TeamService = require("services/team.service");
+const Legacy_TeamService = require("services/legacy_team.service");
 const UserService = require("services/user.service");
 
 const router = new Router({
@@ -31,16 +31,16 @@ class TeamRouter {
     logger.info("Confirming user with token", token);
     const loggedUser = JSON.parse(ctx.request.query.loggedUser);
     const userId = loggedUser.id;
-    const data = TeamService.verifyToken(token);
+    const data = Legacy_TeamService.verifyToken(token);
     if (!userId) ctx.throw(400, "User missing");
     if (data) {
       const { email, teamId } = data;
       const team = await TeamModel.findById(teamId);
       if (team && !team.confirmedUsers.includes(email)) {
-        TeamService.deleteConfirmedUserFromPreviousTeams(userId);
+        Legacy_TeamService.deleteConfirmedUserFromPreviousTeams(userId);
         team.users = team.users.filter(user => user !== email);
         team.confirmedUsers = team.confirmedUsers.concat({ id: userId, email });
-        TeamService.sendManagerConfirmation(email, team.managers, ctx.request.body.locale);
+        Legacy_TeamService.sendManagerConfirmation(email, team.managers, ctx.request.body.locale);
         await team.save();
       }
       logger.info("saved team", team);
@@ -78,7 +78,7 @@ class TeamRouter {
       layers: body.layers,
       createdAt: Date.now()
     }).save();
-    TeamService.sendNotifications(body.users, team, locale);
+    Legacy_TeamService.sendNotifications(body.users, team, locale);
     ctx.body = TeamSerializer.serialize(team);
   }
 
@@ -134,7 +134,7 @@ class TeamRouter {
     }
 
     await team.save();
-    TeamService.sendNotifications(newUsers, team, locale);
+    Legacy_TeamService.sendNotifications(newUsers, team, locale);
     ctx.body = TeamSerializer.serialize(team);
   }
 

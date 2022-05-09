@@ -5,7 +5,7 @@ const MailService = require("services/MailService");
 const UserService = require("services/user.service");
 const TeamModel = require("models/legacy_team.model").default;
 
-class TeamService {
+class Legacy_teamService {
   // eslint-disable-next-line consistent-return
   static verifyToken(token) {
     try {
@@ -51,4 +51,4 @@ class TeamService {
   }
 }
 
-module.exports = TeamService;
+module.exports = Legacy_teamService;
