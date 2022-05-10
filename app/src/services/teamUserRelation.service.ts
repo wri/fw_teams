@@ -3,7 +3,7 @@ import { TeamUserRelationModel } from "models/teamUserRelation.model";
 import TeamService from "services/team.service";
 
 class TeamUserRelationService {
-  async getTeamsByUserId(userId: string, conditions = {}) {
+  static async getTeamsByUserId(userId: string, conditions = {}) {
     const teamUserRelations = await TeamUserRelationModel.find({
       userId,
       ...conditions
@@ -24,4 +24,4 @@ class TeamUserRelationService {
   }
 }
 
-export default new TeamUserRelationService();
+export default TeamUserRelationService;

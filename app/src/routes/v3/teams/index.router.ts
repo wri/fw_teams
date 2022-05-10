@@ -5,7 +5,7 @@ import createTeamInput from "./dto/create-team.input";
 import updateTeamInput from "./dto/update-team.input";
 import { EUserStatus } from "models/teamUserRelation.model";
 import TeamService from "services/team.service";
-import teamUserRelationService from "services/teamUserRelation.service";
+import TeamUserRelationService from "services/teamUserRelation.service";
 import gfwTeamSerializer from "serializers/gfwTeam.serializer";
 
 type TRequest = {
@@ -25,7 +25,7 @@ router.get("/myinvites", authMiddleware, async ctx => {
   const query = <TQuery>ctx.request.query;
   const { id: userId } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
 
-  const teams = await teamUserRelationService.getTeamsByUserId(userId, {
+  const teams = await TeamUserRelationService.getTeamsByUserId(userId, {
     status: EUserStatus.Invited
   });
 
@@ -48,7 +48,7 @@ router.get("/:teamId", authMiddleware, validateObjectId("teamId"), isUser, async
 router.get("/user/:userId", authMiddleware, validateObjectId("userId"), async ctx => {
   const { userId } = ctx.params;
 
-  const teams = await teamUserRelationService.getTeamsByUserId(userId);
+  const teams = await TeamUserRelationService.getTeamsByUserId(userId);
 
   ctx.body = gfwTeamSerializer(teams);
 });
