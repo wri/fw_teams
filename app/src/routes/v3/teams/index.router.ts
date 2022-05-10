@@ -1,13 +1,12 @@
+import { Request } from "koa";
 import Router from "koa-router";
-import { authMiddleware, validatorMiddleware, isAdminOrManager, validateObjectId } from "middlewares";
+import { authMiddleware, validatorMiddleware, isAdminOrManager, validateObjectId, isAdmin, isUser } from "middlewares";
 import createTeamInput from "./dto/create-team.input";
 import updateTeamInput from "./dto/update-team.input";
 import { EUserStatus } from "models/teamUserRelation.model";
 import TeamService from "services/team.service";
 import teamUserRelationService from "services/teamUserRelation.service";
 import gfwTeamSerializer from "serializers/gfwTeam.serializer";
-import { Request } from "koa";
-import { isAdmin, isUser } from "middlewares";
 
 type TRequest = {
   body: any; // ToDo: request body
