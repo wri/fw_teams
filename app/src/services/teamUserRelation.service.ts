@@ -5,6 +5,10 @@ class TeamUserRelationService {
     return TeamUserRelationModel.insertMany(teamUsersToAdd);
   }
 
+  static update(teamId: string, userEmail: string, update: Partial<ITeamUserRelation>) {
+    return TeamUserRelationModel.findOneAndUpdate({ teamId, email: userEmail }, update, { new: true });
+  }
+
   static findTeamUser(teamId: string, userId: string) {
     return TeamUserRelationModel.findOne({
       teamId,

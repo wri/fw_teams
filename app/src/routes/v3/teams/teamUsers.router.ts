@@ -1,13 +1,13 @@
 import Router from "koa-router";
-import { authMiddleware, isAdminOrManager, isUser, validatorMiddleware, validateObjectId } from "middlewares";
+import { authMiddleware, isAdminOrManager, isUser, validateObjectId, validatorMiddleware } from "middlewares";
 import createTeamUsersInput from "./dto/create-team-users.input";
 import updateTeamUsersInput from "./dto/update-team-user.input";
 import {
-  TeamUserRelationModel,
+  EUserRole,
+  EUserStatus,
   ITeamUserRelation,
   ITeamUserRelationModel,
-  EUserRole,
-  EUserStatus
+  TeamUserRelationModel
 } from "models/teamUserRelation.model";
 import { Request } from "koa";
 import serializeTeamUser from "serializers/teamUserRelation.serializer";
@@ -143,14 +143,10 @@ router.patch("/:userId/accept", authMiddleware, validateObjectId(["teamId", "use
     throw new Error("Login with the correct user");
   }
 
-  const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
-    { teamId, email: loggedEmail },
-    {
-      userId: loggedUserId,
-      status: EUserStatus.Confirmed
-    },
-    { new: true }
-  );
+  const updatedUser = await TeamUserRelationService.update(teamId, loggedEmail, {
+    userId: loggedUserId,
+    status: EUserStatus.Confirmed
+  });
 
   ctx.body = serializeTeamUser(updatedUser);
 });
@@ -161,20 +157,16 @@ router.patch("/:userId/accept", authMiddleware, validateObjectId(["teamId", "use
 router.patch("/:userId/decline", authMiddleware, validateObjectId(["teamId", "userId"]), async ctx => {
   const { teamId, userId } = ctx.params;
   const { body } = <TRequest>ctx.request;
-  const { id: loggedUserId, email: loggedEmailId } = body.loggedUser; // ToDo: loggedUser Type
+  const { id: loggedUserId, email: loggedEmail } = body.loggedUser; // ToDo: loggedUser Type
 
   if (userId !== loggedUserId) {
     ctx.status = 401;
     throw new Error("Log in with the correct user");
   }
 
-  const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
-    { teamId, email: loggedEmailId },
-    {
-      status: EUserStatus.Declined
-    },
-    { new: true }
-  );
+  const updatedUser = await TeamUserRelationService.update(teamId, loggedEmail, {
+    status: EUserStatus.Declined
+  });
 
   ctx.body = serializeTeamUser(updatedUser);
 });
@@ -186,7 +178,7 @@ router.patch("/:userId/decline", authMiddleware, validateObjectId(["teamId", "us
 router.patch("/:userId/leave", authMiddleware, validateObjectId(["teamId", "userId"]), async ctx => {
   const { teamId, userId } = ctx.params;
   const { body } = <TRequest>ctx.request;
-  const { id: loggedUserId, email: loggedEmailId } = body.loggedUser; // ToDo: loggedUser Type
+  const { id: loggedUserId, email: loggedEmail } = body.loggedUser; // ToDo: loggedUser Type
 
   if (userId !== loggedUserId) {
     ctx.status = 401;
@@ -200,13 +192,9 @@ router.patch("/:userId/leave", authMiddleware, validateObjectId(["teamId", "user
     throw new Error("Administrator can't leave team");
   }
 
-  const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
-    { teamId, email: loggedEmailId },
-    {
-      role: EUserRole.Left
-    },
-    { new: true }
-  );
+  const updatedUser = await TeamUserRelationService.update(teamId, loggedEmail, {
+    role: EUserRole.Left
+  });
 
   ctx.body = serializeTeamUser(updatedUser);
 });
