@@ -1,5 +1,5 @@
 import Router from "koa-router";
-import { authMiddleware, validatorMiddleware, isAdminOrManager } from "middlewares";
+import { authMiddleware, validatorMiddleware, isAdminOrManager, validateObjectId } from "middlewares";
 import { TeamModel } from "models/team.model";
 import createTeamInput from "./dto/create-team.input";
 import updateTeamInput from "./dto/update-team.input";
@@ -34,7 +34,7 @@ router.get("/myinvites", authMiddleware, async ctx => {
 });
 
 // GET /v3/teams/:teamId
-router.get("/:teamId", authMiddleware, isUser, async ctx => {
+router.get("/:teamId", authMiddleware, validateObjectId("teamId"), isUser, async ctx => {
   const { teamId } = ctx.params;
 
   const team = await TeamModel.findById(teamId);
@@ -46,7 +46,7 @@ router.get("/:teamId", authMiddleware, isUser, async ctx => {
 // Get Teams by user id
 // Return the user's teams that have admin, manager or monitor roles
 // ToDo: What security is need?
-router.get("/user/:userId", authMiddleware, async ctx => {
+router.get("/user/:userId", authMiddleware, validateObjectId("userId"), async ctx => {
   const { userId } = ctx.params;
 
   const teams = await teamUserRelationService.getTeamsByUserId(userId);
@@ -79,24 +79,31 @@ router.post("/", authMiddleware, validatorMiddleware(createTeamInput), async ctx
 
 // PATCH /v3/teams/:teamId
 // Need to be admin or manager
-router.patch("/:teamId", authMiddleware, validatorMiddleware(updateTeamInput), isAdminOrManager, async ctx => {
-  const { teamId } = ctx.params;
-  const { body } = <TRequest>ctx.request;
+router.patch(
+  "/:teamId",
+  authMiddleware,
+  validateObjectId("teamId"),
+  validatorMiddleware(updateTeamInput),
+  isAdminOrManager,
+  async ctx => {
+    const { teamId } = ctx.params;
+    const { body } = <TRequest>ctx.request;
 
-  const team = await TeamModel.findByIdAndUpdate(
-    teamId,
-    {
-      name: body.name
-    },
-    { new: true }
-  );
+    const team = await TeamModel.findByIdAndUpdate(
+      teamId,
+      {
+        name: body.name
+      },
+      { new: true }
+    );
 
-  ctx.body = gfwTeamSerializer(team);
-});
+    ctx.body = gfwTeamSerializer(team);
+  }
+);
 
 // DELETE /v3/teams/:teamId
 // Need to be admin
-router.delete("/:teamId", authMiddleware, isAdmin, async ctx => {
+router.delete("/:teamId", authMiddleware, validateObjectId("teamId"), isAdmin, async ctx => {
   const { teamId } = ctx.params;
 
   await TeamModel.findByIdAndRemove(teamId);

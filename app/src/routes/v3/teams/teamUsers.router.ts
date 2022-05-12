@@ -1,5 +1,5 @@
 import Router from "koa-router";
-import { authMiddleware, isAdminOrManager, isUser, validatorMiddleware } from "middlewares";
+import { authMiddleware, isAdminOrManager, isUser, validatorMiddleware, validateObjectId } from "middlewares";
 import createTeamUsersInput from "./dto/create-team-users.input";
 import updateTeamUsersInput from "./dto/update-team-user.input";
 import {
@@ -27,7 +27,7 @@ type TRequest = {
 
 // GET /v3/teams/:teamId/users
 // Return all users on a team
-router.get("/", authMiddleware, isUser, async ctx => {
+router.get("/", authMiddleware, validateObjectId("teamId"), isUser, async ctx => {
   const { teamId } = ctx.params;
   const { query } = <TRequest>ctx.request;
   const { id: userId } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
@@ -50,78 +50,92 @@ router.get("/", authMiddleware, isUser, async ctx => {
 // POST /v3/teams/:teamId/users
 // Add users to team, and send invitations
 // Only manager or admin can access this router
-router.post("/", authMiddleware, validatorMiddleware(createTeamUsersInput), isAdminOrManager, async ctx => {
-  const { teamId } = ctx.params;
-  const {
-    body: { users }
-  } = <TRequest>ctx.request;
+router.post(
+  "/",
+  authMiddleware,
+  validateObjectId("teamId"),
+  validatorMiddleware(createTeamUsersInput),
+  isAdminOrManager,
+  async ctx => {
+    const { teamId } = ctx.params;
+    const {
+      body: { users }
+    } = <TRequest>ctx.request;
 
-  const userEmails: string[] = [];
-  for (let i = 0; i < users.length; i++) {
-    const userEmail = users[i].email;
+    const userEmails: string[] = [];
+    for (let i = 0; i < users.length; i++) {
+      const userEmail = users[i].email;
 
-    if (!userEmails.includes(userEmail)) {
-      userEmails.push(userEmail);
-    } else {
+      if (!userEmails.includes(userEmail)) {
+        userEmails.push(userEmail);
+      } else {
+        ctx.status = 400;
+        throw new Error("Can't have duplicate users on a team");
+      }
+    }
+
+    // Make sure no duplicate users are added
+    const duplicateUsers = await TeamUserRelationModel.count({ teamId, email: { $in: userEmails } });
+    if (duplicateUsers > 0) {
       ctx.status = 400;
       throw new Error("Can't have duplicate users on a team");
     }
+
+    const userDocumentsToAdd = users.map(user => {
+      return {
+        teamId,
+        email: user.email,
+        role: user.role,
+        status: EUserStatus.Invited
+      };
+    });
+
+    const userDocuments = await TeamUserRelationModel.insertMany(userDocumentsToAdd);
+
+    // ToDo: Send Invitations "userEmails"
+
+    ctx.body = serializeTeamUser(userDocuments);
   }
-
-  // Make sure no duplicate users are added
-  const duplicateUsers = await TeamUserRelationModel.count({ teamId, email: { $in: userEmails } });
-  if (duplicateUsers > 0) {
-    ctx.status = 400;
-    throw new Error("Can't have duplicate users on a team");
-  }
-
-  const userDocumentsToAdd = users.map(user => {
-    return {
-      teamId,
-      email: user.email,
-      role: user.role,
-      status: EUserStatus.Invited
-    };
-  });
-
-  const userDocuments = await TeamUserRelationModel.insertMany(userDocumentsToAdd);
-
-  // ToDo: Send Invitations "userEmails"
-
-  ctx.body = serializeTeamUser(userDocuments);
-});
+);
 
 // PATCH /v3/teams/:teamId/users/:teamUserId
 // Update a user's role on a team
 // body: { role }
 // Only manager or admin can access this router
-router.patch("/:teamUserId", authMiddleware, validatorMiddleware(updateTeamUsersInput), isAdminOrManager, async ctx => {
-  const { teamUserId } = ctx.params;
-  const { body } = <TRequest>ctx.request;
+router.patch(
+  "/:teamUserId",
+  authMiddleware,
+  validateObjectId(["teamId", "teamUserId"]),
+  validatorMiddleware(updateTeamUsersInput),
+  isAdminOrManager,
+  async ctx => {
+    const { teamUserId } = ctx.params;
+    const { body } = <TRequest>ctx.request;
 
-  if (body.role === EUserRole.Administrator) {
-    ctx.status = 401;
-    throw new Error("Can't set user as administrator");
+    if (body.role === EUserRole.Administrator) {
+      ctx.status = 401;
+      throw new Error("Can't set user as administrator");
+    }
+
+    const teamUser = await TeamUserRelationModel.findById(teamUserId);
+
+    if (teamUser.role === EUserRole.Administrator) {
+      ctx.status = 400;
+      throw new Error("Can't change the administrator's role");
+    }
+
+    teamUser.role = body.role;
+
+    await teamUser.save();
+
+    ctx.body = serializeTeamUser(teamUser);
   }
-
-  const teamUser = await TeamUserRelationModel.findById(teamUserId);
-
-  if (teamUser.role === EUserRole.Administrator) {
-    ctx.status = 400;
-    throw new Error("Can't change the administrator's role");
-  }
-
-  teamUser.role = body.role;
-
-  await teamUser.save();
-
-  ctx.body = serializeTeamUser(teamUser);
-});
+);
 
 // PATCH /v3/teams/:teamId/users/:userId/accept
 // Update user's role to "confirmed"
 // Only if JWT's userid match the one in the URL
-router.patch("/:userId/accept", authMiddleware, async ctx => {
+router.patch("/:userId/accept", authMiddleware, validateObjectId(["teamId", "userId"]), async ctx => {
   const { teamId, userId } = ctx.params;
   const { body } = <TRequest>ctx.request;
   const { id: loggedUserId, email: loggedEmail } = body.loggedUser; // ToDo: loggedUser Type
@@ -146,7 +160,7 @@ router.patch("/:userId/accept", authMiddleware, async ctx => {
 // PATCH /v3/teams/:teamId/users/:userId/decline
 // Update user's role to "declined"
 // Only if JWT's userid match the one in the URL
-router.patch("/:userId/decline", authMiddleware, async ctx => {
+router.patch("/:userId/decline", authMiddleware, validateObjectId(["teamId", "userId"]), async ctx => {
   const { teamId, userId } = ctx.params;
   const { body } = <TRequest>ctx.request;
   const { id: loggedUserId, email: loggedEmailId } = body.loggedUser; // ToDo: loggedUser Type
@@ -171,7 +185,7 @@ router.patch("/:userId/decline", authMiddleware, async ctx => {
 // Update user's role to "left"
 // Only if JWT's userid match the one in the URL
 // Unless auth user is admin
-router.patch("/:userId/leave", authMiddleware, async ctx => {
+router.patch("/:userId/leave", authMiddleware, validateObjectId(["teamId", "userId"]), async ctx => {
   const { teamId, userId } = ctx.params;
   const { body } = <TRequest>ctx.request;
   const { id: loggedUserId, email: loggedEmailId } = body.loggedUser; // ToDo: loggedUser Type
