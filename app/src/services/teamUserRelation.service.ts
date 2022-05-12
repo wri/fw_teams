@@ -12,6 +12,10 @@ class TeamUserRelationService {
     });
   }
 
+  static findById(id: string) {
+    return TeamUserRelationModel.findById(id);
+  }
+
   static findAllUsersOnTeam(teamId: string) {
     return TeamUserRelationModel.find({ teamId });
   }

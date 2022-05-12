@@ -115,7 +115,7 @@ router.patch(
       throw new Error("Can't set user as administrator");
     }
 
-    const teamUser = await TeamUserRelationModel.findById(teamUserId);
+    const teamUser = await TeamUserRelationService.findById(teamUserId);
 
     if (teamUser.role === EUserRole.Administrator) {
       ctx.status = 400;
