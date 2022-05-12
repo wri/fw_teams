@@ -1,26 +1,17 @@
-import { ITeamModel } from "models/team.model";
-import { TeamUserRelationModel } from "models/teamUserRelation.model";
-import TeamService from "services/team.service";
+import { EUserStatus, TeamUserRelationModel } from "models/teamUserRelation.model";
 
 class TeamUserRelationService {
-  static async getTeamsByUserId(userId: string, conditions = {}) {
-    const teamUserRelations = await TeamUserRelationModel.find({
-      userId,
-      ...conditions
+  static findAllByUserId(userId: string) {
+    return TeamUserRelationModel.find({
+      userId
     });
+  }
 
-    const teams: ITeamModel[] = [];
-    for (let i = 0; i < teamUserRelations.length; i++) {
-      const teamUser = teamUserRelations[i];
-
-      const team = await TeamService.findById(teamUser.teamId);
-
-      team.userRole = teamUser.role;
-
-      teams.push(team);
-    }
-
-    return teams;
+  static findAllInvitesByUserEmail(userEmail: string) {
+    return TeamUserRelationModel.find({
+      email: userEmail,
+      status: EUserStatus.Invited
+    });
   }
 }
 

@@ -3,9 +3,7 @@ import Router from "koa-router";
 import { authMiddleware, validatorMiddleware, isAdminOrManager, validateObjectId, isAdmin, isUser } from "middlewares";
 import createTeamInput from "./dto/create-team.input";
 import updateTeamInput from "./dto/update-team.input";
-import { EUserStatus } from "models/teamUserRelation.model";
 import TeamService from "services/team.service";
-import TeamUserRelationService from "services/teamUserRelation.service";
 import gfwTeamSerializer from "serializers/gfwTeam.serializer";
 
 type TRequest = {
@@ -23,11 +21,9 @@ const router = new Router();
 // Find teams that auth user is invited to
 router.get("/myinvites", authMiddleware, async ctx => {
   const query = <TQuery>ctx.request.query;
-  const { id: userId } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
+  const { email: loggedEmail } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
 
-  const teams = await TeamUserRelationService.getTeamsByUserId(userId, {
-    status: EUserStatus.Invited
-  });
+  const teams = await TeamService.findAllInvites(loggedEmail);
 
   ctx.body = gfwTeamSerializer(teams);
 });
@@ -48,7 +44,7 @@ router.get("/:teamId", authMiddleware, validateObjectId("teamId"), isUser, async
 router.get("/user/:userId", authMiddleware, validateObjectId("userId"), async ctx => {
   const { userId } = ctx.params;
 
-  const teams = await TeamUserRelationService.getTeamsByUserId(userId);
+  const teams = await TeamService.findAllByUserId(userId);
 
   ctx.body = gfwTeamSerializer(teams);
 });

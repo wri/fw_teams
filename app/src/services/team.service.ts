@@ -1,5 +1,6 @@
 import TeamModel, { ITeamModel, ITeam } from "models/team.model";
-import TeamUserRelationModel, { EUserRole, EUserStatus } from "models/teamUserRelation.model";
+import TeamUserRelationModel, { EUserRole, EUserStatus, ITeamUserRelationModel } from "models/teamUserRelation.model";
+import TeamUserRelationService from "services/teamUserRelation.service";
 
 class TeamService {
   static async create(name: ITeam["name"], loggedUser: any): Promise<ITeamModel> {
@@ -41,6 +42,33 @@ class TeamService {
 
   static findById(id: string) {
     return TeamModel.findById(id);
+  }
+
+  static async findAllInvites(userEmail: string): Promise<ITeamModel[]> {
+    const teamUserRelations = await TeamUserRelationService.findAllInvitesByUserEmail(userEmail);
+
+    return await TeamService.findAllByTeamUserRelations(teamUserRelations);
+  }
+
+  static async findAllByUserId(userId: string): Promise<ITeamModel[]> {
+    const teamUserRelations = await TeamUserRelationService.findAllByUserId(userId);
+
+    return await TeamService.findAllByTeamUserRelations(teamUserRelations);
+  }
+
+  static async findAllByTeamUserRelations(teamUserRelations: ITeamUserRelationModel[]): Promise<ITeamModel[]> {
+    const teams: ITeamModel[] = [];
+    for (let i = 0; i < teamUserRelations.length; i++) {
+      const teamUser = teamUserRelations[i];
+
+      const team = await TeamService.findById(teamUser.teamId);
+
+      team.userRole = teamUser.role;
+
+      teams.push(team);
+    }
+
+    return teams;
   }
 }
 
