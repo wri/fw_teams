@@ -1,8 +1,9 @@
-import { ITeamModel, TeamModel } from "models/team.model";
+import { ITeamModel } from "models/team.model";
 import { TeamUserRelationModel } from "models/teamUserRelation.model";
+import TeamService from "services/team.service";
 
 class TeamUserRelationService {
-  async getTeamsByUserId(userId: string, conditions = {}) {
+  static async getTeamsByUserId(userId: string, conditions = {}) {
     const teamUserRelations = await TeamUserRelationModel.find({
       userId,
       ...conditions
@@ -12,7 +13,7 @@ class TeamUserRelationService {
     for (let i = 0; i < teamUserRelations.length; i++) {
       const teamUser = teamUserRelations[i];
 
-      const team = await TeamModel.findById(teamUser.teamId);
+      const team = await TeamService.findById(teamUser.teamId);
 
       team.userRole = teamUser.role;
 
@@ -23,4 +24,4 @@ class TeamUserRelationService {
   }
 }
 
-export default new TeamUserRelationService();
+export default TeamUserRelationService;
