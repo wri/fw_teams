@@ -79,7 +79,7 @@ router.post(
       throw new Error("Can't have duplicate users on a team");
     }
 
-    const userDocumentsToAdd = users.map(user => {
+    const userDocumentsToAdd = users.map<ITeamUserRelation>(user => {
       return {
         teamId,
         email: user.email,
@@ -88,7 +88,7 @@ router.post(
       };
     });
 
-    const userDocuments = await TeamUserRelationModel.insertMany(userDocumentsToAdd);
+    const userDocuments = await TeamUserRelationService.createMany(userDocumentsToAdd);
 
     // ToDo: Send Invitations "userEmails"
 

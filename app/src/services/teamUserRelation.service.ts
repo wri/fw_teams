@@ -1,6 +1,10 @@
-import { EUserStatus, TeamUserRelationModel } from "models/teamUserRelation.model";
+import { EUserStatus, ITeamUserRelation, TeamUserRelationModel } from "models/teamUserRelation.model";
 
 class TeamUserRelationService {
+  static createMany(teamUsersToAdd: ITeamUserRelation[]) {
+    return TeamUserRelationModel.insertMany(teamUsersToAdd);
+  }
+
   static findTeamUser(teamId: string, userId: string) {
     return TeamUserRelationModel.findOne({
       teamId,
