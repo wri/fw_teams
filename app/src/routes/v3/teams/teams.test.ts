@@ -36,22 +36,20 @@ describe("/v3/teams", () => {
       teamUserDocuments = [
         {
           teamId: new ObjectId(teams[0]._id),
-          userId: new ObjectId("addaddaddaddaddaddaddadd"),
-          email: "admin@user.com",
+          email: "testAuthUser@test.com",
           role: EUserRole.Manager,
           status: EUserStatus.Invited
         },
         {
           teamId: new ObjectId(teams[1]._id),
           userId: new ObjectId("addaddaddaddaddaddaddadd"),
-          email: "admin@user.com",
+          email: "testAuthUser@test.com",
           role: EUserRole.Monitor,
           status: EUserStatus.Confirmed
         },
         {
           teamId: new ObjectId(teams[2]._id),
-          userId: new ObjectId("addaddaddaddaddaddaddadd"),
-          email: "admin@user.com",
+          email: "testAuthUser@test.com",
           role: EUserRole.Monitor,
           status: EUserStatus.Invited
         }
@@ -91,15 +89,15 @@ describe("/v3/teams", () => {
       teamUserDocuments = [
         {
           ...teamUserDocuments[0],
-          userId: new ObjectId()
+          email: "notMe@test.com"
         },
         {
           ...teamUserDocuments[1],
-          userId: new ObjectId()
+          email: "notMe@test.com"
         },
         {
           ...teamUserDocuments[2],
-          userId: new ObjectId()
+          email: "notMe@test.com"
         }
       ];
 
