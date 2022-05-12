@@ -8,6 +8,10 @@ class TeamUserRelationService {
     });
   }
 
+  static findAllUsersOnTeam(teamId: string) {
+    return TeamUserRelationModel.find({ teamId });
+  }
+
   static findAllByUserId(userId: string) {
     return TeamUserRelationModel.find({
       userId

@@ -37,9 +37,9 @@ router.get("/", authMiddleware, validateObjectId("teamId"), isUser, async ctx =>
 
   let users: ITeamUserRelationModel[] = [];
   if (teamUserRelation.role === EUserRole.Administrator || teamUserRelation.role === EUserRole.Manager) {
-    users = await TeamUserRelationModel.find({ teamId });
+    users = await TeamUserRelationService.findAllUsersOnTeam(teamId);
   } else {
-    users = await TeamUserRelationModel.find({ teamId }).select("-status");
+    users = await TeamUserRelationService.findAllUsersOnTeam(teamId).select("-status");
   }
 
   ctx.body = serializeTeamUser(users);
