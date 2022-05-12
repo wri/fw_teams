@@ -1,6 +1,7 @@
 import { Middleware, Request } from "koa";
-import { TeamUserRelationModel, EUserRole } from "models/teamUserRelation.model";
+import { EUserRole } from "models/teamUserRelation.model";
 import TeamModel from "../models/team.model";
+import TeamUserRelationService from "../services/teamUserRelation.service";
 
 type TRequest = {
   body: {
@@ -25,10 +26,7 @@ export const isAdmin: Middleware = async (ctx, next) => {
     throw new Error(`Team not found with id: ${teamId}`);
   }
 
-  const teamUserRelation = await TeamUserRelationModel.findOne({
-    teamId,
-    userId
-  });
+  const teamUserRelation = await TeamUserRelationService.findTeamUser(teamId, userId);
 
   if (teamUserRelation && teamUserRelation.role === EUserRole.Administrator) {
     await next();

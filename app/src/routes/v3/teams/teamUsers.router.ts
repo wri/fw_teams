@@ -11,6 +11,7 @@ import {
 } from "models/teamUserRelation.model";
 import { Request } from "koa";
 import serializeTeamUser from "serializers/teamUserRelation.serializer";
+import TeamUserRelationService from "services/teamUserRelation.service";
 
 const router = new Router({
   prefix: "/:teamId/users"
@@ -32,10 +33,7 @@ router.get("/", authMiddleware, validateObjectId("teamId"), isUser, async ctx =>
   const { query } = <TRequest>ctx.request;
   const { id: userId } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
 
-  const teamUserRelation = await TeamUserRelationModel.findOne({
-    teamId,
-    userId
-  });
+  const teamUserRelation = await TeamUserRelationService.findTeamUser(teamId, userId);
 
   let users: ITeamUserRelationModel[] = [];
   if (teamUserRelation.role === EUserRole.Administrator || teamUserRelation.role === EUserRole.Manager) {
@@ -195,10 +193,7 @@ router.patch("/:userId/leave", authMiddleware, validateObjectId(["teamId", "user
     throw new Error("Log in with the correct user");
   }
 
-  const teamUserRelation = await TeamUserRelationModel.findOne({
-    teamId,
-    userId
-  });
+  const teamUserRelation = await TeamUserRelationService.findTeamUser(teamId, userId);
 
   if (teamUserRelation && teamUserRelation.role === EUserRole.Administrator) {
     ctx.status = 400;
