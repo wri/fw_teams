@@ -1,5 +1,5 @@
 import TeamModel, { ITeamModel, ITeam } from "models/team.model";
-import TeamUserRelationModel, { EUserRole, EUserStatus, ITeamUserRelationModel } from "models/teamUserRelation.model";
+import { EUserRole, EUserStatus, ITeamUserRelationModel } from "models/teamUserRelation.model";
 import TeamUserRelationService from "services/teamUserRelation.service";
 
 class TeamService {
@@ -10,13 +10,14 @@ class TeamService {
 
     // Create the Team User relation model
     // The logged-in user will become the "Administrator" of the team
-    await new TeamUserRelationModel({
-      teamId: team.id,
+    await TeamUserRelationService.create({
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      teamId: team.id!,
       userId: userId,
       email: userEmail,
       role: EUserRole.Administrator,
       status: EUserStatus.Confirmed
-    }).save();
+    });
 
     return team;
   }
@@ -35,9 +36,7 @@ class TeamService {
     await TeamModel.findByIdAndRemove(id);
 
     // Remove all team user relations
-    await TeamUserRelationModel.remove({
-      teamId: id
-    });
+    await TeamUserRelationService.removeAllUsersOnTeam(id);
   }
 
   static findById(id: string) {
