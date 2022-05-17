@@ -1,16 +1,17 @@
 import Router from "koa-router";
-import { authMiddleware, isAdminOrManager, isUser, validatorMiddleware, validateObjectId } from "middlewares";
+import { authMiddleware, isAdminOrManager, isUser, validateObjectId, validatorMiddleware } from "middlewares";
 import createTeamUsersInput from "./dto/create-team-users.input";
 import updateTeamUsersInput from "./dto/update-team-user.input";
 import {
-  TeamUserRelationModel,
+  EUserRole,
+  EUserStatus,
   ITeamUserRelation,
   ITeamUserRelationModel,
-  EUserRole,
-  EUserStatus
+  TeamUserRelationModel
 } from "models/teamUserRelation.model";
 import { Request } from "koa";
 import serializeTeamUser from "serializers/teamUserRelation.serializer";
+import TeamUserRelationService from "services/teamUserRelation.service";
 
 const router = new Router({
   prefix: "/:teamId/users"
@@ -32,16 +33,13 @@ router.get("/", authMiddleware, validateObjectId("teamId"), isUser, async ctx =>
   const { query } = <TRequest>ctx.request;
   const { id: userId } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
 
-  const teamUserRelation = await TeamUserRelationModel.findOne({
-    teamId,
-    userId
-  });
+  const teamUserRelation = await TeamUserRelationService.findTeamUser(teamId, userId);
 
   let users: ITeamUserRelationModel[] = [];
   if (teamUserRelation.role === EUserRole.Administrator || teamUserRelation.role === EUserRole.Manager) {
-    users = await TeamUserRelationModel.find({ teamId });
+    users = await TeamUserRelationService.findAllUsersOnTeam(teamId);
   } else {
-    users = await TeamUserRelationModel.find({ teamId }).select("-status");
+    users = await TeamUserRelationService.findAllUsersOnTeam(teamId).select("-status");
   }
 
   ctx.body = serializeTeamUser(users);
@@ -81,7 +79,7 @@ router.post(
       throw new Error("Can't have duplicate users on a team");
     }
 
-    const userDocumentsToAdd = users.map(user => {
+    const userDocumentsToAdd = users.map<ITeamUserRelation>(user => {
       return {
         teamId,
         email: user.email,
@@ -90,7 +88,7 @@ router.post(
       };
     });
 
-    const userDocuments = await TeamUserRelationModel.insertMany(userDocumentsToAdd);
+    const userDocuments = await TeamUserRelationService.createMany(userDocumentsToAdd);
 
     // ToDo: Send Invitations "userEmails"
 
@@ -117,7 +115,7 @@ router.patch(
       throw new Error("Can't set user as administrator");
     }
 
-    const teamUser = await TeamUserRelationModel.findById(teamUserId);
+    const teamUser = await TeamUserRelationService.findById(teamUserId);
 
     if (teamUser.role === EUserRole.Administrator) {
       ctx.status = 400;
@@ -145,14 +143,10 @@ router.patch("/:userId/accept", authMiddleware, validateObjectId(["teamId", "use
     throw new Error("Login with the correct user");
   }
 
-  const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
-    { teamId, email: loggedEmail },
-    {
-      userId: loggedUserId,
-      status: EUserStatus.Confirmed
-    },
-    { new: true }
-  );
+  const updatedUser = await TeamUserRelationService.update(teamId, loggedEmail, {
+    userId: loggedUserId,
+    status: EUserStatus.Confirmed
+  });
 
   ctx.body = serializeTeamUser(updatedUser);
 });
@@ -163,20 +157,16 @@ router.patch("/:userId/accept", authMiddleware, validateObjectId(["teamId", "use
 router.patch("/:userId/decline", authMiddleware, validateObjectId(["teamId", "userId"]), async ctx => {
   const { teamId, userId } = ctx.params;
   const { body } = <TRequest>ctx.request;
-  const { id: loggedUserId, email: loggedEmailId } = body.loggedUser; // ToDo: loggedUser Type
+  const { id: loggedUserId, email: loggedEmail } = body.loggedUser; // ToDo: loggedUser Type
 
   if (userId !== loggedUserId) {
     ctx.status = 401;
     throw new Error("Log in with the correct user");
   }
 
-  const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
-    { teamId, email: loggedEmailId },
-    {
-      status: EUserStatus.Declined
-    },
-    { new: true }
-  );
+  const updatedUser = await TeamUserRelationService.update(teamId, loggedEmail, {
+    status: EUserStatus.Declined
+  });
 
   ctx.body = serializeTeamUser(updatedUser);
 });
@@ -188,30 +178,23 @@ router.patch("/:userId/decline", authMiddleware, validateObjectId(["teamId", "us
 router.patch("/:userId/leave", authMiddleware, validateObjectId(["teamId", "userId"]), async ctx => {
   const { teamId, userId } = ctx.params;
   const { body } = <TRequest>ctx.request;
-  const { id: loggedUserId, email: loggedEmailId } = body.loggedUser; // ToDo: loggedUser Type
+  const { id: loggedUserId, email: loggedEmail } = body.loggedUser; // ToDo: loggedUser Type
 
   if (userId !== loggedUserId) {
     ctx.status = 401;
     throw new Error("Log in with the correct user");
   }
 
-  const teamUserRelation = await TeamUserRelationModel.findOne({
-    teamId,
-    userId
-  });
+  const teamUserRelation = await TeamUserRelationService.findTeamUser(teamId, userId);
 
   if (teamUserRelation && teamUserRelation.role === EUserRole.Administrator) {
     ctx.status = 400;
     throw new Error("Administrator can't leave team");
   }
 
-  const updatedUser = await TeamUserRelationModel.findOneAndUpdate(
-    { teamId, email: loggedEmailId },
-    {
-      role: EUserRole.Left
-    },
-    { new: true }
-  );
+  const updatedUser = await TeamUserRelationService.update(teamId, loggedEmail, {
+    role: EUserRole.Left
+  });
 
   ctx.body = serializeTeamUser(updatedUser);
 });
