@@ -5,7 +5,7 @@ info:
 servers:
   - url: 'https://api.resourcewatch.org'
     description: Production
-  - url: 'https://gfw-staging.globalforestwatch.org'
+  - url: 'https://staging-fw-api.globalforestwatch.org'
     description: Staging
   - url: 'https://dev-fw-api.globalforestwatch.org'
     description: Dev
@@ -456,6 +456,25 @@ paths:
                   enum:
                     - manager
                     - monitor
+      tags:
+        - v3 team members
+    delete:
+      summary: Delete a team member
+      operationId: delete-v3-teams-teamId-users-teamUserId
+      responses:
+        '200':
+          $ref: '#/components/responses/TeamUserRelation'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+      description: |-
+        Delete a team member.
+
+        Cannot delete the "administrator"\
+        Cannot delete self, instead leave the team by `/v3/teams/{teamId}/users/{userId}/leave`
+
+        The authenticated user has to be either the "administrator" or a "manager" of the team.
       tags:
         - v3 team members
   '/v3/teams/{teamId}/users/{userId}/accept':

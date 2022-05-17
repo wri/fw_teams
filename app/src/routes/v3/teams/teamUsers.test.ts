@@ -546,6 +546,122 @@ describe("/teams/:teamId/users", () => {
     // ToDo: should return 404 if a team-user relation isn't found
   });
 
+  describe("DELETE /v3/teams/:teamId/users/:teamUserId", () => {
+    let teamUserDocumentAuth: ITeamUserRelation,
+      teamUserDocumentToDelete: ITeamUserRelation,
+      teamUserModelToDelete: ITeamUserRelationModel;
+
+    afterEach(async () => {
+      await TeamUserRelationModel.remove({});
+    });
+
+    beforeEach(async () => {
+      teamUserDocumentAuth = {
+        userId: new ObjectId("addaddaddaddaddaddaddadd"),
+        teamId: new ObjectId(team.id),
+        email: "testAuthUser@test.com",
+        role: EUserRole.Administrator,
+        status: EUserStatus.Confirmed
+      };
+
+      teamUserDocumentToDelete = {
+        userId: new ObjectId(),
+        teamId: new ObjectId(team.id),
+        email: "user@test.com",
+        role: EUserRole.Manager,
+        status: EUserStatus.Confirmed
+      };
+    });
+
+    const exec = async ({ teamId, teamUserId }: { teamId?: string; teamUserId?: string } = {}) => {
+      [, teamUserModelToDelete] = await TeamUserRelationModel.insertMany([
+        teamUserDocumentAuth,
+        teamUserDocumentToDelete
+      ]);
+
+      return request(server)
+        .delete(`/v3/teams/${teamId || team.id}/users/${teamUserId || teamUserModelToDelete.id}`)
+        .send();
+    };
+
+    it("should return 200 for happy case", async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it("should return 200 when authenticated user is a manager of the team", async () => {
+      teamUserDocumentAuth = {
+        ...teamUserDocumentAuth,
+        role: EUserRole.Manager
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it("should return the deleted team-user relation", async () => {
+      const res = await exec();
+
+      expect(res.body.data).toEqual(
+        expect.objectContaining({
+          type: "teamUser",
+          id: teamUserModelToDelete.id?.toString(),
+          attributes: expect.objectContaining({
+            userId: teamUserDocumentToDelete.userId?.toString()
+          })
+        })
+      );
+    });
+
+    it("should delete the team-user relation from the database", async () => {
+      await exec();
+
+      const deletedTeamUser = await TeamUserRelationModel.findById(teamUserModelToDelete._id);
+
+      expect(deletedTeamUser).toBeNull();
+    });
+
+    // ToDo: should return 401 when user is not authorised
+
+    it("should return 401 when authenticated user is a monitor of the team", async () => {
+      teamUserDocumentAuth = {
+        ...teamUserDocumentAuth,
+        role: EUserRole.Monitor
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 400 when attempting to delete the administrator", async () => {
+      teamUserDocumentToDelete = {
+        ...teamUserDocumentToDelete,
+        role: EUserRole.Administrator
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 400 when attempting to delete the authenticated user", async () => {
+      teamUserDocumentToDelete = {
+        ...teamUserDocumentToDelete,
+        userId: new ObjectId("addaddaddaddaddaddaddadd")
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    // ToDo: should return 404 if the team id isn't found
+    // ToDo: should return 404 if a team-user relation isn't found
+  });
+
   describe("PATCH /v3/teams/:teamId/users/:userId/accept", () => {
     let teamUserDocument: ITeamUserRelation, teamUserModel: ITeamUserRelationModel;
 

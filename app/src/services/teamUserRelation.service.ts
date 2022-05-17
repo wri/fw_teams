@@ -13,6 +13,10 @@ class TeamUserRelationService {
     return TeamUserRelationModel.findOneAndUpdate({ teamId, email: userEmail }, update, { new: true });
   }
 
+  static remove(teamUserId: string) {
+    return TeamUserRelationModel.findByIdAndRemove(teamUserId);
+  }
+
   static removeAllUsersOnTeam(teamId: string) {
     return TeamUserRelationModel.remove({
       teamId

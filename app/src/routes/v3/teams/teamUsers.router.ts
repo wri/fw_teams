@@ -116,6 +116,40 @@ router.patch(
   }
 );
 
+// DELETE /v3/teams/:teamId/users/:teamUserId
+// Remove a member from a team
+// Only Admin and Managers can remove members
+// Can't remove the Admin
+// Can't remove yourself
+router.delete(
+  "/:teamUserId",
+  authMiddleware,
+  validateObjectId(["teamId", "teamUserId"]),
+  isAdminOrManager,
+  async ctx => {
+    const { teamUserId } = ctx.params;
+    const { query } = <TKoaRequest>ctx.request;
+    const { id: loggedUserId } = <TLoggedUser>JSON.parse(query.loggedUser);
+
+    const teamUser = await TeamUserRelationService.findById(teamUserId);
+
+    if (teamUser.userId?.toString() === loggedUserId) {
+      ctx.status = 400;
+      throw new Error("Can't remove self from team");
+    }
+
+    if (teamUser.role === EUserRole.Administrator) {
+      ctx.status = 400;
+      throw new Error("Can't remove the administrator");
+    }
+
+    const deletedTeamUser = await TeamUserRelationService.remove(teamUserId);
+
+    ctx.status = 200;
+    ctx.body = serializeTeamUser(deletedTeamUser);
+  }
+);
+
 // PATCH /v3/teams/:teamId/users/:userId/accept
 // Update user's role to "confirmed"
 // Only if JWT's userid match the one in the URL
