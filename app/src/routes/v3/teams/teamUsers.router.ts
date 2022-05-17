@@ -1,5 +1,5 @@
 import Router from "koa-router";
-import { TKoaRequest } from "types/koa-request";
+import { TKoaRequest, TLoggedUser } from "types/koa-request";
 import { authMiddleware, isAdminOrManager, isUser, validateObjectId, validatorMiddleware } from "middlewares";
 import createTeamUsersInput, { DTOCreateTeamUsers } from "./dto/create-team-users.input";
 import updateTeamUsersInput, { DTOUpdateTeamUsers } from "./dto/update-team-user.input";
@@ -22,7 +22,7 @@ const router = new Router({
 router.get("/", authMiddleware, validateObjectId("teamId"), isUser, async ctx => {
   const { teamId } = ctx.params;
   const { query } = <TKoaRequest>ctx.request;
-  const { id: userId } = JSON.parse(query.loggedUser);
+  const { id: userId } = <TLoggedUser>JSON.parse(query.loggedUser);
 
   const teamUserRelation = await TeamUserRelationService.findTeamUser(teamId, userId);
 

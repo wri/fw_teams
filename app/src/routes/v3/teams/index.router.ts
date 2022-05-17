@@ -1,5 +1,5 @@
 import Router from "koa-router";
-import { TKoaRequest } from "types/koa-request";
+import { TKoaRequest, TLoggedUser } from "types/koa-request";
 import { authMiddleware, validatorMiddleware, isAdminOrManager, validateObjectId, isAdmin, isUser } from "middlewares";
 import createTeamInput, { DTOCreateTeam } from "./dto/create-team.input";
 import updateTeamInput, { DTOUpdateTeam } from "./dto/update-team.input";
@@ -12,7 +12,7 @@ const router = new Router();
 // Find teams that auth user is invited to
 router.get("/myinvites", authMiddleware, async ctx => {
   const { query } = <TKoaRequest>ctx.request;
-  const { email: loggedEmail } = JSON.parse(query.loggedUser);
+  const { email: loggedEmail } = <TLoggedUser>JSON.parse(query.loggedUser);
 
   const teams = await TeamService.findAllInvites(loggedEmail);
 
