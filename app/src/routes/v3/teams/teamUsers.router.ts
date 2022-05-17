@@ -1,7 +1,8 @@
 import Router from "koa-router";
+import { TKoaRequest, TLoggedUser } from "types/koa-request";
 import { authMiddleware, isAdminOrManager, isUser, validateObjectId, validatorMiddleware } from "middlewares";
-import createTeamUsersInput from "./dto/create-team-users.input";
-import updateTeamUsersInput from "./dto/update-team-user.input";
+import createTeamUsersInput, { DTOCreateTeamUsers } from "./dto/create-team-users.input";
+import updateTeamUsersInput, { DTOUpdateTeamUsers } from "./dto/update-team-user.input";
 import {
   EUserRole,
   EUserStatus,
@@ -9,7 +10,6 @@ import {
   ITeamUserRelationModel,
   TeamUserRelationModel
 } from "models/teamUserRelation.model";
-import { Request } from "koa";
 import serializeTeamUser from "serializers/teamUserRelation.serializer";
 import TeamUserRelationService from "services/teamUserRelation.service";
 
@@ -17,21 +17,12 @@ const router = new Router({
   prefix: "/:teamId/users"
 });
 
-type TRequest = {
-  query: any;
-  body: {
-    loggedUser: any;
-    users: ITeamUserRelation[];
-    role: ITeamUserRelation["role"];
-  }; // ToDo: request body
-} & Request;
-
 // GET /v3/teams/:teamId/users
 // Return all users on a team
 router.get("/", authMiddleware, validateObjectId("teamId"), isUser, async ctx => {
   const { teamId } = ctx.params;
-  const { query } = <TRequest>ctx.request;
-  const { id: userId } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
+  const { query } = <TKoaRequest>ctx.request;
+  const { id: userId } = <TLoggedUser>JSON.parse(query.loggedUser);
 
   const teamUserRelation = await TeamUserRelationService.findTeamUser(teamId, userId);
 
@@ -58,7 +49,7 @@ router.post(
     const { teamId } = ctx.params;
     const {
       body: { users }
-    } = <TRequest>ctx.request;
+    } = <TKoaRequest<DTOCreateTeamUsers>>ctx.request;
 
     const userEmails: string[] = [];
     for (let i = 0; i < users.length; i++) {
@@ -108,12 +99,7 @@ router.patch(
   isAdminOrManager,
   async ctx => {
     const { teamUserId } = ctx.params;
-    const { body } = <TRequest>ctx.request;
-
-    if (body.role === EUserRole.Administrator) {
-      ctx.status = 401;
-      throw new Error("Can't set user as administrator");
-    }
+    const { body } = <TKoaRequest<DTOUpdateTeamUsers>>ctx.request;
 
     const teamUser = await TeamUserRelationService.findById(teamUserId);
 
@@ -135,8 +121,8 @@ router.patch(
 // Only if JWT's userid match the one in the URL
 router.patch("/:userId/accept", authMiddleware, validateObjectId(["teamId", "userId"]), async ctx => {
   const { teamId, userId } = ctx.params;
-  const { body } = <TRequest>ctx.request;
-  const { id: loggedUserId, email: loggedEmail } = body.loggedUser; // ToDo: loggedUser Type
+  const { body } = <TKoaRequest>ctx.request;
+  const { id: loggedUserId, email: loggedEmail } = body.loggedUser;
 
   if (userId !== loggedUserId) {
     ctx.status = 401;
@@ -156,8 +142,8 @@ router.patch("/:userId/accept", authMiddleware, validateObjectId(["teamId", "use
 // Only if JWT's userid match the one in the URL
 router.patch("/:userId/decline", authMiddleware, validateObjectId(["teamId", "userId"]), async ctx => {
   const { teamId, userId } = ctx.params;
-  const { body } = <TRequest>ctx.request;
-  const { id: loggedUserId, email: loggedEmail } = body.loggedUser; // ToDo: loggedUser Type
+  const { body } = <TKoaRequest>ctx.request;
+  const { id: loggedUserId, email: loggedEmail } = body.loggedUser;
 
   if (userId !== loggedUserId) {
     ctx.status = 401;
@@ -177,8 +163,8 @@ router.patch("/:userId/decline", authMiddleware, validateObjectId(["teamId", "us
 // Unless auth user is admin
 router.patch("/:userId/leave", authMiddleware, validateObjectId(["teamId", "userId"]), async ctx => {
   const { teamId, userId } = ctx.params;
-  const { body } = <TRequest>ctx.request;
-  const { id: loggedUserId, email: loggedEmail } = body.loggedUser; // ToDo: loggedUser Type
+  const { body } = <TKoaRequest>ctx.request;
+  const { id: loggedUserId, email: loggedEmail } = body.loggedUser;
 
   if (userId !== loggedUserId) {
     ctx.status = 401;

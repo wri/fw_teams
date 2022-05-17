@@ -1,27 +1,18 @@
-import { Request } from "koa";
 import Router from "koa-router";
+import { TKoaRequest, TLoggedUser } from "types/koa-request";
 import { authMiddleware, validatorMiddleware, isAdminOrManager, validateObjectId, isAdmin, isUser } from "middlewares";
-import createTeamInput from "./dto/create-team.input";
-import updateTeamInput from "./dto/update-team.input";
+import createTeamInput, { DTOCreateTeam } from "./dto/create-team.input";
+import updateTeamInput, { DTOUpdateTeam } from "./dto/update-team.input";
 import TeamService from "services/team.service";
 import gfwTeamSerializer from "serializers/gfwTeam.serializer";
-
-type TRequest = {
-  body: any; // ToDo: request body
-} & Request;
-
-type TQuery = {
-  loggedUser: string;
-  userRole?: string;
-};
 
 const router = new Router();
 
 // GET /v3/teams/myinvites
 // Find teams that auth user is invited to
 router.get("/myinvites", authMiddleware, async ctx => {
-  const query = <TQuery>ctx.request.query;
-  const { email: loggedEmail } = JSON.parse(query.loggedUser); // ToDo: loggedUser Type
+  const { query } = <TKoaRequest>ctx.request;
+  const { email: loggedEmail } = <TLoggedUser>JSON.parse(query.loggedUser);
 
   const teams = await TeamService.findAllInvites(loggedEmail);
 
@@ -52,7 +43,7 @@ router.get("/user/:userId", authMiddleware, validateObjectId("userId"), async ct
 // POST /v3/teams
 // Add user as admin to teamUserRelation model
 router.post("/", authMiddleware, validatorMiddleware(createTeamInput), async ctx => {
-  const { body } = <TRequest>ctx.request;
+  const { body } = <TKoaRequest<DTOCreateTeam>>ctx.request;
 
   const team = await TeamService.create(body.name, body.loggedUser);
 
@@ -69,7 +60,7 @@ router.patch(
   isAdminOrManager,
   async ctx => {
     const { teamId } = ctx.params;
-    const { body } = <TRequest>ctx.request;
+    const { body } = <TKoaRequest<DTOUpdateTeam>>ctx.request;
 
     const team = await TeamService.update(teamId, body.name);
 
