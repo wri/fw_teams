@@ -1,10 +1,11 @@
 import { Request } from "koa";
 
-export type TKoaRequest<Body = object, Query extends Request["query"]> = {
+export type TKoaRequest<Body = object, Query = object> = {
   body: {
-    loggedUser: any;
+    loggedUser: any; // ToDo: loggedUser Type
   } & Body;
   query: {
-    loggedUser: string;
-  } & Query;
-};
+    loggedUser: string; // ToDo: loggedUser Type
+  } & Query &
+    Request["query"];
+} & Request;
