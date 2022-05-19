@@ -871,6 +871,12 @@ components:
                       type: string
                     attrbiutes:
                       $ref: '#/components/schemas/GFWTeam'
+                  required:
+                    - id
+                    - type
+                    - attrbiutes
+            required:
+              - data
           examples:
             Teams:
               value:
@@ -889,6 +895,10 @@ components:
             properties:
               data:
                 type: object
+                required:
+                  - type
+                  - id
+                  - attributes
                 properties:
                   type:
                     type: string
@@ -896,6 +906,8 @@ components:
                     type: string
                   attributes:
                     $ref: '#/components/schemas/GFWTeam'
+            required:
+              - data
           examples:
             Team:
               value:
@@ -979,6 +991,12 @@ components:
                       type: string
                     attributes:
                       $ref: '#/components/schemas/TeamUserRelation'
+                  required:
+                    - id
+                    - type
+                    - attributes
+            required:
+              - data
           examples:
             TeamUserRelations:
               value:
