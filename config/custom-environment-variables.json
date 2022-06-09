@@ -24,6 +24,9 @@
   "usersApi": {
     "url": "USERS_API_URL"
   },
+  "areasApi": {
+    "url": "AREAS_API_URL"
+  },
   "controlTower": {
     "url": "CONTROL_TOWER_URL"
   }

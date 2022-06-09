@@ -5,6 +5,9 @@ import createTeamInput, { DTOCreateTeam } from "./dto/create-team.input";
 import updateTeamInput, { DTOUpdateTeam } from "./dto/update-team.input";
 import TeamService from "services/team.service";
 import gfwTeamSerializer from "serializers/gfwTeam.serializer";
+import { EUserRole, ITeamUserRelationModel } from "models/teamUserRelation.model";
+import TeamUserRelationService from "services/teamUserRelation.service";
+import AreaService from "services/areas.service";
 
 const router = new Router();
 
@@ -37,7 +40,33 @@ router.get("/user/:userId", authMiddleware, validateObjectId("userId"), async ct
 
   const teams = await TeamService.findAllByUserId(userId);
 
-  ctx.body = gfwTeamSerializer(teams);
+  // get members of teams and areas of team
+  const teamsToSend = [];
+  for await (const team of teams) {
+    const { query } = <TKoaRequest>ctx.request;
+    const { id: userId } = <TLoggedUser>JSON.parse(query.loggedUser);
+    const teamId = team._id;
+
+    const teamUserRelation = await TeamUserRelationService.findTeamUser(teamId, userId);
+
+    let users: ITeamUserRelationModel[] = [];
+    if (teamUserRelation.role === EUserRole.Administrator || teamUserRelation.role === EUserRole.Manager) {
+      users = await TeamUserRelationService.findAllUsersOnTeam(teamId);
+    } else {
+      users = await TeamUserRelationService.findAllUsersOnTeam(teamId).select("-status");
+    }
+
+    team.members = users;
+
+    // array of area ids
+    const areas = await AreaService.getTeamAreas(teamId);
+    if (areas) team.areas = areas.data;
+    else team.areas = [];
+
+    teamsToSend.push(team);
+  }
+
+  ctx.body = gfwTeamSerializer(teamsToSend);
 });
 
 // POST /v3/teams

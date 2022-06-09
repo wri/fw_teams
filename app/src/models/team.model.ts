@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { EUserRole } from "./teamUserRelation.model";
+import { EUserRole, ITeamUserRelationModel } from "./teamUserRelation.model";
 
 const { Schema } = mongoose;
 
@@ -7,6 +7,8 @@ export interface ITeam {
   name: string;
   userRole?: EUserRole;
   createdAt: string;
+  members?: ITeamUserRelationModel[];
+  areas?: string[];
 }
 
 const TeamSchema = new Schema({

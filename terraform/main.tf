@@ -85,6 +85,7 @@ data "template_file" "container_definition" {
     APP_URL                    = var.APP_URL
     USERS_API_URL              = var.USERS_API_URL
     CONTROL_TOWER_URL          = var.CONTROL_TOWER_URL
+    AREAS_API_URL              = var.AREAS_API_URL
   }
 
 }
