@@ -10,7 +10,6 @@ JWT_SECRET        = "@@JWT_SECRET@@"
 redis_queue_name  = "mail"
 APP_URL           = "https://gfw-web-dev.cube-cdn.com"
 USERS_API_URL     = "https://staging-api.resourcewatch.org/v1"
-AREAS_API_URL     = "https://dev-fw-api.globalforestwatch.org/v3/forest-watcher"
 CONTROL_TOWER_URL = "https://staging-api.resourcewatch.org"
 
 healthcheck_path = "/v1/fw_teams/healthcheck"
