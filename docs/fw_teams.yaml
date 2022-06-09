@@ -336,6 +336,14 @@ paths:
                               type: string
                               format: date-time
                               readOnly: true
+                            areas:
+                              type: array
+                              items:
+                                type: string
+                            members:
+                              type: array
+                              items:
+                                $ref: '#/components/schemas/TeamUserRelation'
                       required:
                         - id
                         - type
@@ -352,6 +360,10 @@ paths:
                           name: string
                           userRole: administrator
                           createdAt: '2019-08-24T14:15:22Z'
+                          areas:
+                            - string
+                          members:
+                            - {}
         '401':
           $ref: '#/components/responses/Error'
       description: Get all the teams a user is a member of.

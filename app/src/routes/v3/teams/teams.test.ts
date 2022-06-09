@@ -253,7 +253,6 @@ describe("/v3/teams", () => {
 
     it("should return the role which the userId has as an attribute on each team", async () => {
       const res = await exec();
-
       expect(res.body.data[0].attributes.userRole).toEqual(EUserRole.Administrator);
       expect(res.body.data[1].attributes.userRole).toEqual(EUserRole.Monitor);
     });

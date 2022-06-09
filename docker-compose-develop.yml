@@ -21,6 +21,7 @@ services:
       APP_URL: http://127.0.0.1:3035
       USERS_API_URL: https://staging-api.resourcewatch.org
       CONTROL_TOWER_URL: https://staging-api.resourcewatch.org
+      AREAS_API_URL: "https://dev-fw-api.globalforestwatch.org/v3/forest-watcher"
     volumes:
       - ./app:/opt/fw-teams/app
       - ./debug:/opt/fw-teams/debug
@@ -52,6 +53,7 @@ services:
       APP_URL: http://127.0.0.1:3035
       USERS_API_URL: http://127.0.0.1:9000
       CONTROL_TOWER_URL: http://127.0.0.1:9000
+      AREAS_API_URL: http://127.0.0.1:9000
     depends_on:
       - mongo
       - redis
