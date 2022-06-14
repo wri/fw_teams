@@ -61,7 +61,7 @@ router.get("/user/:userId", authMiddleware, validateObjectId("userId"), async ct
     // array of area ids
     const areas = await AreaService.getTeamAreas(teamId);
     team.areas = [];
-    if (areas && areas.data) team.areas = areas.data;
+    if (areas) team.areas = areas;
 
     teamsToSend.push(team);
   }
