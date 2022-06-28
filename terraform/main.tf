@@ -43,6 +43,7 @@ module "fargate_autoscaling" {
   task_role_policies = []
   task_execution_role_policies = [
     data.terraform_remote_state.fw_core.outputs.gfw_data_api_key_secret_policy_arn,
+    data.terraform_remote_state.fw_core.outputs.microservice_token_secret_policy_arn,
     data.terraform_remote_state.core.outputs.document_db_secrets_policy_arn
   ]
   container_definition = data.template_file.container_definition.rendered
@@ -75,6 +76,7 @@ data "template_file" "container_definition" {
     redis_endpoint             = data.terraform_remote_state.core.outputs.redis_replication_group_primary_endpoint_address
     redis_port                 = data.terraform_remote_state.core.outputs.redis_replication_group_port
     gfw_data_api_key           = data.terraform_remote_state.fw_core.outputs.gfw_data_api_key_secret_arn
+    microservice_token_secret  = data.terraform_remote_state.fw_core.outputs.microservice_token_secret_arn
     document_db_endpoint       = data.terraform_remote_state.core.outputs.document_db_endpoint
     document_db_port           = data.terraform_remote_state.core.outputs.document_db_port
     NODE_ENV                   = var.environment
