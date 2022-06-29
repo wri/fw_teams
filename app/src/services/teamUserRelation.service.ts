@@ -1,4 +1,5 @@
 import { EUserStatus, ITeamUserRelation, TeamUserRelationModel } from "models/teamUserRelation.model";
+import UserService from "./user.service";
 
 class TeamUserRelationService {
   static create(team: ITeamUserRelation) {
@@ -24,31 +25,37 @@ class TeamUserRelationService {
   }
 
   static findTeamUser(teamId: string, userId: string) {
-    return TeamUserRelationModel.findOne({
+    return this.findFullNameForTeamUserRelations(TeamUserRelationModel.findOne({
       teamId,
       userId
-    });
+    }));
   }
 
   static findById(id: string) {
-    return TeamUserRelationModel.findById(id);
+    return this.findFullNameForTeamUserRelations(TeamUserRelationModel.findById(id));
   }
 
   static findAllUsersOnTeam(teamId: string) {
-    return TeamUserRelationModel.find({ teamId });
+    return this.findFullNameForTeamUserRelations(TeamUserRelationModel.find({ teamId }));
   }
 
   static findAllByUserId(userId: string) {
-    return TeamUserRelationModel.find({
+    return this.findFullNameForTeamUserRelations(TeamUserRelationModel.find({
       userId
-    });
+    }));
   }
 
   static findAllInvitesByUserEmail(userEmail: string) {
-    return TeamUserRelationModel.find({
+    return this.findFullNameForTeamUserRelations(TeamUserRelationModel.find({
       email: userEmail,
       status: EUserStatus.Invited
-    });
+    }));
+  }
+
+  static findFullNameForTeamUserRelations(teamUserRelations) {
+    return teamUserRelations.map(teamUserRelation => {
+      teamUserRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId)
+    })
   }
 }
 
