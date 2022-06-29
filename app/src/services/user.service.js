@@ -47,7 +47,6 @@ class UserService {
       return null;
     }
   }
-
 }
 
 module.exports = UserService;

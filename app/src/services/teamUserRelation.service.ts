@@ -25,10 +25,12 @@ class TeamUserRelationService {
   }
 
   static findTeamUser(teamId: string, userId: string) {
-    return this.findFullNameForTeamUserRelations(TeamUserRelationModel.findOne({
-      teamId,
-      userId
-    }));
+    return this.findFullNameForTeamUserRelations(
+      TeamUserRelationModel.findOne({
+        teamId,
+        userId
+      })
+    );
   }
 
   static findById(id: string) {
@@ -40,22 +42,26 @@ class TeamUserRelationService {
   }
 
   static findAllByUserId(userId: string) {
-    return this.findFullNameForTeamUserRelations(TeamUserRelationModel.find({
-      userId
-    }));
+    return this.findFullNameForTeamUserRelations(
+      TeamUserRelationModel.find({
+        userId
+      })
+    );
   }
 
   static findAllInvitesByUserEmail(userEmail: string) {
-    return this.findFullNameForTeamUserRelations(TeamUserRelationModel.find({
-      email: userEmail,
-      status: EUserStatus.Invited
-    }));
+    return this.findFullNameForTeamUserRelations(
+      TeamUserRelationModel.find({
+        email: userEmail,
+        status: EUserStatus.Invited
+      })
+    );
   }
 
   static findFullNameForTeamUserRelations(teamUserRelations) {
     return teamUserRelations.map(teamUserRelation => {
-      teamUserRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId)
-    })
+      teamUserRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
+    });
   }
 }
 
