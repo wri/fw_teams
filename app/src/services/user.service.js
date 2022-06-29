@@ -41,7 +41,9 @@ class UserService {
       const user = response.data;
       if (!user || !user.data) return null;
       logger.info("Got user by user id", user);
-      return user.data ? `${user.data.attributes.firstName} ${user.data.attributes.lastName}` : null;
+      return user.data.attributes.firstName
+        ? `${user.data.attributes.firstName} ${user.data.attributes.lastName}`
+        : user.data.attributes.lastName;
     } catch (e) {
       logger.info("Error finding user", e);
       return null;
