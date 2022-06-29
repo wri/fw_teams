@@ -1,4 +1,10 @@
-import { EUserStatus, EUserRole, ITeamUserRelation, TeamUserRelationModel, ITeamUserRelationModel } from "models/teamUserRelation.model";
+import {
+  EUserStatus,
+  EUserRole,
+  ITeamUserRelation,
+  TeamUserRelationModel,
+  ITeamUserRelationModel
+} from "models/teamUserRelation.model";
 const UserService = require("./user.service");
 
 class TeamUserRelationService {
@@ -25,12 +31,14 @@ class TeamUserRelationService {
   }
 
   static async findTeamUser(teamId: string, userId: string) {
-    return Promise.resolve(this.findFullNameForTeamUserRelation(
-      await TeamUserRelationModel.findOne({
-        teamId,
-        userId
-      })
-    ));
+    return Promise.resolve(
+      this.findFullNameForTeamUserRelation(
+        await TeamUserRelationModel.findOne({
+          teamId,
+          userId
+        })
+      )
+    );
   }
 
   static async findById(id: string) {
@@ -40,8 +48,7 @@ class TeamUserRelationService {
   static async findAllUsersOnTeam(teamId: string, teamUserRole: EUserRole) {
     if (teamUserRole === EUserRole.Administrator || teamUserRole === EUserRole.Manager) {
       return this.findFullNameForTeamUserRelations(await TeamUserRelationModel.find({ teamId }));
-    }
-    else {
+    } else {
       return this.findFullNameForTeamUserRelations(await TeamUserRelationModel.find({ teamId }).select("-status"));
     }
   }
@@ -64,15 +71,17 @@ class TeamUserRelationService {
   }
 
   static findFullNameForTeamUserRelation(teamUserRelation: ITeamUserRelationModel) {
-      teamUserRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
-      return teamUserRelation
+    teamUserRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
+    return teamUserRelation;
   }
 
   static findFullNameForTeamUserRelations(teamUserRelations: ITeamUserRelationModel[]) {
-    return Promise.all(teamUserRelations.map(async teamUserRelation => {
-      teamUserRelation.name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
-      return teamUserRelation
-    }));
+    return Promise.all(
+      teamUserRelations.map(async teamUserRelation => {
+        teamUserRelation.name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
+        return teamUserRelation;
+      })
+    );
   }
 }
 

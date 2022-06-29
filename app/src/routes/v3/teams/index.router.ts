@@ -49,7 +49,10 @@ router.get("/user/:userId", authMiddleware, validateObjectId("userId"), async ct
 
     const teamUserRelation = await TeamUserRelationService.findTeamUser(teamId, userId);
 
-    let users: ITeamUserRelationModel[] = await TeamUserRelationService.findAllUsersOnTeam(teamId, teamUserRelation.role);
+    const users: ITeamUserRelationModel[] = await TeamUserRelationService.findAllUsersOnTeam(
+      teamId,
+      teamUserRelation.role
+    );
 
     team.members = users;
 

@@ -39,8 +39,7 @@ describe("/v3/teams", () => {
               lastName: "something"
             }
           }
-        }
-        );
+        });
       teams = await TeamModel.insertMany([{ name: "TestTeam1" }, { name: "TestTeam2" }, { name: "TestTeam3" }]);
     });
 
@@ -77,7 +76,6 @@ describe("/v3/teams", () => {
     };
 
     it("should return 200 for happy case", async () => {
-
       const res = await exec();
 
       expect(res.status).toBe(200);

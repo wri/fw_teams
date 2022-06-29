@@ -26,7 +26,10 @@ router.get("/", authMiddleware, validateObjectId("teamId"), isUser, async ctx =>
 
   const teamUserRelation = await TeamUserRelationService.findTeamUser(teamId, userId);
 
-  let users: ITeamUserRelationModel[] = await TeamUserRelationService.findAllUsersOnTeam(teamId, teamUserRelation.role);
+  const users: ITeamUserRelationModel[] = await TeamUserRelationService.findAllUsersOnTeam(
+    teamId,
+    teamUserRelation.role
+  );
 
   ctx.body = serializeTeamUser(users);
 });
