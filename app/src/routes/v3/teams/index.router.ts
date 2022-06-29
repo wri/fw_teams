@@ -4,6 +4,7 @@ import { authMiddleware, validatorMiddleware, isAdminOrManager, validateObjectId
 import createTeamInput, { DTOCreateTeam } from "./dto/create-team.input";
 import updateTeamInput, { DTOUpdateTeam } from "./dto/update-team.input";
 import TeamService from "services/team.service";
+import UserService from "services/user.service";
 import gfwTeamSerializer from "serializers/gfwTeam.serializer";
 import { EUserRole, ITeamUserRelationModel } from "models/teamUserRelation.model";
 import TeamUserRelationService from "services/teamUserRelation.service";
@@ -56,7 +57,14 @@ router.get("/user/:userId", authMiddleware, validateObjectId("userId"), async ct
       users = await TeamUserRelationService.findAllUsersOnTeam(teamId).select("-status");
     }
 
-    team.members = users;
+    const namedUsers = [];
+
+    for await (const user of users) {
+      user.name = await UserService.getNameByIdMICROSERVICE(user._id);
+      namedUsers.push(user);
+    }
+
+    team.members = namedUsers;
 
     // array of area ids
     const areas = await AreaService.getTeamAreas(teamId);
