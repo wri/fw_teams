@@ -11,6 +11,8 @@ import {
   ITeamUserRelationModel,
   TeamUserRelationModel
 } from "models/teamUserRelation.model";
+import nock from "nock"
+const config = require("config");
 
 const { ObjectId } = mongoose.Types;
 
@@ -24,6 +26,7 @@ describe("/teams/:teamId/users", () => {
 
   beforeAll(async () => {
     team = await new TeamModel({ name: "TestTeam" }).save();
+    
   });
 
   describe("GET /v3/teams/:teamId/users", () => {
@@ -34,6 +37,18 @@ describe("/teams/:teamId/users", () => {
     });
 
     beforeEach(async () => {
+      nock(config.get("usersApi.url"))
+        .persist()
+        .get(`/user/addaddaddaddaddaddaddadd`)
+        .reply(200, {
+          data: {
+            attributes: {
+              firstName: "something",
+              lastName: "something"
+            }
+          }
+        }
+        );
       teamAuthUser = {
         teamId: new ObjectId(team.id),
         userId: new ObjectId("addaddaddaddaddaddaddadd"),

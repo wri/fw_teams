@@ -7,6 +7,8 @@ import { ITeam, ITeamModel, TeamModel } from "models/team.model";
 import { EUserRole, EUserStatus, ITeamUserRelation, TeamUserRelationModel } from "models/teamUserRelation.model";
 import { DTOCreateTeam } from "./dto/create-team.input";
 import { DTOUpdateTeam } from "./dto/update-team.input";
+import nock from "nock";
+const config = require("config");
 
 const { ObjectId } = mongoose.Types;
 
@@ -27,6 +29,18 @@ describe("/v3/teams", () => {
     });
 
     beforeAll(async () => {
+      nock(config.get("usersApi.url"))
+        .persist()
+        .get(`/user/addaddaddaddaddaddaddadd`)
+        .reply(200, {
+          data: {
+            attributes: {
+              firstName: "something",
+              lastName: "something"
+            }
+          }
+        }
+        );
       teams = await TeamModel.insertMany([{ name: "TestTeam1" }, { name: "TestTeam2" }, { name: "TestTeam3" }]);
     });
 
@@ -63,6 +77,7 @@ describe("/v3/teams", () => {
     };
 
     it("should return 200 for happy case", async () => {
+
       const res = await exec();
 
       expect(res.status).toBe(200);

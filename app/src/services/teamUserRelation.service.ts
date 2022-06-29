@@ -1,5 +1,5 @@
-import { EUserStatus, ITeamUserRelation, TeamUserRelationModel } from "models/teamUserRelation.model";
-import UserService from "./user.service";
+import { EUserStatus, EUserRole, ITeamUserRelation, TeamUserRelationModel, ITeamUserRelationModel } from "models/teamUserRelation.model";
+const UserService = require("./user.service");
 
 class TeamUserRelationService {
   static create(team: ITeamUserRelation) {
@@ -24,44 +24,55 @@ class TeamUserRelationService {
     });
   }
 
-  static findTeamUser(teamId: string, userId: string) {
-    return this.findFullNameForTeamUserRelations(
-      TeamUserRelationModel.findOne({
+  static async findTeamUser(teamId: string, userId: string) {
+    return Promise.resolve(this.findFullNameForTeamUserRelation(
+      await TeamUserRelationModel.findOne({
         teamId,
         userId
       })
-    );
+    ));
   }
 
-  static findById(id: string) {
-    return this.findFullNameForTeamUserRelations(TeamUserRelationModel.findById(id));
+  static async findById(id: string) {
+    return this.findFullNameForTeamUserRelation(await TeamUserRelationModel.findById(id));
   }
 
-  static findAllUsersOnTeam(teamId: string) {
-    return this.findFullNameForTeamUserRelations(TeamUserRelationModel.find({ teamId }));
+  static async findAllUsersOnTeam(teamId: string, teamUserRole: EUserRole) {
+    if (teamUserRole === EUserRole.Administrator || teamUserRole === EUserRole.Manager) {
+      return this.findFullNameForTeamUserRelations(await TeamUserRelationModel.find({ teamId }));
+    }
+    else {
+      return this.findFullNameForTeamUserRelations(await TeamUserRelationModel.find({ teamId }).select("-status"));
+    }
   }
 
-  static findAllByUserId(userId: string) {
+  static async findAllByUserId(userId: string) {
     return this.findFullNameForTeamUserRelations(
-      TeamUserRelationModel.find({
+      await TeamUserRelationModel.find({
         userId
       })
     );
   }
 
-  static findAllInvitesByUserEmail(userEmail: string) {
+  static async findAllInvitesByUserEmail(userEmail: string) {
     return this.findFullNameForTeamUserRelations(
-      TeamUserRelationModel.find({
+      await TeamUserRelationModel.find({
         email: userEmail,
         status: EUserStatus.Invited
       })
     );
   }
 
-  static findFullNameForTeamUserRelations(teamUserRelations) {
-    return teamUserRelations.map(teamUserRelation => {
+  static findFullNameForTeamUserRelation(teamUserRelation: ITeamUserRelationModel) {
       teamUserRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
-    });
+      return teamUserRelation
+  }
+
+  static findFullNameForTeamUserRelations(teamUserRelations: ITeamUserRelationModel[]) {
+    return Promise.all(teamUserRelations.map(async teamUserRelation => {
+      teamUserRelation.name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
+      return teamUserRelation
+    }));
   }
 }
 
