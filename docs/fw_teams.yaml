@@ -670,6 +670,8 @@ components:
     TeamUserRelation:
       title: TeamUserRelation
       type: object
+      x-tags:
+        - v3
       properties:
         teamId:
           type: string
@@ -693,13 +695,13 @@ components:
             - invited
             - declined
           readOnly: true
+        name:
+          type: string
       required:
         - teamId
         - email
         - role
         - status
-      x-tags:
-        - v3
   securitySchemes:
     Authorization:
       type: http
