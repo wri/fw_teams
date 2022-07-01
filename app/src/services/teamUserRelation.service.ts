@@ -25,12 +25,12 @@ class TeamUserRelationService {
   }
 
   static async findTeamUser(teamId: string, userId: string) {
-    return Promise.resolve(this.findFullNameForTeamUserRelation(
+    return this.findFullNameForTeamUserRelation(
       await TeamUserRelationModel.findOne({
         teamId,
         userId
       })
-    ));
+    );
   }
 
   static async findById(id: string) {
@@ -63,15 +63,20 @@ class TeamUserRelationService {
     );
   }
 
-  static findFullNameForTeamUserRelation(teamUserRelation: ITeamUserRelationModel) {
-      teamUserRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
+  static findFullNameForTeamUserRelation(teamUserRelation: ITeamUserRelation) {
+      if(teamUserRelation) teamUserRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
       return teamUserRelation
   }
 
-  static findFullNameForTeamUserRelations(teamUserRelations: ITeamUserRelationModel[]) {
+  static findFullNameForTeamUserRelations(teamUserRelations: ITeamUserRelation[]) {
     return Promise.all(teamUserRelations.map(async teamUserRelation => {
-      teamUserRelation.name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
-      return teamUserRelation
+      let name = ""
+      let tempRelation = JSON.parse(JSON.stringify(teamUserRelation))
+      if(tempRelation) {
+        name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
+        tempRelation.name = name
+      }
+      return tempRelation
     }));
   }
 }

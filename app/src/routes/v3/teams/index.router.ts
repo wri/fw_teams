@@ -15,11 +15,28 @@ const router = new Router();
 // Find teams that auth user is invited to
 router.get("/myinvites", authMiddleware, async ctx => {
   const { query } = <TKoaRequest>ctx.request;
-  const { email: loggedEmail } = <TLoggedUser>JSON.parse(query.loggedUser);
+  const { email: loggedEmail, id: userId } = <TLoggedUser>JSON.parse(query.loggedUser);
 
   const teams = await TeamService.findAllInvites(loggedEmail);
 
-  ctx.body = gfwTeamSerializer(teams);
+// get members of teams and areas of team
+const teamsToSend = [];
+for await (const team of teams) {
+
+  const teamId = team._id;
+  let users: ITeamUserRelationModel[] = await TeamUserRelationService.findAllUsersOnTeam(teamId, EUserRole.Monitor);
+
+  team.members = users;
+
+  // array of area ids
+  const areas = await AreaService.getTeamAreas(teamId);
+  team.areas = [];
+  if (areas) team.areas = areas;
+
+  teamsToSend.push(team);
+}
+
+  ctx.body = gfwTeamSerializer(teamsToSend);
 });
 
 // GET /v3/teams/:teamId
