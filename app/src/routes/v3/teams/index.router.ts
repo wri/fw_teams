@@ -19,22 +19,21 @@ router.get("/myinvites", authMiddleware, async ctx => {
 
   const teams = await TeamService.findAllInvites(loggedEmail);
 
-// get members of teams and areas of team
-const teamsToSend = [];
-for await (const team of teams) {
+  // get members of teams and areas of team
+  const teamsToSend = [];
+  for await (const team of teams) {
+    const teamId = team._id;
+    const users: ITeamUserRelationModel[] = await TeamUserRelationService.findAllUsersOnTeam(teamId, EUserRole.Monitor);
 
-  const teamId = team._id;
-  let users: ITeamUserRelationModel[] = await TeamUserRelationService.findAllUsersOnTeam(teamId, EUserRole.Monitor);
+    team.members = users;
 
-  team.members = users;
+    // array of area ids
+    const areas = await AreaService.getTeamAreas(teamId);
+    team.areas = [];
+    if (areas) team.areas = areas;
 
-  // array of area ids
-  const areas = await AreaService.getTeamAreas(teamId);
-  team.areas = [];
-  if (areas) team.areas = areas;
-
-  teamsToSend.push(team);
-}
+    teamsToSend.push(team);
+  }
 
   ctx.body = gfwTeamSerializer(teamsToSend);
 });

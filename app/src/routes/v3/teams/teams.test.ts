@@ -39,9 +39,8 @@ describe("/v3/teams", () => {
               lastName: "something"
             }
           }
-        }
-        );
-        nock(config.get("usersApi.url"))
+        });
+      nock(config.get("usersApi.url"))
         .persist()
         .get(`/user/undefined`)
         .reply(200, {
@@ -51,8 +50,7 @@ describe("/v3/teams", () => {
               lastName: "something"
             }
           }
-        }
-        );
+        });
       teams = await TeamModel.insertMany([{ name: "TestTeam1" }, { name: "TestTeam2" }, { name: "TestTeam3" }]);
     });
 
@@ -107,8 +105,7 @@ describe("/v3/teams", () => {
 
       expect(Array.isArray(res.body.data)).toBe(true);
       expect(res.body.data[0].attributes).toHaveProperty("members");
-      expect(res.body.data[0].attributes.members[0]).toHaveProperty("name", "something something")
-
+      expect(res.body.data[0].attributes.members[0]).toHaveProperty("name", "something something");
     });
 
     it("should return only the teams the authorised user is invited too", async () => {
@@ -139,11 +136,10 @@ describe("/v3/teams", () => {
 
       expect(res.status).toBe(200);
       expect(res.body.data.length).toBe(0);
-    }); 
-    
+    });
   });
 
- describe("GET /v3/teams/:teamId", () => {
+  describe("GET /v3/teams/:teamId", () => {
     let team: ITeamModel, teamDocument: Omit<ITeam, "createdAt">, teamUserDocument: ITeamUserRelation;
 
     afterEach(async () => {
@@ -237,8 +233,7 @@ describe("/v3/teams", () => {
               lastName: "something"
             }
           }
-        }
-        );
+        });
       teamsDocument = [
         {
           name: "TestTeam1"
@@ -295,8 +290,7 @@ describe("/v3/teams", () => {
 
       expect(Array.isArray(res.body.data)).toBe(true);
       expect(res.body.data[0].attributes).toHaveProperty("members");
-      expect(res.body.data[0].attributes.members[0]).toHaveProperty("name", "something something")
-
+      expect(res.body.data[0].attributes.members[0]).toHaveProperty("name", "something something");
     });
 
     it("should return only the teams the userId is a part of", async () => {

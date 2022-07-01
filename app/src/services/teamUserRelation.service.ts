@@ -68,22 +68,24 @@ class TeamUserRelationService {
     );
   }
 
-  static findFullNameForTeamUserRelation(teamUserRelation: ITeamUserRelation) {
-    let tempRelation = JSON.parse(JSON.stringify(teamUserRelation))
-      if(tempRelation) tempRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
-      return tempRelation
+  static findFullNameForTeamUserRelation(teamUserRelation: ITeamUserRelationModel) {
+    const tempRelation = JSON.parse(JSON.stringify(teamUserRelation));
+    if (tempRelation) tempRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
+    return tempRelation;
   }
 
-  static findFullNameForTeamUserRelations(teamUserRelations: ITeamUserRelation[]) {
-    return Promise.all(teamUserRelations.map(async teamUserRelation => {
-      let name = ""
-      let tempRelation = JSON.parse(JSON.stringify(teamUserRelation))
-      if(tempRelation) {
-        name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
-        tempRelation.name = name
-      }
-      return tempRelation
-    }));
+  static findFullNameForTeamUserRelations(teamUserRelations: ITeamUserRelationModel[]) {
+    return Promise.all(
+      teamUserRelations.map(async teamUserRelation => {
+        let name = "";
+        const tempRelation = JSON.parse(JSON.stringify(teamUserRelation));
+        if (tempRelation) {
+          name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
+          tempRelation.name = name;
+        }
+        return tempRelation;
+      })
+    );
   }
 }
 
