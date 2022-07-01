@@ -88,7 +88,6 @@ describe("/v3/teams", () => {
     };
 
     it("should return 200 for happy case", async () => {
-
       const res = await exec();
 
       expect(res.status).toBe(200);

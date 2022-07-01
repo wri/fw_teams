@@ -1,4 +1,10 @@
-import { EUserStatus, EUserRole, ITeamUserRelation, TeamUserRelationModel, ITeamUserRelationModel } from "models/teamUserRelation.model";
+import {
+  EUserStatus,
+  EUserRole,
+  ITeamUserRelation,
+  TeamUserRelationModel,
+  ITeamUserRelationModel
+} from "models/teamUserRelation.model";
 const UserService = require("./user.service");
 
 class TeamUserRelationService {
@@ -40,8 +46,7 @@ class TeamUserRelationService {
   static async findAllUsersOnTeam(teamId: string, teamUserRole: EUserRole) {
     if (teamUserRole === EUserRole.Administrator || teamUserRole === EUserRole.Manager) {
       return this.findFullNameForTeamUserRelations(await TeamUserRelationModel.find({ teamId }));
-    }
-    else {
+    } else {
       return this.findFullNameForTeamUserRelations(await TeamUserRelationModel.find({ teamId }).select("-status"));
     }
   }
@@ -64,8 +69,9 @@ class TeamUserRelationService {
   }
 
   static findFullNameForTeamUserRelation(teamUserRelation: ITeamUserRelation) {
-      if(teamUserRelation) teamUserRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
-      return teamUserRelation
+    let tempRelation = JSON.parse(JSON.stringify(teamUserRelation))
+      if(tempRelation) tempRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
+      return tempRelation
   }
 
   static findFullNameForTeamUserRelations(teamUserRelations: ITeamUserRelation[]) {
