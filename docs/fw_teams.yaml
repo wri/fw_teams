@@ -279,6 +279,14 @@ paths:
                               type: string
                               format: date-time
                               readOnly: true
+                            areas:
+                              type: array
+                              items:
+                                type: string
+                            members:
+                              type: array
+                              items:
+                                $ref: '#/components/schemas/TeamUserRelation'
                       required:
                         - id
                         - type
@@ -670,6 +678,8 @@ components:
     TeamUserRelation:
       title: TeamUserRelation
       type: object
+      x-tags:
+        - v3
       properties:
         teamId:
           type: string
@@ -693,13 +703,13 @@ components:
             - invited
             - declined
           readOnly: true
+        name:
+          type: string
       required:
         - teamId
         - email
         - role
         - status
-      x-tags:
-        - v3
   securitySchemes:
     Authorization:
       type: http

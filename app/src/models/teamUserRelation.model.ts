@@ -21,6 +21,7 @@ export interface ITeamUserRelation {
   email: string;
   role: EUserRole;
   status: EUserStatus;
+  name?: string;
 }
 
 const TeamUserRelationSchema = new Schema({

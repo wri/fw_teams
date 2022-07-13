@@ -10,7 +10,7 @@ NODE_PATH         = "app/src"
 JWT_SECRET        = "overridden_in_github_secrets"
 redis_queue_name  = "mail"
 APP_URL           = "https://forestwatcher.globalforestwatch.org"
-USERS_API_URL     = "https://api.resourcewatch.org/v1"
+USERS_API_URL     = "https://api.resourcewatch.org"
 CONTROL_TOWER_URL = "https://api.resourcewatch.org"
 
 healthcheck_path = "/v1/fw_teams/healthcheck"
