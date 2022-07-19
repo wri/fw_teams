@@ -56,9 +56,11 @@ router.get("/user/:userId", authMiddleware, validateObjectId("userId"), async ct
 
   const teams = await TeamService.findAllByUserId(userId);
 
+  const filteredTeams = teams.filter(team => team.userRole !== EUserRole.Left);
+
   // get members of teams and areas of team
   const teamsToSend = [];
-  for await (const team of teams) {
+  for await (const team of filteredTeams) {
     const { query } = <TKoaRequest>ctx.request;
     const { id: userId } = <TLoggedUser>JSON.parse(query.loggedUser);
     const teamId = team._id;
