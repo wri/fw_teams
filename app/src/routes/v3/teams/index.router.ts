@@ -56,7 +56,7 @@ router.get("/user/:userId", authMiddleware, validateObjectId("userId"), async ct
 
   const teams = await TeamService.findAllByUserId(userId);
 
-  const filteredTeams = teams.filter(team => team.userRole !== EUserRole.Left)
+  const filteredTeams = teams.filter(team => team.userRole !== EUserRole.Left);
 
   // get members of teams and areas of team
   const teamsToSend = [];
