@@ -130,7 +130,6 @@ router.delete(
     const { id: loggedUserId } = <TLoggedUser>JSON.parse(query.loggedUser);
 
     const teamUser = await TeamUserRelationService.findById(teamUserId);
-    logger.info("Got team user", teamUser);
     if (teamUser.userId?.toString() === loggedUserId) {
       ctx.status = 400;
       throw new Error("Can't remove self from team");

@@ -69,9 +69,9 @@ class TeamUserRelationService {
     );
   }
 
-  static findFullNameForTeamUserRelation(teamUserRelation: ITeamUserRelationModel) {
+  static async findFullNameForTeamUserRelation(teamUserRelation: ITeamUserRelationModel) {
     const tempRelation = JSON.parse(JSON.stringify(teamUserRelation));
-    if (tempRelation) tempRelation.name = UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
+    if (tempRelation) tempRelation.name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
     logger.info("Returning relation", tempRelation);
     return tempRelation;
   }
