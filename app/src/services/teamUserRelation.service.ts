@@ -41,8 +41,8 @@ class TeamUserRelationService {
   }
 
   static async findById(id: string) {
-    //return await this.findFullNameForTeamUserRelation(await TeamUserRelationModel.findById(id));
-    return TeamUserRelationModel.findById(id);
+    return this.findFullNameForTeamUserRelation(await TeamUserRelationModel.findById(id));
+    //return TeamUserRelationModel.findById(id);
   }
 
   static async findAllUsersOnTeam(teamId: string, teamUserRole: EUserRole) {
@@ -74,7 +74,7 @@ class TeamUserRelationService {
     const tempRelation = JSON.parse(JSON.stringify(teamUserRelation));
     if (tempRelation) tempRelation.name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
     logger.info("Returning relation", tempRelation);
-    return Promise.resolve(tempRelation);
+    return tempRelation;
   }
 
   static findFullNameForTeamUserRelations(teamUserRelations: ITeamUserRelationModel[]) {
