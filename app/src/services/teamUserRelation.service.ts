@@ -73,7 +73,7 @@ class TeamUserRelationService {
     const tempRelation = JSON.parse(JSON.stringify(teamUserRelation));
     if (tempRelation) tempRelation.name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
     logger.info("Returning relation", tempRelation);
-    return tempRelation;
+    return Promise.resolve(tempRelation);
   }
 
   static findFullNameForTeamUserRelations(teamUserRelations: ITeamUserRelationModel[]) {
