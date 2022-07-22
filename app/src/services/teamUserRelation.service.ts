@@ -6,6 +6,7 @@ import {
   ITeamUserRelationModel
 } from "models/teamUserRelation.model";
 const UserService = require("./user.service");
+const logger = require("logger");
 
 class TeamUserRelationService {
   static create(team: ITeamUserRelation) {
