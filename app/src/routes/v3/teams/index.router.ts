@@ -15,7 +15,7 @@ const router = new Router();
 // Find teams that auth user is invited to
 router.get("/myinvites", authMiddleware, async ctx => {
   const { query } = <TKoaRequest>ctx.request;
-  const { email: loggedEmail, id: userId } = <TLoggedUser>JSON.parse(query.loggedUser);
+  const { email: loggedEmail } = <TLoggedUser>JSON.parse(query.loggedUser);
 
   const teams = await TeamService.findAllInvites(loggedEmail);
 

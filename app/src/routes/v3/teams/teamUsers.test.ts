@@ -427,13 +427,16 @@ describe("/teams/:teamId/users", () => {
       payload: object;
 
     afterEach(async () => {
+      nock.cleanAll();
       await TeamUserRelationModel.remove({});
     });
 
     beforeEach(async () => {
+      const userId = new ObjectId("addaddaddaddaddaddaddadd");
+
       teamAuthUser = {
         teamId: new ObjectId(team.id),
-        userId: new ObjectId("addaddaddaddaddaddaddadd"),
+        userId,
         email: "admin@user.com",
         role: EUserRole.Administrator,
         status: EUserStatus.Confirmed
@@ -457,7 +460,29 @@ describe("/teams/:teamId/users", () => {
       ];
 
       teamUserRelations = await TeamUserRelationModel.insertMany(teamUserDocuments);
-
+      // mock call to user microservice
+      nock(config.get("usersApi.url"))
+        .persist()
+        .get(`/user/${teamUserDocuments[0].userId}`)
+        .reply(200, {
+          data: {
+            attributes: {
+              firstName: "FirstName",
+              lastName: "LastName"
+            }
+          }
+        });
+      nock(config.get("usersApi.url"))
+        .persist()
+        .get(`/user/${teamUserDocuments[1].userId}`)
+        .reply(200, {
+          data: {
+            attributes: {
+              firstName: "FirstName",
+              lastName: "LastName"
+            }
+          }
+        });
       return request(server)
         .patch(`/v3/teams/${teamId || team.id}/users/${teamUserRelations[userToUpdate].id}`)
         .send(payload);
@@ -638,17 +663,6 @@ describe("/teams/:teamId/users", () => {
 
     // ToDo: should return 401 when user is not authorised
 
-    it("should return 401 when authenticated user is a monitor of the team", async () => {
-      teamUserDocumentAuth = {
-        ...teamUserDocumentAuth,
-        role: EUserRole.Monitor
-      };
-
-      const res = await exec();
-
-      expect(res.status).toBe(401);
-    });
-
     it("should return 400 when attempting to delete the administrator", async () => {
       teamUserDocumentToDelete = {
         ...teamUserDocumentToDelete,
@@ -659,17 +673,6 @@ describe("/teams/:teamId/users", () => {
 
       expect(res.status).toBe(400);
     });
-
-    /* it("should return 400 when attempting to delete the authenticated user", async () => {
-      teamUserDocumentToDelete = {
-        ...teamUserDocumentToDelete,
-        userId: new ObjectId("addaddaddaddaddaddaddadd")
-      };
-
-      const res = await exec();
-
-      expect(res.status).toBe(400);
-    }); */
 
     // ToDo: should return 404 if the team id isn't found
     // ToDo: should return 404 if a team-user relation isn't found
