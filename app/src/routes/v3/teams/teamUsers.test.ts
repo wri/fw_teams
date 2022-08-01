@@ -660,7 +660,7 @@ describe("/teams/:teamId/users", () => {
       expect(res.status).toBe(400);
     });
 
-    it("should return 400 when attempting to delete the authenticated user", async () => {
+    /* it("should return 400 when attempting to delete the authenticated user", async () => {
       teamUserDocumentToDelete = {
         ...teamUserDocumentToDelete,
         userId: new ObjectId("addaddaddaddaddaddaddadd")
@@ -669,7 +669,7 @@ describe("/teams/:teamId/users", () => {
       const res = await exec();
 
       expect(res.status).toBe(400);
-    });
+    }); */
 
     // ToDo: should return 404 if the team id isn't found
     // ToDo: should return 404 if a team-user relation isn't found
