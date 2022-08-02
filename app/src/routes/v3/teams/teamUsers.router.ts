@@ -137,7 +137,7 @@ router.delete(
       throw new Error("Can't remove self from team");
     } */
 
-    if(!teamUser) ctx.throw(404, "This team user relation doesn't exist")
+    if (!teamUser) ctx.throw(404, "This team user relation doesn't exist");
 
     if (
       !(
