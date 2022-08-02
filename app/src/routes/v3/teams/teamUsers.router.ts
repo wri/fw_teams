@@ -12,6 +12,7 @@ import {
 } from "models/teamUserRelation.model";
 import serializeTeamUser from "serializers/teamUserRelation.serializer";
 import TeamUserRelationService from "services/teamUserRelation.service";
+const logger = require("logger");
 
 const router = new Router({
   prefix: "/:teamId/users"
@@ -128,12 +129,15 @@ router.delete(
     const { teamUserId } = ctx.params;
     const { query } = <TKoaRequest>ctx.request;
     const { id: loggedUserId } = <TLoggedUser>JSON.parse(query.loggedUser);
-
     const teamUser = await TeamUserRelationService.findById(teamUserId);
+
     /*     if (teamUser.userId?.toString() === loggedUserId) {
+    if (teamUser.userId?.toString() === loggedUserId) {
       ctx.status = 400;
       throw new Error("Can't remove self from team");
     } */
+
+    if(!teamUser) ctx.throw(404, "This team user relation doesn't exist")
 
     if (
       !(

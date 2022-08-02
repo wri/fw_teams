@@ -41,6 +41,7 @@ class TeamUserRelationService {
 
   static async findById(id: string) {
     return this.findFullNameForTeamUserRelation(await TeamUserRelationModel.findById(id));
+    //return TeamUserRelationModel.findById(id);
   }
 
   static async findAllUsersOnTeam(teamId: string, teamUserRole: EUserRole) {
