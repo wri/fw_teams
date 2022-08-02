@@ -100,7 +100,7 @@ router.patch(
     const { teamUserId } = ctx.params;
     const { body } = <TKoaRequest<DTOUpdateTeamUsers>>ctx.request;
 
-    const teamUser = await TeamUserRelationService.findById(teamUserId);
+    const teamUser: ITeamUserRelationModel = await TeamUserRelationService.findById(teamUserId);
 
     if (teamUser.role === EUserRole.Administrator) {
       ctx.status = 400;
@@ -124,17 +124,30 @@ router.delete(
   "/:teamUserId",
   authMiddleware,
   validateObjectId(["teamId", "teamUserId"]),
-  isAdminOrManager,
+  //isAdminOrManager,
   async ctx => {
     const { teamUserId } = ctx.params;
     const { query } = <TKoaRequest>ctx.request;
     const { id: loggedUserId } = <TLoggedUser>JSON.parse(query.loggedUser);
     const teamUser = await TeamUserRelationService.findById(teamUserId);
-    if(!teamUser) ctx.throw(404, "This team user relation doesn't exist")
+
+    /*     if (teamUser.userId?.toString() === loggedUserId) {
     if (teamUser.userId?.toString() === loggedUserId) {
       ctx.status = 400;
       throw new Error("Can't remove self from team");
-    }
+    } */
+
+    if (!teamUser) ctx.throw(404, "This team user relation doesn't exist");
+
+    if (
+      !(
+        teamUser &&
+        (teamUser.role === EUserRole.Administrator ||
+          teamUser.role === EUserRole.Manager ||
+          teamUser.userId?.toString() === loggedUserId)
+      )
+    )
+      ctx.throw(400, "You are not authorized to remove this user from this team");
 
     if (teamUser.role === EUserRole.Administrator) {
       ctx.status = 400;

@@ -492,9 +492,8 @@ paths:
         Delete a team member.
 
         Cannot delete the "administrator"\
-        Cannot delete self, instead leave the team by `/v3/teams/{teamId}/users/{userId}/leave`
 
-        The authenticated user has to be either the "administrator" or a "manager" of the team.
+        The authenticated user has to be either the "administrator" or a "manager" of the team or the user that is being deleted (only used in the case of account deletion). In all other cases, leave the team by `/v3/teams/{teamId}/users/{userId}/leave`
       tags:
         - v3 team members
   '/v3/teams/{teamId}/users/{userId}/accept':

@@ -29,7 +29,8 @@ const TeamUserRelationSchema = new Schema({
   userId: { type: Schema.Types.ObjectId },
   email: { type: String, required: true },
   role: { type: String, required: true },
-  status: { type: String, required: true }
+  status: { type: String, required: true },
+  name: { type: String }
 });
 
 export interface ITeamUserRelationModel extends ITeamUserRelation, mongoose.Document {}

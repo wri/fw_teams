@@ -6,7 +6,6 @@ import {
   ITeamUserRelationModel
 } from "models/teamUserRelation.model";
 const UserService = require("./user.service");
-const logger = require("logger");
 
 class TeamUserRelationService {
   static create(team: ITeamUserRelation) {
@@ -71,22 +70,16 @@ class TeamUserRelationService {
   }
 
   static async findFullNameForTeamUserRelation(teamUserRelation: ITeamUserRelationModel) {
-    const tempRelation = JSON.parse(JSON.stringify(teamUserRelation));
-    if (tempRelation) tempRelation.name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
-    logger.info("Returning relation", tempRelation);
-    return tempRelation;
+    if (teamUserRelation) teamUserRelation.name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
+    return teamUserRelation;
   }
 
   static findFullNameForTeamUserRelations(teamUserRelations: ITeamUserRelationModel[]) {
     return Promise.all(
       teamUserRelations.map(async teamUserRelation => {
-        let name = "";
-        const tempRelation = JSON.parse(JSON.stringify(teamUserRelation));
-        if (tempRelation) {
-          name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
-          tempRelation.name = name;
-        }
-        return tempRelation;
+        if (teamUserRelation)
+          teamUserRelation.name = await UserService.getNameByIdMICROSERVICE(teamUserRelation.userId);
+        return teamUserRelation;
       })
     );
   }
