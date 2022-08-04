@@ -943,4 +943,138 @@ describe("/teams/:teamId/users", () => {
     //   expect(res.status).toBe(404);
     // });
   });
+
+  describe("PATCH /v3/teams/:teamId/users/reassignAdmin/:teamUserId", () => {
+    let teamAuthUser: ITeamUserRelation,
+      teamUserDocuments: ITeamUserRelation[],
+      teamUserRelations: ITeamUserRelationModel[];
+
+    afterEach(async () => {
+      nock.cleanAll();
+      await TeamUserRelationModel.remove({});
+    });
+
+    beforeEach(async () => {
+      teamAuthUser = {
+        teamId: new ObjectId(team.id),
+        userId: "addaddaddaddaddaddaddadd",
+        email: "admin@user.coom",
+        role: EUserRole.Administrator,
+        status: EUserStatus.Confirmed
+      };
+    });
+
+    const exec = async ({ teamId, userToUpdate = 1 }: { teamId?: string; userToUpdate?: 0 | 1 } = {}) => {
+      teamUserDocuments = [
+        teamAuthUser,
+        {
+          teamId: new ObjectId(team.id),
+          userId: new ObjectId(),
+          email: "member1@user.com",
+          role: EUserRole.Monitor,
+          status: EUserStatus.Confirmed
+        }
+      ];
+
+      teamUserRelations = await TeamUserRelationModel.insertMany(teamUserDocuments);
+
+      // mock call to user microservice
+      nock(config.get("usersApi.url"))
+        .persist()
+        .get(`/user/${teamUserDocuments[0].userId}`)
+        .reply(200, {
+          data: {
+            attributes: {
+              firstName: "FirstName",
+              lastName: "LastName"
+            }
+          }
+        });
+      nock(config.get("usersApi.url"))
+        .persist()
+        .get(`/user/${teamUserDocuments[1].userId}`)
+        .reply(200, {
+          data: {
+            attributes: {
+              firstName: "FirstName",
+              lastName: "LastName"
+            }
+          }
+        });
+      return request(server).patch(
+        `/v3/teams/${teamId || team.id}/users/reassignAdmin/${teamUserRelations[userToUpdate].userId}`
+      );
+    };
+
+    it("should return 200 for happy case", async () => {
+      const res = await exec();
+
+      expect(res.status).toBe(200);
+    });
+
+    it("should return 401 when the authorised user is a manager of the team", async () => {
+      teamAuthUser = {
+        ...teamAuthUser,
+        role: EUserRole.Manager
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return the updated team-user", async () => {
+      const res = await exec();
+
+      expect(res.body.data).toEqual(
+        expect.objectContaining({
+          type: "teamUser",
+          attributes: expect.objectContaining({
+            userId: teamUserDocuments[1].userId?.toString(),
+            role: EUserRole.Administrator
+          })
+        })
+      );
+    });
+
+    it("should update the team-user's role and the old administrator's role in the database", async () => {
+      await exec();
+
+      const teamUserRelation0 = await TeamUserRelationModel.findById(teamUserRelations[0]._id);
+      const teamUserRelation1 = await TeamUserRelationModel.findById(teamUserRelations[1]._id);
+
+      expect(teamUserRelation0.role).toEqual(EUserRole.Manager);
+      expect(teamUserRelation1.role).toEqual(EUserRole.Administrator);
+    });
+
+    it("should return 401 when the authorised user is a monitor of the team", async () => {
+      teamAuthUser = {
+        ...teamAuthUser,
+        role: EUserRole.Monitor
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 401 when the authorised user is not a member of the team", async () => {
+      teamAuthUser = {
+        ...teamAuthUser,
+        userId: new ObjectId()
+      };
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 400 when the administrator is trying to update themselves", async () => {
+      const res = await exec({ userToUpdate: 0 });
+
+      expect(res.status).toBe(400);
+    });
+
+    // ToDo: should return 404 if the team id isn't found
+  });
 });

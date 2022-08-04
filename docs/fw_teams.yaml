@@ -496,6 +496,38 @@ paths:
         The authenticated user has to be either the "administrator" or a "manager" of the team or the user that is being deleted (only used in the case of account deletion). In all other cases, leave the team by `/v3/teams/{teamId}/users/{userId}/leave`
       tags:
         - v3 team members
+  '/v3/teams/{teamId}/users/reassignAdmin/{userId}':
+    parameters:
+      - schema:
+          type: string
+        name: teamId
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+    patch:
+      summary: Reassign administrator
+      operationId: patch-v3-teams-teamId-users-reassignAdmin-userId
+      responses:
+        '200':
+          $ref: '#/components/responses/TeamUserRelation'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+      description: |-
+        Reassign the administrator role to the user with user id {userId} with this user's team relation returned as a response. The current administrator is demoted to a manager.
+
+        Only the administrator can do this (401 thrown if anyone but administrator hits the endpoint). 
+
+        400 thrown if administrator tries to update themselves.
+      tags:
+        - v3 team members
   '/v3/teams/{teamId}/users/{userId}/accept':
     parameters:
       - schema:
