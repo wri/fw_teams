@@ -21,7 +21,7 @@
     "restart:debug": "rimraf debug/dist && yarn run start:debug",
     "dev:debug": "nodemon --exec yarn run restart:debug",
     "test": "concurrently -n jest,mocha \"yarn run test:jest\" \"yarn run test:mocha\"",
-    "test:jest": "NODE_ENV=test jest app/src/routes/v3/teams/teamUsers.test.ts --watchAll -i", 
+    "test:jest": "NODE_ENV=test jest --watchAll -i", 
     "test:mocha": "NODE_ENV=test nodemon --exec \"yarn run build && mocha dist/test/mocha/**/*.spec.js\""
   },
   "devDependencies": {
