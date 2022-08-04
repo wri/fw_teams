@@ -12,7 +12,6 @@ import {
 } from "models/teamUserRelation.model";
 import serializeTeamUser from "serializers/teamUserRelation.serializer";
 import TeamUserRelationService from "services/teamUserRelation.service";
-const logger = require("logger");
 
 const router = new Router({
   prefix: "/:teamId/users"
@@ -89,30 +88,24 @@ router.post(
 // PATCH /v3/teams/:teamId/users/reassignAdmin/:teamUserId
 // Reassign the admin role to a different user
 // Only admin can access this router
-router.patch(
-  "/reassignAdmin/:userId",
-  authMiddleware,
-  validateObjectId(["teamId", "userId"]),
-  isAdmin,
-  async ctx => {
-    const { userId, teamId } = ctx.params;
-    const { body } = <TKoaRequest>ctx.request;
-    const { id: loggedUserId } = <TLoggedUser>body.loggedUser;
+router.patch("/reassignAdmin/:userId", authMiddleware, validateObjectId(["teamId", "userId"]), isAdmin, async ctx => {
+  const { userId, teamId } = ctx.params;
+  const { body } = <TKoaRequest>ctx.request;
+  const { id: loggedUserId } = <TLoggedUser>body.loggedUser;
 
-    if(userId.toString() === loggedUserId.toString()) ctx.throw(400, "This user is already the Administrator");
+  if (userId.toString() === loggedUserId.toString()) ctx.throw(400, "This user is already the Administrator");
 
-    const teamUser: ITeamUserRelationModel = await TeamUserRelationService.findTeamUser(teamId, userId);
-    const adminUser: ITeamUserRelationModel = await TeamUserRelationService.findTeamUser(teamId, loggedUserId);
+  const teamUser: ITeamUserRelationModel = await TeamUserRelationService.findTeamUser(teamId, userId);
+  const adminUser: ITeamUserRelationModel = await TeamUserRelationService.findTeamUser(teamId, loggedUserId);
 
-    teamUser.role = EUserRole.Administrator;
-    adminUser.role = EUserRole.Manager;
+  teamUser.role = EUserRole.Administrator;
+  adminUser.role = EUserRole.Manager;
 
-    await teamUser.save();
-    await adminUser.save();
+  await teamUser.save();
+  await adminUser.save();
 
-    ctx.body = serializeTeamUser(teamUser);
-  }
-);
+  ctx.body = serializeTeamUser(teamUser);
+});
 
 // PATCH /v3/teams/:teamId/users/:teamUserId
 // Update a user's role on a team
@@ -165,7 +158,7 @@ router.delete(
       throw new Error("Can't remove self from team");
     } */
 
-    if(!teamUser) ctx.throw(404, "This team user relation doesn't exist")
+    if (!teamUser) ctx.throw(404, "This team user relation doesn't exist");
 
     if (
       !(

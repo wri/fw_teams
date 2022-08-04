@@ -944,11 +944,10 @@ describe("/teams/:teamId/users", () => {
     // });
   });
 
-
   describe("PATCH /v3/teams/:teamId/users/reassignAdmin/:teamUserId", () => {
     let teamAuthUser: ITeamUserRelation,
       teamUserDocuments: ITeamUserRelation[],
-      teamUserRelations: ITeamUserRelationModel[]
+      teamUserRelations: ITeamUserRelationModel[];
 
     afterEach(async () => {
       nock.cleanAll();
@@ -956,7 +955,6 @@ describe("/teams/:teamId/users", () => {
     });
 
     beforeEach(async () => {
-
       teamAuthUser = {
         teamId: new ObjectId(team.id),
         userId: "addaddaddaddaddaddaddadd",
@@ -1003,8 +1001,9 @@ describe("/teams/:teamId/users", () => {
             }
           }
         });
-      return request(server)
-        .patch(`/v3/teams/${teamId || team.id}/users/reassignAdmin/${teamUserRelations[userToUpdate].userId}`)
+      return request(server).patch(
+        `/v3/teams/${teamId || team.id}/users/reassignAdmin/${teamUserRelations[userToUpdate].userId}`
+      );
     };
 
     it("should return 200 for happy case", async () => {
@@ -1071,8 +1070,7 @@ describe("/teams/:teamId/users", () => {
     });
 
     it("should return 400 when the administrator is trying to update themselves", async () => {
-
-      const res = await exec({userToUpdate: 0});
+      const res = await exec({ userToUpdate: 0 });
 
       expect(res.status).toBe(400);
     });
