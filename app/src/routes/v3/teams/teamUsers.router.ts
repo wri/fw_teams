@@ -85,7 +85,7 @@ router.post(
   }
 );
 
-// PATCH /v3/teams/:teamId/users/reassignAdmin/:teamUserId
+// PATCH /v3/teams/:teamId/users/reassignAdmin/:userId
 // Reassign the admin role to a different user
 // Only admin can access this router
 router.patch("/reassignAdmin/:userId", authMiddleware, validateObjectId(["teamId", "userId"]), isAdmin, async ctx => {
