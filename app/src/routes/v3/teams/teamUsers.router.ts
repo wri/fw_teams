@@ -1,6 +1,6 @@
 import Router from "koa-router";
 import { TKoaRequest, TLoggedUser } from "types/koa-request";
-import { authMiddleware, isAdminOrManager, isUser, validateObjectId, validatorMiddleware } from "middlewares";
+import { authMiddleware, isAdminOrManager, isAdmin, isUser, validateObjectId, validatorMiddleware } from "middlewares";
 import createTeamUsersInput, { DTOCreateTeamUsers } from "./dto/create-team-users.input";
 import updateTeamUsersInput, { DTOUpdateTeamUsers } from "./dto/update-team-user.input";
 import {
@@ -83,6 +83,34 @@ router.post(
     // ToDo: Send Invitations "userEmails"
 
     ctx.body = serializeTeamUser(userDocuments);
+  }
+);
+
+// PATCH /v3/teams/:teamId/users/reassignAdmin/:teamUserId
+// Reassign the admin role to a different user
+// Only admin can access this router
+router.patch(
+  "/reassignAdmin/:userId",
+  authMiddleware,
+  validateObjectId(["teamId", "userId"]),
+  isAdmin,
+  async ctx => {
+    const { userId, teamId } = ctx.params;
+    const { body } = <TKoaRequest>ctx.request;
+    const { id: loggedUserId } = <TLoggedUser>body.loggedUser;
+
+    if(userId.toString() === loggedUserId.toString()) ctx.throw(400, "This user is already the Administrator");
+
+    const teamUser: ITeamUserRelationModel = await TeamUserRelationService.findTeamUser(teamId, userId);
+    const adminUser: ITeamUserRelationModel = await TeamUserRelationService.findTeamUser(teamId, loggedUserId);
+
+    teamUser.role = EUserRole.Administrator;
+    adminUser.role = EUserRole.Manager;
+
+    await teamUser.save();
+    await adminUser.save();
+
+    ctx.body = serializeTeamUser(teamUser);
   }
 );
 
