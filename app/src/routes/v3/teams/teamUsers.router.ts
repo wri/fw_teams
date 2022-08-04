@@ -98,6 +98,8 @@ router.patch("/reassignAdmin/:userId", authMiddleware, validateObjectId(["teamId
   const teamUser: ITeamUserRelationModel = await TeamUserRelationService.findTeamUser(teamId, userId);
   const adminUser: ITeamUserRelationModel = await TeamUserRelationService.findTeamUser(teamId, loggedUserId);
 
+  if (!teamUser) ctx.throw(404, "A user with this id is not a member of this team");
+
   teamUser.role = EUserRole.Administrator;
   adminUser.role = EUserRole.Manager;
 
