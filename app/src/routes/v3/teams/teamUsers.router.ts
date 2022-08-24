@@ -163,10 +163,11 @@ router.delete(
     } */
 
     if (!teamUser) ctx.throw(404, "This team user relation doesn't exist");
+    if(!currentUser) ctx.throw(401, "You are not authorized to remove this user from this team")
 
     let authorised = teamUser && (currentUser.role === EUserRole.Administrator || currentUser.role === EUserRole.Manager || teamUser.userId?.toString() === loggedUserId)
     logger.info(authorised, teamUser)
-    if (!authorised) ctx.throw(400, "You are not authorized to remove this user from this team");
+    if (!authorised) ctx.throw(401, "You are not authorized to remove this user from this team");
 
     if (teamUser.role === EUserRole.Administrator) {
       ctx.status = 400;
