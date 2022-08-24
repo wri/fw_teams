@@ -12,6 +12,7 @@ import {
 } from "models/teamUserRelation.model";
 import serializeTeamUser from "serializers/teamUserRelation.serializer";
 import TeamUserRelationService from "services/teamUserRelation.service";
+const logger = require("logger");
 
 const router = new Router({
   prefix: "/:teamId/users"
@@ -149,10 +150,11 @@ router.delete(
   validateObjectId(["teamId", "teamUserId"]),
   //isAdminOrManager,
   async ctx => {
-    const { teamUserId } = ctx.params;
+    const { teamUserId, teamId } = ctx.params;
     const { query } = <TKoaRequest>ctx.request;
     const { id: loggedUserId } = <TLoggedUser>JSON.parse(query.loggedUser);
     const teamUser = await TeamUserRelationService.findById(teamUserId);
+    const currentUser = await TeamUserRelationService.findTeamUser(teamId, loggedUserId);
 
     /*     if (teamUser.userId?.toString() === loggedUserId) {
     if (teamUser.userId?.toString() === loggedUserId) {
@@ -161,16 +163,15 @@ router.delete(
     } */
 
     if (!teamUser) ctx.throw(404, "This team user relation doesn't exist");
+    if (!currentUser) ctx.throw(401, "You are not authorized to remove this user from this team");
 
-    if (
-      !(
-        teamUser &&
-        (teamUser.role === EUserRole.Administrator ||
-          teamUser.role === EUserRole.Manager ||
-          teamUser.userId?.toString() === loggedUserId)
-      )
-    )
-      ctx.throw(400, "You are not authorized to remove this user from this team");
+    const authorised =
+      teamUser &&
+      (currentUser.role === EUserRole.Administrator ||
+        currentUser.role === EUserRole.Manager ||
+        teamUser.userId?.toString() === loggedUserId);
+    logger.info(authorised, teamUser);
+    if (!authorised) ctx.throw(401, "You are not authorized to remove this user from this team");
 
     if (teamUser.role === EUserRole.Administrator) {
       ctx.status = 400;
