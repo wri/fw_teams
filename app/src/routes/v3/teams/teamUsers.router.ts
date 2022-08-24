@@ -12,6 +12,7 @@ import {
 } from "models/teamUserRelation.model";
 import serializeTeamUser from "serializers/teamUserRelation.serializer";
 import TeamUserRelationService from "services/teamUserRelation.service";
+const logger = require("logger")
 
 const router = new Router({
   prefix: "/:teamId/users"
@@ -162,15 +163,9 @@ router.delete(
 
     if (!teamUser) ctx.throw(404, "This team user relation doesn't exist");
 
-    if (
-      !(
-        teamUser &&
-        (teamUser.role === EUserRole.Administrator ||
-          teamUser.role === EUserRole.Manager ||
-          teamUser.userId?.toString() === loggedUserId)
-      )
-    )
-      ctx.throw(400, "You are not authorized to remove this user from this team");
+    let authorised = teamUser && (teamUser.role === EUserRole.Administrator || teamUser.role === EUserRole.Manager || teamUser.userId?.toString() === loggedUserId)
+    logger.info(authorised, teamUser)
+    if (!authorised) ctx.throw(400, "You are not authorized to remove this user from this team");
 
     if (teamUser.role === EUserRole.Administrator) {
       ctx.status = 400;
