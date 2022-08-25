@@ -131,6 +131,10 @@ router.patch(
       throw new Error("Can't change the administrator's role");
     }
 
+    if (teamUser.status === EUserStatus.Invited || teamUser.status === EUserStatus.Declined) {
+      ctx.throw(400, "Can't update a user's role before they have accepted an invitation");
+    }
+
     teamUser.role = body.role;
 
     await teamUser.save();
