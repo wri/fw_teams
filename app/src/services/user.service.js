@@ -27,6 +27,7 @@ class UserService {
   }
 
   static async getNameByIdMICROSERVICE(userId) {
+    if(!userId) return null
     logger.info("Get user by user id", userId);
     try {
       let baseURL = config.get("usersApi.url");
