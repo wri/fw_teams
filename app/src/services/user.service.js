@@ -27,7 +27,7 @@ class UserService {
   }
 
   static async getNameByIdMICROSERVICE(userId) {
-    if(!userId) return null
+    if (!userId) return null;
     try {
       let baseURL = config.get("usersApi.url");
       const response = await axios.default({
