@@ -39,7 +39,7 @@ router.get("/myinvites", authMiddleware, async ctx => {
 });
 
 // GET /v3/teams/:teamId
-router.get("/:teamId", authMiddleware, validateObjectId("teamId"), isUser, async ctx => {
+router.get("/:teamId", authMiddleware, validateObjectId("teamId"), async ctx => {
   const { teamId } = ctx.params;
 
   const team = await TeamService.findById(teamId);
