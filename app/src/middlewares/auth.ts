@@ -14,7 +14,7 @@ export const authMiddleware: Middleware = async (ctx, next) => {
   const user = { ...(query.loggedUser ? JSON.parse(query.loggedUser) : {}), ...body.loggedUser };
 
   if (!user || !user.id) {
-    ctx.throw(401, "Unauthorized");
+    ctx.throw(401, `Unauthorized ${user} ${query} ${body}`);
     return;
   }
   await next();
