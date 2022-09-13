@@ -23,5 +23,22 @@ class AreaService {
       logger.error("Error while fetching areas", e);
     }
   }
+
+  static async createTeamAreaRelation(areaId: string, teamId: string) {
+    try {
+      const baseURL = config.get("areasApi.url");
+      await axios.default({
+        baseURL,
+        url: `/area/${areaId}/team/${teamId}`,
+        method: "POST",
+        headers: {
+          authorization: loggedInUserService.token
+        }
+      });
+      return null;
+    } catch (e) {
+      logger.error("Error while creating relation", e);
+    }
+  }
 }
 export default AreaService;

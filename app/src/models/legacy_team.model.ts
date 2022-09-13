@@ -8,11 +8,11 @@ export enum EUserRole {
   Invited = "invited"
 }
 
-export interface ITeam {
-  name?: string;
+export interface ILegacyTeam {
+  name: string;
   userRole?: EUserRole;
   // Managers of the Team
-  managers: { id: string; email?: string }[];
+  managers: { id: string; email: string }[];
   // Users who have been invited but have not confirmed their invitation
   users: string[];
   // Deprecated
@@ -35,8 +35,8 @@ const TeamSchema = new Schema({
   createdAt: { type: Date, required: true, default: Date.now }
 });
 
-export interface ITeamModel extends ITeam, mongoose.Document {}
+export interface ILegacyTeamModel extends ILegacyTeam, mongoose.Document {}
 
-export const Legacy_teamModel = mongoose.model<ITeamModel>("Team", TeamSchema);
+export const Legacy_teamModel = mongoose.model<ILegacyTeamModel>("Team", TeamSchema);
 
 export default Legacy_teamModel;

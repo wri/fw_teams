@@ -5,11 +5,55 @@ import createTeamInput, { DTOCreateTeam } from "./dto/create-team.input";
 import updateTeamInput, { DTOUpdateTeam } from "./dto/update-team.input";
 import TeamService from "services/team.service";
 import gfwTeamSerializer from "serializers/gfwTeam.serializer";
-import { EUserRole, ITeamUserRelationModel } from "models/teamUserRelation.model";
+import { EUserRole, EUserStatus, ITeamUserRelationModel } from "models/teamUserRelation.model";
 import TeamUserRelationService from "services/teamUserRelation.service";
 import AreaService from "services/areas.service";
+import { ITeamModel } from "models/team.model";
 
 const router = new Router();
+
+// GET /v3/teams/transform
+// transform existing data
+router.get("/transform", authMiddleware, async () => {
+  // get every team
+  const legacyTeams = await TeamService.findAll();
+  for await (const legacyTeam of legacyTeams) {
+    const usersToAdd: any[] = [];
+    // createAdmin
+    legacyTeam.managers.forEach(manager => {
+      if (manager.email && manager.id) usersToAdd.push(manager);
+    });
+    // create new team from legacy team
+    const newTeam: ITeamModel = await TeamService.create(legacyTeam.name, usersToAdd[0], legacyTeam.layers);
+    // add managers to team
+    usersToAdd.shift();
+    for await (const user of usersToAdd) {
+      await TeamUserRelationService.create({
+        teamId: newTeam.id!,
+        userId: user.id,
+        email: user.email,
+        role: EUserRole.Manager,
+        status: EUserStatus.Confirmed
+      });
+    }
+    // add monitors to team
+    for await (const user of legacyTeam.confirmedUsers) {
+      if (user.email && user.id)
+        await TeamUserRelationService.create({
+          teamId: newTeam.id!,
+          userId: user.id,
+          email: user.email!,
+          role: EUserRole.Monitor,
+          status: EUserStatus.Confirmed
+        });
+    }
+
+    // add area team relations
+    legacyTeam.areas.forEach(area => {
+      AreaService.createTeamAreaRelation(area, newTeam.id!);
+    });
+  }
+});
 
 // GET /v3/teams/myinvites
 // Find teams that auth user is invited to
@@ -90,7 +134,7 @@ router.get("/user/:userId", authMiddleware, validateObjectId("userId"), async ct
 router.post("/", authMiddleware, validatorMiddleware(createTeamInput), async ctx => {
   const { body } = <TKoaRequest<DTOCreateTeam>>ctx.request;
 
-  const team = await TeamService.create(body.name, body.loggedUser);
+  const team = await TeamService.create(body.name, body.loggedUser, []);
 
   ctx.body = gfwTeamSerializer(team);
 });

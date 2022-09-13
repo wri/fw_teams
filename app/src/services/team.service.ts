@@ -1,12 +1,13 @@
+import Legacy_teamModel, { ILegacyTeamModel } from "models/legacy_team.model";
 import TeamModel, { ITeamModel, ITeam } from "models/team.model";
 import { EUserRole, EUserStatus, ITeamUserRelationModel } from "models/teamUserRelation.model";
 import TeamUserRelationService from "services/teamUserRelation.service";
 
 class TeamService {
-  static async create(name: ITeam["name"], loggedUser: any): Promise<ITeamModel> {
+  static async create(name: ITeam["name"], loggedUser: any, layers: string[]): Promise<ITeamModel> {
     const { id: userId, email: userEmail } = loggedUser; // ToDo: loggedUser Type
 
-    const team = await new TeamModel({ name }).save();
+    const team = await new TeamModel({ name, layers }).save();
 
     // Create the Team User relation model
     // The logged-in user will become the "Administrator" of the team
@@ -68,6 +69,10 @@ class TeamService {
     }
 
     return teams;
+  }
+
+  static async findAll(): Promise<ILegacyTeamModel[]> {
+    return await Legacy_teamModel.find({});
   }
 }
 
