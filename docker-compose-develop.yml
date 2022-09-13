@@ -104,8 +104,7 @@ services:
     networks:
       - gfw-teams-network
     volumes:
-      - cache:/data
-
+      - redis
 volumes:
   fw-teams-mongodb-data:
   redis: 
