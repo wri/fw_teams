@@ -4,6 +4,11 @@ const routersPath = `${__dirname}/routes`;
 const logger = require("logger");
 const mount = require("koa-mount");
 
+const requireESModuleDefault = path => {
+  const module = require(path);
+  return module.__esModule ? module.default : module;
+};
+
 /**
  * Load routers
  */
@@ -15,15 +20,15 @@ module.exports = (() => {
       const newPath = path ? `${path}/${file}` : file;
       const stat = fs.statSync(newPath);
       if (!stat.isDirectory()) {
-        if (file.lastIndexOf(".router.js") !== -1) {
-          if (file === "index.router.js") {
+        if (file.endsWith(".router.js") || file.endsWith(".router.ts")) {
+          if (file === "index.router.js" || file === "index.router.ts") {
             existIndexRouter = true;
           } else {
             logger.debug("Loading route %s, in path %s", newPath, pathApi);
             if (pathApi) {
-              app.use(mount(pathApi, require(newPath).middleware()));
+              app.use(mount(pathApi, requireESModuleDefault(newPath).middleware()));
             } else {
-              app.use(require(newPath).middleware());
+              app.use(requireESModuleDefault(newPath).middleware());
             }
           }
         }
@@ -35,12 +40,12 @@ module.exports = (() => {
     });
     if (existIndexRouter) {
       // load indexRouter when finish other Router
-      const newPath = path ? `${path}/indexRouter.js` : "indexRouter.js";
+      const newPath = path ? `${path}/index.router` : "index.router";
       logger.debug("Loading route %s, in path %s", newPath, pathApi);
       if (pathApi) {
-        app.use(mount(pathApi, require(newPath).middleware()));
+        app.use(mount(pathApi, requireESModuleDefault(newPath).middleware()));
       } else {
-        app.use(require(newPath).middleware());
+        app.use(requireESModuleDefault(newPath).middleware());
       }
     }
   };

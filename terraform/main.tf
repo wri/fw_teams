@@ -43,6 +43,7 @@ module "fargate_autoscaling" {
   task_role_policies = []
   task_execution_role_policies = [
     data.terraform_remote_state.fw_core.outputs.gfw_data_api_key_secret_policy_arn,
+    data.terraform_remote_state.fw_core.outputs.microservice_token_secret_policy_arn,
     data.terraform_remote_state.core.outputs.document_db_secrets_policy_arn
   ]
   container_definition = data.template_file.container_definition.rendered
@@ -51,7 +52,7 @@ module "fargate_autoscaling" {
   lb_target_group_arn = module.fargate_autoscaling.lb_target_group_arn
   listener_arn        = data.terraform_remote_state.fw_core.outputs.lb_listener_arn
   project_prefix      = var.project_prefix
-  path_pattern        = ["/v1/fw_teams/healthcheck", "/v1/teams*"]
+  path_pattern        = ["/v1/fw_teams/healthcheck", "/v1/teams*", "/v3/myteams", "/v3/teams*"]
   priority            = 4
   health_check_path = "/v1/fw_teams/healthcheck"
 
@@ -75,9 +76,9 @@ data "template_file" "container_definition" {
     redis_endpoint             = data.terraform_remote_state.core.outputs.redis_replication_group_primary_endpoint_address
     redis_port                 = data.terraform_remote_state.core.outputs.redis_replication_group_port
     gfw_data_api_key           = data.terraform_remote_state.fw_core.outputs.gfw_data_api_key_secret_arn
+    microservice_token_secret  = data.terraform_remote_state.fw_core.outputs.microservice_token_secret_arn
     document_db_endpoint       = data.terraform_remote_state.core.outputs.document_db_endpoint
     document_db_port           = data.terraform_remote_state.core.outputs.document_db_port
-    NODE_PATH                  = var.NODE_PATH
     NODE_ENV                   = var.environment
     SUPPRESS_NO_CONFIG_WARNING = "true"
     SERVICE_PORT               = var.container_port
@@ -86,6 +87,7 @@ data "template_file" "container_definition" {
     APP_URL                    = var.APP_URL
     USERS_API_URL              = var.USERS_API_URL
     CONTROL_TOWER_URL          = var.CONTROL_TOWER_URL
+    AREAS_API_URL              = "https://${data.terraform_remote_state.fw_core.outputs.public_url}/v3/forest-watcher"
   }
 
 }

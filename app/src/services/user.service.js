@@ -25,6 +25,29 @@ class UserService {
       return null;
     }
   }
+
+  static async getNameByIdMICROSERVICE(userId) {
+    if (!userId) return null;
+    try {
+      let baseURL = config.get("usersApi.url");
+      const response = await axios.default({
+        baseURL,
+        url: `/user/${userId}`,
+        method: "GET",
+        headers: {
+          authorization: `Bearer ${config.get("service.token")}`
+        }
+      });
+      const user = response.data;
+      if (!user || !user.data) return null;
+      return user.data.attributes.firstName
+        ? `${user.data.attributes.firstName} ${user.data.attributes.lastName}`
+        : user.data.attributes.lastName;
+    } catch (e) {
+      logger.info(`Error finding user ${userId}`, e);
+      return null;
+    }
+  }
 }
 
 module.exports = UserService;

@@ -6,7 +6,6 @@ auto_scaling_min_capacity = 1
 auto_scaling_max_capacity = 5
 
 
-NODE_PATH         = "app/src"
 JWT_SECRET        = "@@JWT_SECRET@@"
 redis_queue_name  = "mail"
 APP_URL           = "http://127.0.0.1:80"
