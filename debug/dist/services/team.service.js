@@ -1,0 +1,77 @@
+"use strict";
+
+const logger = require("../logger");
+
+const JWT = require("jsonwebtoken");
+
+const config = require("config");
+
+const MailService = require("./MailService");
+
+const UserService = require("./user.service");
+
+const TeamModel = require("../models/team.model");
+
+class TeamService {
+  // eslint-disable-next-line consistent-return
+  static verifyToken(token) {
+    try {
+      return JWT.verify(token, config.get("jwt.token"));
+    } catch (e) {
+      logger.info(`Generated token ${e}`);
+    }
+  }
+
+  static generateToken(email, teamId) {
+    const token = JWT.sign({
+      email,
+      teamId
+    }, config.get("jwt.token"), {});
+    logger.info(`Generated token ${token}`);
+    return token;
+  }
+
+  static sendNotifications(users = [], team, locale) {
+    users.forEach(async email => {
+      const generatedToken = this.generateToken(email, team.id);
+      const link = `${config.get("application.url")}/login?callbackUrl=${config.get("application.url")}/settings?confirmToken=${generatedToken}&confirmToken=${generatedToken}`;
+      logger.info(`Sent team invitation to: ${email}`);
+      const invitationMailId = `team-invitation-${locale || "en"}`;
+      MailService.sendMail(invitationMailId, {
+        link
+      }, [{
+        address: {
+          email
+        }
+      }]);
+    });
+  }
+
+  static sendManagerConfirmation(confirmedUserEmail, managers, locale) {
+    managers.forEach(async manager => {
+      const joinedMailId = `team-joined-${locale || "en"}`;
+      const managerEmail = manager.email || (await UserService.getEmailById(manager.id));
+      MailService.sendMail(joinedMailId, {
+        email: confirmedUserEmail
+      }, [{
+        address: {
+          managerEmail
+        }
+      }]);
+    });
+  }
+
+  static async deleteConfirmedUserFromPreviousTeams(userId) {
+    const userTeam = await TeamModel.findOne({
+      confirmedUsers: userId
+    });
+    logger.info(`User was in ${userTeam}`);
+    userTeam.confirmedUsers = userTeam.confirmedUsers.filter(user => user !== userId);
+    await userTeam.save();
+    logger.info(`User is not in ${userTeam}`);
+  }
+
+}
+
+module.exports = TeamService;
+//# sourceMappingURL=team.service.js.map
