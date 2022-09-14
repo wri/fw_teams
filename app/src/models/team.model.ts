@@ -9,11 +9,13 @@ export interface ITeam {
   createdAt: string;
   members?: ITeamUserRelationModel[];
   areas?: string[];
+  layers?: string[];
 }
 
 const TeamSchema = new Schema({
   name: { type: String, required: false, trim: true },
-  createdAt: { type: Date, required: true, default: Date.now }
+  createdAt: { type: Date, required: true, default: Date.now },
+  layers: [{ type: String }]
 });
 
 export interface ITeamModel extends ITeam, mongoose.Document {}

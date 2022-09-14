@@ -1,6 +1,6 @@
 import Router from "koa-router";
 import { TKoaRequest, TLoggedUser } from "types/koa-request";
-import { authMiddleware, validatorMiddleware, isAdminOrManager, validateObjectId, isAdmin, isUser } from "middlewares";
+import { authMiddleware, validatorMiddleware, isAdminOrManager, validateObjectId, isAdmin } from "middlewares";
 import createTeamInput, { DTOCreateTeam } from "./dto/create-team.input";
 import updateTeamInput, { DTOUpdateTeam } from "./dto/update-team.input";
 import TeamService from "services/team.service";
@@ -8,8 +8,16 @@ import gfwTeamSerializer from "serializers/gfwTeam.serializer";
 import { EUserRole, ITeamUserRelationModel } from "models/teamUserRelation.model";
 import TeamUserRelationService from "services/teamUserRelation.service";
 import AreaService from "services/areas.service";
+import TransformerService from "services/transformer.service";
 
 const router = new Router();
+
+// GET /v3/teams/transform
+// transform existing data
+router.get("/transform", authMiddleware, async ctx => {
+  TransformerService.transform();
+  ctx.status = 204;
+});
 
 // GET /v3/teams/myinvites
 // Find teams that auth user is invited to
@@ -90,7 +98,7 @@ router.get("/user/:userId", authMiddleware, validateObjectId("userId"), async ct
 router.post("/", authMiddleware, validatorMiddleware(createTeamInput), async ctx => {
   const { body } = <TKoaRequest<DTOCreateTeam>>ctx.request;
 
-  const team = await TeamService.create(body.name, body.loggedUser);
+  const team = await TeamService.create(body.name, body.loggedUser, []);
 
   ctx.body = gfwTeamSerializer(team);
 });
