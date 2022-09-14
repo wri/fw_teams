@@ -9,7 +9,11 @@ container_port            = "80"
 JWT_SECRET        = "overridden_in_github_secrets"
 redis_queue_name  = "mail"
 APP_URL           = "https://gfw-web-staging.cube-cdn.com"
+<<<<<<< HEAD
 USERS_API_URL     = "https://staging-api.resourcewatch.org"
+=======
+USERS_API_URL     = "https://staging-api.resourcewatch.org/v1"
+>>>>>>> staging
 CONTROL_TOWER_URL = "https://staging-api.resourcewatch.org"
 
 healthcheck_path = "/v1/fw_teams/healthcheck"

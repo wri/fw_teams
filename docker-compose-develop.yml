@@ -19,10 +19,15 @@ services:
       REDIS_URL: redis://redis:6379
       REDIS_QUEUE_NAME: mail
       APP_URL: http://127.0.0.1:3035
+<<<<<<< HEAD
       USERS_API_URL: https://staging-api.resourcewatch.org
       CONTROL_TOWER_URL: https://staging-api.resourcewatch.org
       AREAS_API_URL: "https://dev-fw-api.globalforestwatch.org/v3/forest-watcher"
       MICROSERVICE_TOKEN: ${microservice_token}
+=======
+      USERS_API_URL: https://staging-api.resourcewatch.org/v1
+      CONTROL_TOWER_URL: https://staging-api.resourcewatch.org
+>>>>>>> staging
     volumes:
       - ./app:/opt/fw-teams/app
       - ./debug:/opt/fw-teams/debug
