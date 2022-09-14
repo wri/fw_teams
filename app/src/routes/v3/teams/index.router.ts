@@ -1,58 +1,22 @@
 import Router from "koa-router";
 import { TKoaRequest, TLoggedUser } from "types/koa-request";
-import { authMiddleware, validatorMiddleware, isAdminOrManager, validateObjectId, isAdmin, isUser } from "middlewares";
+import { authMiddleware, validatorMiddleware, isAdminOrManager, validateObjectId, isAdmin } from "middlewares";
 import createTeamInput, { DTOCreateTeam } from "./dto/create-team.input";
 import updateTeamInput, { DTOUpdateTeam } from "./dto/update-team.input";
 import TeamService from "services/team.service";
 import gfwTeamSerializer from "serializers/gfwTeam.serializer";
-import { EUserRole, EUserStatus, ITeamUserRelationModel } from "models/teamUserRelation.model";
+import { EUserRole, ITeamUserRelationModel } from "models/teamUserRelation.model";
 import TeamUserRelationService from "services/teamUserRelation.service";
 import AreaService from "services/areas.service";
-import { ITeamModel } from "models/team.model";
+import TransformerService from "services/transformer.service";
 
 const router = new Router();
 
 // GET /v3/teams/transform
 // transform existing data
-router.get("/transform", authMiddleware, async () => {
-  // get every team
-  const legacyTeams = await TeamService.findAll();
-  for await (const legacyTeam of legacyTeams) {
-    const usersToAdd: any[] = [];
-    // createAdmin
-    legacyTeam.managers.forEach(manager => {
-      if (manager.email && manager.id) usersToAdd.push(manager);
-    });
-    // create new team from legacy team
-    const newTeam: ITeamModel = await TeamService.create(legacyTeam.name, usersToAdd[0], legacyTeam.layers);
-    // add managers to team
-    usersToAdd.shift();
-    for await (const user of usersToAdd) {
-      await TeamUserRelationService.create({
-        teamId: newTeam.id!,
-        userId: user.id,
-        email: user.email,
-        role: EUserRole.Manager,
-        status: EUserStatus.Confirmed
-      });
-    }
-    // add monitors to team
-    for await (const user of legacyTeam.confirmedUsers) {
-      if (user.email && user.id)
-        await TeamUserRelationService.create({
-          teamId: newTeam.id!,
-          userId: user.id,
-          email: user.email!,
-          role: EUserRole.Monitor,
-          status: EUserStatus.Confirmed
-        });
-    }
-
-    // add area team relations
-    legacyTeam.areas.forEach(area => {
-      AreaService.createTeamAreaRelation(area, newTeam.id!);
-    });
-  }
+router.get("/transform", authMiddleware, async ctx => {
+  TransformerService.transform();
+  ctx.status = 204;
 });
 
 // GET /v3/teams/myinvites
