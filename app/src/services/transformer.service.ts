@@ -18,6 +18,7 @@ class TransformerService {
         // createAdmin
         teamLog.push(`Adding team ${legacyTeam.name}`);
         legacyTeam.managers.forEach(manager => {
+          if (!manager.email) manager.email = `${manager.id}@placeholder.com`;
           if (manager.email && manager.id) usersToAdd.push(manager);
         });
         if (!(usersToAdd[0] && usersToAdd[0].id && usersToAdd[0].email)) {
@@ -43,6 +44,7 @@ class TransformerService {
         }
         // add monitors to team
         for (const user of legacyTeam.confirmedUsers) {
+          if (!user.email) user.email = `${user.id}@placeholder.com`;
           if (user.email && user.id) {
             teamLog.push(`Adding monitor ${user.id} ${user.email}`);
             TeamUserRelationService.create({
