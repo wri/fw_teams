@@ -5,3 +5,5 @@
 /.idea
 **.terraform**
 .terraform*
+dist/
+debug/

@@ -6,7 +6,8 @@
     "url": "APP_URL"
   },
   "service": {
-    "port": "SERVICE_PORT"
+    "port": "SERVICE_PORT",
+    "token": "MICROSERVICE_TOKEN"
   },
   "mongodb": {
     "host": "MONGODB_HOST",
@@ -23,6 +24,9 @@
   },
   "usersApi": {
     "url": "USERS_API_URL"
+  },
+  "areasApi": {
+    "url": "AREAS_API_URL"
   },
   "controlTower": {
     "url": "CONTROL_TOWER_URL"

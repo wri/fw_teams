@@ -65,6 +65,10 @@ variable "USERS_API_URL" {
   type    = string
   default = "https://api.resourcewatch.org/v1"
 }
+variable "AREAS_API_URL" {
+  type    = string
+  default = "https://api.resourcewatch.org/v3/forest-watcher"
+}
 variable "CONTROL_TOWER_URL" {
   type    = string
   default = "https://api.resourcewatch.org"

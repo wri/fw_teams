@@ -29,10 +29,6 @@
       "value": "${container_port}"
     },
     {
-      "name": "NODE_PATH",
-      "value": "${NODE_PATH}"
-    },
-    {
       "name": "NODE_ENV",
       "value": "${NODE_ENV}"
     },
@@ -52,6 +48,10 @@
       "name": "USERS_API_URL",
       "value": "${USERS_API_URL}"
     },
+        {
+      "name": "AREAS_API_URL",
+      "value": "${AREAS_API_URL}"
+    },
     {
       "name": "CONTROL_TOWER_URL",
       "value": "${CONTROL_TOWER_URL}"
@@ -65,6 +65,10 @@
     {
       "name": "GFW_DATA_API_KEY",
       "valueFrom": "${gfw_data_api_key}"
+    },
+    {
+      "name": "MICROSERVICE_TOKEN",
+      "valueFrom": "${microservice_token_secret}"
     }
   ],
   "portMappings": [

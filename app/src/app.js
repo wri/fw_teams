@@ -5,7 +5,7 @@ const koaLogger = require("koa-logger");
 const config = require("config");
 const loader = require("loader");
 const mongoose = require("mongoose");
-const loggedInUserService = require("./services/LoggedInUserService");
+const loggedInUserService = require("services/LoggedInUserService");
 const Sentry = require("@sentry/node");
 
 mongoose.Promise = Promise;
@@ -50,7 +50,8 @@ const mongoURL =
   "mongodb://" +
   `${dbSecret.username}:${dbSecret.password}` +
   `@${config.get("mongodb.host")}:${config.get("mongodb.port")}` +
-  `/${config.get("mongodb.database")}`;
+  `/${config.get("mongodb.database")}` +
+  "?authSource=admin";
 
 const onDbReady = err => {
   if (err) {
@@ -106,8 +107,8 @@ app.use(async function (ctx, next) {
 
 loader.loadRoutes(app);
 
-const server = app.listen(config.get("service.port"), () => {});
-
-logger.info("Server started in ", config.get("service.port"));
+const server = app.listen(config.get("service.port"), () => {
+  logger.info("Server started in ", config.get("service.port"));
+});
 
 module.exports = server;
